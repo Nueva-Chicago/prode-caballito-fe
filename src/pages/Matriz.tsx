@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { api } from '@/api/client'
 import { Spinner } from '@/components/ui/Spinner'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
+import { teamFlag } from '@/utils/teamFlags'
 import { useAuthStore } from '@/store/authStore'
 import type { Match, RankingEntry, Tournament } from '@/types'
 
@@ -160,9 +161,15 @@ export function Matriz() {
                 <th className="px-2 py-2 text-center font-semibold w-14">Pts</th>
                 {allMatches.map((m) => (
                   <th key={m.id} className="px-1 py-2 text-center font-medium min-w-[60px]">
-                    <div className="truncate max-w-[55px]">{m.home_team.substring(0,3).toUpperCase()}</div>
+                    {teamFlag(m.home_team)
+                      ? <div className="text-base leading-none">{teamFlag(m.home_team)}</div>
+                      : <div className="truncate max-w-[55px]">{m.home_team.substring(0,3).toUpperCase()}</div>
+                    }
                     <div className="text-[10px] text-white/60">vs</div>
-                    <div className="truncate max-w-[55px]">{m.away_team.substring(0,3).toUpperCase()}</div>
+                    {teamFlag(m.away_team)
+                      ? <div className="text-base leading-none">{teamFlag(m.away_team)}</div>
+                      : <div className="truncate max-w-[55px]">{m.away_team.substring(0,3).toUpperCase()}</div>
+                    }
                     {m.estado === 'finished' && (
                       <div className="text-[#FFDF00] font-bold text-[11px]">{m.resultado_local}-{m.resultado_visitante}</div>
                     )}

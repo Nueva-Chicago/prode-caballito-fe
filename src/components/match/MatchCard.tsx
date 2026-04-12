@@ -4,6 +4,7 @@ import { es } from 'date-fns/locale'
 import { api } from '@/api/client'
 import { useToastStore } from '@/store/toastStore'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
+import { teamFlag } from '@/utils/teamFlags'
 import type { Match, Bet } from '@/types'
 
 interface Props {
@@ -89,7 +90,10 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
             <span className="text-2xl md:text-3xl font-bold text-[#001A4B]">
               {isFinished ? match.resultado_local : '—'}
             </span>
-            <span className="mt-1 text-xs md:text-sm font-medium text-center truncate w-full px-1">
+            {teamFlag(match.home_team) && (
+              <span className="text-xl mt-1">{teamFlag(match.home_team)}</span>
+            )}
+            <span className="mt-0.5 text-xs md:text-sm font-medium text-center truncate w-full px-1">
               {match.home_team}
             </span>
           </div>
@@ -112,7 +116,10 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
             <span className="text-2xl md:text-3xl font-bold text-[#001A4B]">
               {isFinished ? match.resultado_visitante : '—'}
             </span>
-            <span className="mt-1 text-xs md:text-sm font-medium text-center truncate w-full px-1">
+            {teamFlag(match.away_team) && (
+              <span className="text-xl mt-1">{teamFlag(match.away_team)}</span>
+            )}
+            <span className="mt-0.5 text-xs md:text-sm font-medium text-center truncate w-full px-1">
               {match.away_team}
             </span>
           </div>
