@@ -144,6 +144,9 @@ export function Matriz() {
   const [unlocks, setUnlocks] = useState<Map<string, 'approved' | 'pending'>>(new Map())
   const [pendingUnlock, setPendingUnlock] = useState<{ targetUserId: string; targetName: string; match: Match } | null>(null)
   const [unlocking, setUnlocking] = useState(false)
+  const [payStep, setPayStep] = useState<'info' | 'reference'>('info')
+  const [paymentRef, setPaymentRef] = useState('')
+  const [unlockConfig, setUnlockConfig] = useState<{ price: number; currency: string; payment_link: string; free: boolean }>({ price: 0, currency: 'ARS', payment_link: '', free: true })
   const tableRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -153,19 +156,20 @@ export function Matriz() {
       api.get('/bets/all-for-matrix'),
       api.get('/tournaments'),
       api.get('/bets/my-unlocks').catch(() => ({ data: { data: [] } })),
-    ]).then(([mRes, rRes, bRes, tRes, uRes]) => {
+      api.get('/bets/unlock-price').catch(() => ({ data: { data: { price: 0, currency: 'ARS', payment_link: '', free: true } } })),
+    ]).then(([mRes, rRes, bRes, tRes, uRes, priceRes]) => {
       setMatches(mRes.data.data.matches)
       setRanking(rRes.data.data.ranking)
       setBets(bRes.data.data)
       const tourList = tRes.data.data || []
       setTournaments(tourList)
-      // Seleccionar el primer torneo por defecto
       if (tourList.length > 0) setSelectedTournament(tourList[0].id)
       const unlocksMap = new Map<string, 'approved' | 'pending'>()
       ;(uRes.data.data || []).forEach((u: { target_user_id: string; match_id: string; status: string }) => {
         unlocksMap.set(`${u.target_user_id}_${u.match_id}`, u.status as 'approved' | 'pending')
       })
       setUnlocks(unlocksMap)
+      if (priceRes.data.data) setUnlockConfig(priceRes.data.data)
     }).finally(() => setLoading(false))
   }, [])
 
@@ -176,15 +180,26 @@ export function Matriz() {
       await api.post('/bets/request-unlock', {
         target_user_id: pendingUnlock.targetUserId,
         match_id: pendingUnlock.match.id,
+        payment_reference: paymentRef.trim() || undefined,
       })
       const key = `${pendingUnlock.targetUserId}_${pendingUnlock.match.id}`
       setUnlocks(prev => new Map([...prev, [key, 'pending']]))
       setPendingUnlock(null)
+      setPayStep('info')
+      setPaymentRef('')
     } catch {
       setPendingUnlock(null)
+      setPayStep('info')
+      setPaymentRef('')
     } finally {
       setUnlocking(false)
     }
+  }
+
+  const handleClosePendingUnlock = () => {
+    setPendingUnlock(null)
+    setPayStep('info')
+    setPaymentRef('')
   }
 
   useEffect(() => {
@@ -427,36 +442,120 @@ export function Matriz() {
           </table>
         </div>
       )}
-      {/* Sheet de confirmación de unlock */}
+      {/* Sheet de desbloqueo con flujo de pago */}
       {pendingUnlock && (
         <>
-          <div className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm" onClick={() => setPendingUnlock(null)} />
+          <div className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm" onClick={handleClosePendingUnlock} />
           <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl max-w-lg mx-auto p-6"
             style={{ animation: 'slideUp 0.2s ease-out both' }}>
             <div className="flex justify-center mb-4">
               <div className="w-10 h-1 rounded-full bg-gray-200" />
             </div>
-            <div className="text-center mb-5">
-              <div className="text-3xl mb-2">🔓</div>
-              <h3 className="font-bold text-[#001A4B] text-base">Solicitar ver apuesta</h3>
+
+            {/* Partido info siempre visible */}
+            <div className="text-center mb-4">
+              <div className="text-3xl mb-2">{unlockConfig.free ? '🔓' : '💳'}</div>
+              <h3 className="font-bold t-text-nav text-base">
+                {unlockConfig.free ? 'Solicitar ver apuesta' : 'Desbloquear apuesta'}
+              </h3>
               <p className="text-sm text-gray-600 mt-1 font-medium">{pendingUnlock.targetName}</p>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-gray-400 mt-0.5">
                 {pendingUnlock.match.home_team} vs {pendingUnlock.match.away_team}
               </p>
-              <p className="text-xs text-gray-400 mt-3 leading-relaxed">
-                Los administradores recibirán un email con tu solicitud. Una vez aprobada, podrás ver el pronóstico de este partido.
-              </p>
             </div>
-            <div className="flex gap-3">
-              <button onClick={() => setPendingUnlock(null)}
-                className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
-                Cancelar
-              </button>
-              <button onClick={handleRequestUnlock} disabled={unlocking}
-                className="flex-1 bg-[#001A4B] text-white text-sm font-bold py-3 rounded-xl hover:bg-[#002870] transition-colors disabled:opacity-50">
-                {unlocking ? '...' : 'Enviar solicitud'}
-              </button>
-            </div>
+
+            {/* FLUJO GRATUITO */}
+            {unlockConfig.free && (
+              <>
+                <p className="text-xs text-gray-400 text-center mb-5 leading-relaxed">
+                  Los administradores recibirán un email con tu solicitud. Una vez aprobada, podrás ver el pronóstico.
+                </p>
+                <div className="flex gap-3">
+                  <button onClick={handleClosePendingUnlock}
+                    className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
+                    Cancelar
+                  </button>
+                  <button onClick={handleRequestUnlock} disabled={unlocking}
+                    className="flex-1 t-btn-primary text-sm py-3">
+                    {unlocking ? '...' : 'Enviar solicitud'}
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* FLUJO PAGO — paso 1: info y botón de pago */}
+            {!unlockConfig.free && payStep === 'info' && (
+              <>
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 text-center">
+                  <p className="text-xs text-amber-700 font-semibold uppercase tracking-wide mb-1">Costo del desbloqueo</p>
+                  <p className="text-3xl font-black text-amber-600">${unlockConfig.price.toLocaleString('es-AR')}</p>
+                  <p className="text-xs text-amber-600 mt-0.5">{unlockConfig.currency}</p>
+                </div>
+                <p className="text-xs text-gray-500 text-center mb-4 leading-relaxed">
+                  Pagá por MercadoPago y luego ingresá el número de comprobante para enviar tu solicitud al admin.
+                </p>
+                <div className="flex gap-3">
+                  <button onClick={handleClosePendingUnlock}
+                    className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
+                    Cancelar
+                  </button>
+                  {unlockConfig.payment_link ? (
+                    <a
+                      href={unlockConfig.payment_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setTimeout(() => setPayStep('reference'), 1500)}
+                      className="flex-1 bg-[#009EE3] text-white text-sm font-bold py-3 rounded-xl text-center hover:bg-[#0086c3] transition-colors"
+                    >
+                      Pagar en MercadoPago →
+                    </a>
+                  ) : (
+                    <button onClick={() => setPayStep('reference')}
+                      className="flex-1 t-btn-primary text-sm py-3">
+                      Ya pagué
+                    </button>
+                  )}
+                </div>
+                {unlockConfig.payment_link && (
+                  <button onClick={() => setPayStep('reference')}
+                    className="w-full mt-2 text-xs text-gray-400 hover:text-gray-600 py-2">
+                    Ya pagué, ingresar comprobante →
+                  </button>
+                )}
+              </>
+            )}
+
+            {/* FLUJO PAGO — paso 2: ingresar referencia */}
+            {!unlockConfig.free && payStep === 'reference' && (
+              <>
+                <div className="mb-4">
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                    Número de comprobante / referencia de pago
+                  </label>
+                  <input
+                    type="text"
+                    value={paymentRef}
+                    onChange={(e) => setPaymentRef(e.target.value)}
+                    placeholder="Ej: 12345678 o ID de transacción"
+                    autoFocus
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#009EE3]"
+                  />
+                  <p className="text-xs text-gray-400 mt-1.5">
+                    El admin verificará el pago antes de aprobar tu solicitud.
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={() => setPayStep('info')}
+                    className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
+                    ← Volver
+                  </button>
+                  <button onClick={handleRequestUnlock} disabled={unlocking || !paymentRef.trim()}
+                    className="flex-1 t-btn-primary text-sm py-3 disabled:opacity-40">
+                    {unlocking ? '...' : 'Enviar solicitud'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </>
       )}

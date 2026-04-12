@@ -22,6 +22,8 @@ interface UnlockRequest {
   away_team: string
   start_time: string
   created_at: string
+  payment_reference?: string
+  payment_amount?: number
 }
 
 export function Admin() {
@@ -238,6 +240,15 @@ export function Admin() {
                     <p className="text-xs text-gray-400 mt-0.5">
                       {format(new Date(r.created_at), "d MMM yyyy HH:mm", { locale: es })}
                     </p>
+                    {r.payment_amount != null && (
+                      <div className={`mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${r.payment_reference ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                        {r.payment_reference ? '✅' : '⚠️'}
+                        {r.payment_reference
+                          ? `Comprobante: ${r.payment_reference}`
+                          : `Pago requerido $${r.payment_amount} — sin comprobante`
+                        }
+                      </div>
+                    )}
                   </div>
                   {r.status === 'pending' && (
                     <div className="flex gap-2 shrink-0">
