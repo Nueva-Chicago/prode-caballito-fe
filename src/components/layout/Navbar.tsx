@@ -4,11 +4,12 @@ import { useAuthStore } from '@/store/authStore'
 import { api } from '@/api/client'
 
 const navLinks = [
-  { to: '/',          label: 'Inicio',        icon: '🏠' },
-  { to: '/apuestas',  label: 'Pronósticos',   icon: '⚽' },
-  { to: '/matriz',    label: 'Matriz',         icon: '📊' },
-  { to: '/ranking',   label: 'Ranking',        icon: '🏆' },
-  { to: '/messages',  label: 'Mensajes',       icon: '💬' },
+  { to: '/',            label: 'Inicio',      icon: '🏠' },
+  { to: '/apuestas',    label: 'Pronósticos', icon: '⚽' },
+  { to: '/matriz',      label: 'Matriz',      icon: '📊' },
+  { to: '/ranking',     label: 'Ranking',     icon: '🏆' },
+  { to: '/tournaments', label: 'Torneos',     icon: '🎯' },
+  { to: '/messages',    label: 'Mensajes',    icon: '💬' },
 ]
 
 export function Navbar() {

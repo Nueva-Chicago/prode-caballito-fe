@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
@@ -163,7 +164,7 @@ export function Profile() {
             {planillas.length === 0 && <p className="text-sm text-gray-400 text-center py-4">No tenés planillas todavía</p>}
             {planillas.map((p) => (
               <div key={p.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                <div>
+                <Link to={`/planilla/${p.id}`} className="flex-1 min-w-0 hover:opacity-80">
                   <p className="text-sm font-semibold text-[#001A4B]">{p.nombre_planilla}</p>
                   <div className="flex gap-2 mt-0.5">
                     <span className="text-xs text-gray-400">{p.puntos_totales || 0} pts</span>
@@ -171,8 +172,8 @@ export function Profile() {
                       {p.precio_pagado ? 'Pagada' : 'Sin pagar'}
                     </span>
                   </div>
-                </div>
-                <button onClick={() => handleDeletePlanilla(p.id)} className="text-gray-300 hover:text-red-400 transition-colors text-lg">×</button>
+                </Link>
+                <button onClick={() => handleDeletePlanilla(p.id)} className="text-gray-300 hover:text-red-400 transition-colors text-lg ml-2">×</button>
               </div>
             ))}
           </div>

@@ -12,6 +12,8 @@ import { Profile } from '@/pages/Profile'
 import { Messages } from '@/pages/Messages'
 import { Admin } from '@/pages/Admin'
 import { Reglamento } from '@/pages/Reglamento'
+import { Planilla } from '@/pages/Planilla'
+import { Tournaments } from '@/pages/Tournaments'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -67,6 +69,12 @@ export default function App() {
         } />
         <Route path="/reglamento" element={
           <RequireAuth><AppLayout><Reglamento /></AppLayout></RequireAuth>
+        } />
+        <Route path="/planilla/:planillaId" element={
+          <RequireAuth><AppLayout><Planilla /></AppLayout></RequireAuth>
+        } />
+        <Route path="/tournaments" element={
+          <RequireAuth><AppLayout><Tournaments /></AppLayout></RequireAuth>
         } />
 
         {/* Admin */}
