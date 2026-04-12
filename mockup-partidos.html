@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prode Caballito – Mockup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0e1a;
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+    min-height: 100vh;
+    padding: 24px 16px 40px;
+  }
+
+  /* ── HEADER ── */
+  .page-title {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #6b7fa3;
+    margin-bottom: 24px;
+  }
+
+  /* ── APOSTAR CARD ── */
+  .bet-card {
+    background: linear-gradient(135deg, #1a2540 0%, #131c33 100%);
+    border: 1px solid #2a3654;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .bet-teams {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+  }
+
+  .bet-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .bet-flag {
+    width: 48px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .bet-team-name {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #8fa3c8;
+    text-transform: uppercase;
+  }
+
+  .bet-vs {
+    font-size: 11px;
+    font-weight: 700;
+    color: #3d5080;
+    letter-spacing: 2px;
+  }
+
+  .score-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #0d1220;
+    border: 1.5px solid #2a3654;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 20px;
+    font-weight: 900;
+    color: #fff;
+    width: 80px;
+    text-align: center;
+    letter-spacing: 3px;
+  }
+
+  .btn-apostar {
+    background: linear-gradient(135deg, #f5c518 0%, #e6a800 100%);
+    color: #0a0e1a;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 24px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(245,197,24,0.35);
+    white-space: nowrap;
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #4a5f85;
+    margin-bottom: 16px;
+    padding-left: 4px;
+  }
+
+  /* ── MATCH CARD ── */
+  .match-card {
+    border-radius: 20px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    border: 1px solid #1e2d4a;
+    position: relative;
+  }
+
+  .match-header {
+    padding: 8px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #8fa3c8;
+    background: #111827;
+    border-bottom: 1px solid #1e2d4a;
+  }
+
+  .match-body {
+    background: linear-gradient(160deg, #131c33 0%, #0e1626 100%);
+    padding: 24px 20px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+
+  .team-flag {
+    width: 72px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+
+  .team-name {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #8fa3c8;
+    text-transform: uppercase;
+  }
+
+  .score-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .score {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+
+  .score.winner { color: #fff; }
+  .score.loser  { color: #3d5080; }
+
+  .score-sep {
+    font-size: 28px;
+    font-weight: 900;
+    color: #2a3654;
+    margin: 0 4px;
+    align-self: center;
+  }
+
+  .vs-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #3d5080;
+    letter-spacing: 2px;
+  }
+
+  /* ── RESULTADO PERSONAL ── */
+  .result-bar {
+    margin: 0 20px 20px;
+    border-radius: 10px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .result-bar.ganaste {
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+  }
+
+  .result-bar.fallaste {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #f87171;
+  }
+
+  .result-bar.sin-pronostico {
+    background: rgba(99, 116, 158, 0.08);
+    border: 1px solid rgba(99, 116, 158, 0.15);
+    color: #4a5f85;
+  }
+
+  .result-label { display: flex; align-items: center; gap: 8px; }
+  .result-prediction { font-weight: 600; opacity: 0.8; font-size: 12px; }
+
+  /* ── WINNER GLOW ── */
+  .team.is-winner .team-flag {
+    box-shadow: 0 4px 24px rgba(245,197,24,0.4);
+  }
+  .team.is-winner .team-name { color: #f5c518; }
+  .team.is-loser .team-flag  { opacity: 0.5; }
+  .team.is-loser .team-name  { color: #2e3f62; }
+
+  /* ── PUNTOS BADGE ── */
+  .points-badge {
+    background: linear-gradient(135deg, #f5c518, #e6a800);
+    color: #0a0e1a;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .no-points {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<p class="page-title">Últimos Resultados</p>
+
+<!-- ── CARD 1: GANASTE ── -->
+<div class="match-card">
+  <div class="match-header">Clasificación Qatar 2026 · classification</div>
+  <div class="match-body">
+
+    <div class="team is-loser">
+      <img class="team-flag" src="https://flagcdn.com/w160/rs.png" alt="Serbia">
+      <span class="team-name">Serbia</span>
+    </div>
+
+    <div class="score-block">
+      <div class="score-row">
+        <span class="score loser">2</span>
+        <span class="score-sep">–</span>
+        <span class="score winner">3</span>
+      </div>
+      <span class="vs-label">FT</span>
+    </div>
+
+    <div class="team is-winner">
+      <img class="team-flag" src="https://flagcdn.com/w160/ch.png" alt="Suiza">
+      <span class="team-name">Suiza</span>
+    </div>
+
+  </div>
+  <div class="result-bar ganaste">
+    <div class="result-label">
+      <span>🏆 ¡Acertaste!</span>
+      <span class="result-prediction">Tu pronóstico: 2-3</span>
+    </div>
+    <span class="points-badge">+3 pts</span>
+  </div>
+</div>
+
+<!-- ── CARD 2: FALLASTE ── -->
+<div class="match-card">
+  <div class="match-header">Clasificación Qatar 2026 · classification</div>
+  <div class="match-body">
+
+    <div class="team is-loser">
+      <img class="team-flag" src="https://flagcdn.com/w160/qa.png" alt="Qatar">
+      <span class="team-name">Qatar</span>
+    </div>
+
+    <div class="score-block">
+      <div class="score-row">
+        <span class="score loser">0</span>
+        <span class="score-sep">–</span>
+        <span class="score winner">2</span>
+      </div>
+      <span class="vs-label">FT</span>
+    </div>
+
+    <div class="team is-winner">
+      <img class="team-flag" src="https://flagcdn.com/w160/ec.png" alt="Ecuador">
+      <span class="team-name">Ecuador</span>
+    </div>
+
+  </div>
+  <div class="result-bar fallaste">
+    <div class="result-label">
+      <span>💀 Fallaste</span>
+      <span class="result-prediction">Tu pronóstico: 1-1</span>
+    </div>
+    <span class="no-points">0 pts</span>
+  </div>
+</div>
+
+<!-- ── CARD 3: SIN PRONÓSTICO ── -->
+<div class="match-card">
+  <div class="match-header">Clasificación Qatar 2026 · classification</div>
+  <div class="match-body">
+
+    <div class="team is-loser">
+      <img class="team-flag" src="https://flagcdn.com/w160/ir.png" alt="Iran">
+      <span class="team-name">Iran</span>
+    </div>
+
+    <div class="score-block">
+      <div class="score-row">
+        <span class="score winner">6</span>
+        <span class="score-sep">–</span>
+        <span class="score loser">2</span>
+      </div>
+      <span class="vs-label">FT</span>
+    </div>
+
+    <div class="team is-winner">
+      <img class="team-flag" src="https://flagcdn.com/w160/gb-eng.png" alt="Inglaterra">
+      <span class="team-name">Inglaterra</span>
+    </div>
+
+  </div>
+  <div class="result-bar sin-pronostico">
+    <div class="result-label">
+      <span>— Sin pronóstico</span>
+    </div>
+    <span class="no-points">0 pts</span>
+  </div>
+</div>
+
+</body>
+</html>
