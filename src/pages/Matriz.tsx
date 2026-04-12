@@ -218,10 +218,30 @@ export function Matriz() {
   const pendingMatches  = filteredMatches.filter(m => m.estado !== 'finished')
   const allMatches = [...finishedMatches, ...pendingMatches]
 
-  // Mostrar jugadores del ranking que tengan apuestas en los partidos del torneo
-  const rows: RankingEntry[] = selectedTournament
+  // Jugadores con apuestas en el torneo
+  const baseRows: RankingEntry[] = selectedTournament
     ? ranking.filter(r => allMatches.some(m => bets[r.planilla_id]?.[m.id]))
     : ranking
+
+  // Calcular puntos del torneo (solo partidos terminados del torneo)
+  const tournamentPts = new Map<string, number>()
+  baseRows.forEach(r => {
+    const playerBets = bets[r.planilla_id] || {}
+    const pts = finishedMatches.reduce((total, m) => {
+      const b = playerBets[m.id]
+      if (!b || m.resultado_local === undefined || m.resultado_visitante === undefined) return total
+      return total + calcularPuntaje(
+        { goles_local: b.home, goles_visitante: b.away },
+        { resultado_local: m.resultado_local!, resultado_visitante: m.resultado_visitante! }
+      ).puntos
+    }, 0)
+    tournamentPts.set(r.planilla_id, pts)
+  })
+
+  // Ordenar por puntos del torneo
+  const rows = [...baseRows].sort(
+    (a, b) => (tournamentPts.get(b.planilla_id) ?? 0) - (tournamentPts.get(a.planilla_id) ?? 0)
+  )
 
   const getBetsForRow = (r: RankingEntry) => bets[r.planilla_id] || {}
 
@@ -310,15 +330,17 @@ export function Matriz() {
             <tbody>
               {rows.map((r, ri) => {
                 const isMe = r.user_id === user?.id
-                const playerBets = isTournamentMode ? getBetsForRow(r) : (bets[r.planilla_id] || {})
+                const playerBets = getBetsForRow(r)
                 const rowBg = isMe ? 'bg-blue-50' : ri % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                 const rowKey = `${r.planilla_id}-${ri}`
+                const pts = tournamentPts.get(r.planilla_id) ?? 0
+                const pos = ri + 1
                 return (
                   <tr key={rowKey} className={`${rowBg} hover:bg-yellow-50/50 transition-colors`}>
                     <td className={`sticky left-0 px-2 py-1.5 font-medium z-10 border-r border-gray-100 ${rowBg}`}>
                       <div className="flex items-center gap-2">
                         <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isMe ? 'bg-[#0042A5] text-white' : 'bg-gray-200 text-gray-600'}`}>
-                          {r.position}
+                          {pos}
                         </span>
                         {r.user_avatar
                           ? <img src={r.user_avatar} alt="" className="w-6 h-6 rounded-full object-cover shrink-0 border border-gray-100" />
@@ -336,7 +358,7 @@ export function Matriz() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-2 py-1.5 text-center font-black text-[#0042A5]">{r.puntos_totales}</td>
+                    <td className="px-2 py-1.5 text-center font-black text-[#0042A5]">{pts}</td>
                     {allMatches.map((m) => {
                       const b = playerBets[m.id]
                       const isCutoffPassed = new Date() > new Date(m.time_cutoff)
