@@ -140,7 +140,7 @@ export const TEAM_THEMES: Record<string, { primary: string; secondary: string; n
   river:        { primary: '#CC0000', secondary: '#FFFFFF', name: 'River Plate' },
   independiente:{ primary: '#CC0000', secondary: '#FFFFFF', name: 'Independiente' },
   racing:       { primary: '#75AADB', secondary: '#FFFFFF', name: 'Racing Club' },
-  san_lorenzo:  { primary: '#001A4B', secondary: '#CC0000', name: 'San Lorenzo' },
+  sanlorenzo:   { primary: '#001A4B', secondary: '#CC0000', name: 'San Lorenzo' },
   estudiantes:  { primary: '#CC0000', secondary: '#FFFFFF', name: 'Estudiantes' },
   huracan:      { primary: '#FFFFFF', secondary: '#CC0000', name: 'Huracán' },
 }
