@@ -10,9 +10,9 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: #0a0e1a;
+    background: #f0f2f7;
     font-family: 'Inter', sans-serif;
-    color: #fff;
+    color: #111827;
     min-height: 100vh;
     padding: 24px 16px 40px;
   }
@@ -21,7 +21,7 @@
   .page-title {
     text-align: center;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: #6b7fa3;
@@ -125,7 +125,8 @@
     border-radius: 20px;
     margin-bottom: 16px;
     overflow: hidden;
-    border: 1px solid #1e2d4a;
+    border: 1px solid #d1d9eb;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
     position: relative;
   }
 
@@ -135,13 +136,13 @@
     font-weight: 600;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: #8fa3c8;
-    background: #111827;
-    border-bottom: 1px solid #1e2d4a;
+    color: #6b7fa3;
+    background: #e4e8f2;
+    border-bottom: 1px solid #d1d9eb;
   }
 
   .match-body {
-    background: linear-gradient(160deg, #131c33 0%, #0e1626 100%);
+    background: #fff;
     padding: 24px 20px 20px;
     display: flex;
     align-items: center;
@@ -168,7 +169,7 @@
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 1.5px;
-    color: #8fa3c8;
+    color: #374151;
     text-transform: uppercase;
   }
 
@@ -193,13 +194,13 @@
     letter-spacing: -2px;
   }
 
-  .score.winner { color: #fff; }
-  .score.loser  { color: #3d5080; }
+  .score.winner { color: #111827; }
+  .score.loser  { color: #9ca3af; }
 
   .score-sep {
     font-size: 28px;
     font-weight: 900;
-    color: #2a3654;
+    color: #d1d5db;
     margin: 0 4px;
     align-self: center;
   }
@@ -207,7 +208,7 @@
   .vs-label {
     font-size: 10px;
     font-weight: 700;
-    color: #3d5080;
+    color: #9ca3af;
     letter-spacing: 2px;
   }
 
@@ -246,11 +247,12 @@
 
   /* ── WINNER GLOW ── */
   .team.is-winner .team-flag {
-    box-shadow: 0 4px 24px rgba(245,197,24,0.4);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+    outline: 3px solid #f5c518;
+    outline-offset: 2px;
   }
-  .team.is-winner .team-name { color: #f5c518; }
-  .team.is-loser .team-flag  { opacity: 0.5; }
-  .team.is-loser .team-name  { color: #2e3f62; }
+  .team.is-winner .team-name { color: #111827; font-weight: 800; }
+  .team.is-loser .team-name  { color: #9ca3af; font-weight: 600; }
 
   /* ── PUNTOS BADGE ── */
   .points-badge {
