@@ -113,6 +113,8 @@ export function Ranking() {
 
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
+  const now = new Date()
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
       <h1 className="text-xl font-bold text-[#001A4B]">🏆 Ranking</h1>
@@ -129,19 +131,30 @@ export function Ranking() {
         >
           Global
         </button>
-        {tournaments.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setSelectedTournamentId(t.id)}
-            className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
-              selectedTournamentId === t.id
-                ? 'bg-[#001A4B] text-white border-[#001A4B]'
-                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
-            }`}
-          >
-            {t.name}
-          </button>
-        ))}
+        {tournaments.map(t => {
+          const notStarted = t.start_date ? new Date(t.start_date) > now : false
+          return notStarted ? (
+            <span
+              key={t.id}
+              title="El torneo aún no comenzó"
+              className="px-4 py-2 rounded-full text-sm font-semibold border border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed select-none"
+            >
+              {t.name}
+            </span>
+          ) : (
+            <button
+              key={t.id}
+              onClick={() => setSelectedTournamentId(t.id)}
+              className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
+                selectedTournamentId === t.id
+                  ? 'bg-[#001A4B] text-white border-[#001A4B]'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+              }`}
+            >
+              {t.name}
+            </button>
+          )
+        })}
       </div>
 
       {isLoadingDisplay ? (
