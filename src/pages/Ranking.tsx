@@ -117,7 +117,7 @@ export function Ranking() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
-      <h1 className="text-xl font-bold text-[#001A4B]">🏆 Ranking</h1>
+      <h1 className="text-xl font-bold t-text-nav">🏆 Ranking</h1>
 
       {/* Selector de torneo */}
       <div className="flex gap-2 flex-wrap">
@@ -132,7 +132,13 @@ export function Ranking() {
           Global
         </button>
         {tournaments.map(t => {
-          const notStarted = t.start_date ? new Date(t.start_date) > now : false
+          // Torneo sin arrancar: no tiene partidos terminados Y su fecha de inicio es futura
+          const futureStart = t.start_date ? new Date(t.start_date) > now : false
+          const hasFinished = (t.finished_count ?? 0) > 0
+          const firstMatch = t.first_match_time ? new Date(t.first_match_time) : null
+          const matchesStarted = firstMatch ? firstMatch <= now : false
+          const notStarted = !hasFinished && futureStart && !matchesStarted
+
           return notStarted ? (
             <span
               key={t.id}
@@ -147,7 +153,7 @@ export function Ranking() {
               onClick={() => setSelectedTournamentId(t.id)}
               className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
                 selectedTournamentId === t.id
-                  ? 'bg-[#001A4B] text-white border-[#001A4B]'
+                  ? 't-pill-active'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
               }`}
             >
@@ -165,7 +171,7 @@ export function Ranking() {
           {myEntry && (
             <div
               onClick={() => setSelected(myEntry)}
-              className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] rounded-xl p-4 text-white flex items-center gap-4 cursor-pointer hover:opacity-90 transition-opacity"
+              className="t-gradient-hero rounded-xl p-4 text-white flex items-center gap-4 cursor-pointer hover:opacity-90 transition-opacity"
             >
               <div className="text-3xl font-black">#{myEntry.position}</div>
               {myEntry.user_avatar
@@ -181,7 +187,7 @@ export function Ranking() {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-black text-[#FFDF00]">{myEntry.puntos_totales}</p>
+                <p className="text-2xl font-black t-text-secondary">{myEntry.puntos_totales}</p>
                 <p className="text-white/60 text-xs">puntos</p>
               </div>
             </div>
@@ -199,7 +205,7 @@ export function Ranking() {
           {displayRanking.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
               {selectedTournament && (
-                <div className="bg-[#001A4B] px-4 py-2">
+                <div className="t-bg-nav px-4 py-2">
                   <p className="text-xs font-semibold text-white/80">{selectedTournament.name} · {selectedTournament.fase}</p>
                 </div>
               )}
@@ -215,7 +221,7 @@ export function Ranking() {
                   <div
                     key={r.planilla_id}
                     onClick={() => setSelected(r)}
-                    className={`grid grid-cols-[2rem_1fr_auto_auto] gap-2 items-center px-4 py-3 cursor-pointer transition-colors ${i < displayRanking.length - 1 ? 'border-b border-gray-50' : ''} ${isMe ? 'bg-blue-50 hover:bg-blue-100/70' : 'hover:bg-gray-50'}`}
+                    className={`grid grid-cols-[2rem_1fr_auto_auto] gap-2 items-center px-4 py-3 cursor-pointer transition-colors ${i < displayRanking.length - 1 ? 'border-b border-gray-50' : ''} ${isMe ? 't-row-me' : 'hover:bg-gray-50'}`}
                   >
                     <span className="text-sm font-bold text-gray-400">
                       {i < 3 ? MEDAL[i] : r.position}
@@ -223,12 +229,12 @@ export function Ranking() {
                     <div className="min-w-0 flex items-center gap-2.5">
                       {r.user_avatar
                         ? <img src={r.user_avatar} alt="" className="w-8 h-8 rounded-full object-cover shrink-0 border border-gray-100" />
-                        : <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${isMe ? 'bg-[#0042A5] text-white' : 'bg-gray-200 text-gray-600'}`}>
+                        : <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${isMe ? 't-bg-primary text-white' : 'bg-gray-200 text-gray-600'}`}>
                             {r.user_name[0].toUpperCase()}
                           </div>
                       }
                       <div className="min-w-0">
-                        <p className={`text-sm font-semibold truncate ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
+                        <p className={`text-sm font-semibold truncate ${isMe ? 't-text-primary' : 't-text-nav'}`}>
                           {r.user_name} {isMe && <span className="text-xs font-normal">(vos)</span>}
                         </p>
                         <p className="text-xs text-gray-400 truncate">{r.nombre_planilla}
@@ -237,7 +243,7 @@ export function Ranking() {
                       </div>
                     </div>
                     <span className="text-xs text-center text-gray-600">{r.exactos_count}</span>
-                    <span className="font-black text-[#0042A5] text-right">{r.puntos_totales}</span>
+                    <span className="font-black t-text-primary text-right">{r.puntos_totales}</span>
                   </div>
                 )
               })}

@@ -86,6 +86,8 @@ export interface Tournament {
   end_date?: string
   status?: string
   is_active: boolean
+  finished_count?: number   // partidos terminados (del endpoint público)
+  first_match_time?: string
 }
 
 export interface Notification {

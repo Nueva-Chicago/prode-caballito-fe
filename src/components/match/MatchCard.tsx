@@ -187,7 +187,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="bg-[#FFDF00] text-[#001A4B] text-xs font-bold px-4 py-2 rounded-lg hover:bg-yellow-400 disabled:opacity-50 transition-colors"
+                  className="t-btn-cta text-xs px-4 py-2 disabled:opacity-50"
                 >
                   {saving ? '...' : '🎯 Apostar'}
                 </button>
@@ -208,7 +208,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
             ) : (
               <button
                 onClick={() => setEditing(true)}
-                className="bg-[#FFDF00] text-[#001A4B] text-xs font-bold px-4 py-2 rounded-lg hover:bg-yellow-400 transition-colors"
+                className="t-btn-cta text-xs px-4 py-2"
               >
                 🎯 Apostar
               </button>

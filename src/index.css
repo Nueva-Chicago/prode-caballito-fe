@@ -77,6 +77,65 @@
   --theme-on-primary:  #ffffff;
 }
 
+/* ── THEME UTILITIES ────────────────────────────────────────────── */
+
+/* Fondo primario del tema (azul, rojo, etc.) */
+.t-bg-primary   { background-color: var(--theme-primary) !important; }
+.t-bg-nav       { background-color: var(--theme-nav-bg) !important; }
+.t-bg-secondary { background-color: var(--theme-secondary) !important; }
+
+/* Texto */
+.t-text-primary   { color: var(--theme-primary) !important; }
+.t-text-nav       { color: var(--theme-nav-bg) !important; }
+.t-text-secondary { color: var(--theme-secondary) !important; }
+.t-text-accent    { color: var(--theme-accent-text) !important; }
+.t-text-on-primary{ color: var(--theme-on-primary) !important; }
+
+/* Borde */
+.t-border-primary { border-color: var(--theme-primary) !important; }
+
+/* Gradiente hero (mi posición card, etc.) */
+.t-gradient-hero {
+  background: linear-gradient(135deg, var(--theme-nav-bg), var(--theme-primary)) !important;
+}
+
+/* Botón CTA primario (amarillo/secondary) */
+.t-btn-cta {
+  background-color: var(--theme-secondary);
+  color: var(--theme-accent-text);
+  font-weight: 700;
+  border-radius: 0.75rem;
+  transition: filter 0.15s;
+}
+.t-btn-cta:hover { filter: brightness(0.9); }
+
+/* Botón primario lleno */
+.t-btn-primary {
+  background-color: var(--theme-primary);
+  color: var(--theme-on-primary);
+  font-weight: 700;
+  border-radius: 0.75rem;
+  transition: filter 0.15s;
+}
+.t-btn-primary:hover { filter: brightness(0.9); }
+
+/* Pill activa */
+.t-pill-active {
+  background-color: var(--theme-nav-bg);
+  color: var(--theme-on-primary);
+  border-color: var(--theme-nav-bg);
+}
+
+/* Focus ring */
+.t-focus-ring:focus { outline: none; box-shadow: 0 0 0 2px var(--theme-primary); }
+
+/* Highlight row (yo en ranking) */
+.t-row-me { background-color: color-mix(in srgb, var(--theme-primary) 8%, transparent); }
+.t-row-me:hover { background-color: color-mix(in srgb, var(--theme-primary) 15%, transparent); }
+
+/* Score / puntos destacados */
+.t-score { color: var(--theme-primary); }
+
 /* ── BASE ───────────────────────────────────────────────────────── */
 
 body {
