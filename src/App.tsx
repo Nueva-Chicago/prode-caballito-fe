@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { applyTheme } from '@/utils/theme'
 import { Navbar } from '@/components/layout/Navbar'
 import { ToastContainer } from '@/components/ui/Toast'
 import { Login } from '@/pages/Login'
@@ -37,6 +39,12 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const { user } = useAuthStore()
+
+  useEffect(() => {
+    applyTheme(user?.tema_equipo ?? 'neutral')
+  }, [user?.tema_equipo])
+
   return (
     <BrowserRouter>
       <ToastContainer />
