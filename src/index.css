@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: #f9fafb;
+  color: #1f2937;
+}
+
+a { text-decoration: none; color: inherit; }
