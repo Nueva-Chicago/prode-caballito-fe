@@ -30,6 +30,15 @@ export function Apuestas() {
     if (selectedPlanilla) loadBets(selectedPlanilla)
   }, [selectedPlanilla])
 
+  // Cuando cambia el torneo, selecciona la primera planilla válida para ese torneo
+  useEffect(() => {
+    if (selectedTournament === 'all') return
+    const validPlanillas = planillas.filter(p => p.tournament_ids?.includes(selectedTournament))
+    if (validPlanillas.length > 0 && !validPlanillas.find(p => p.id === selectedPlanilla)) {
+      setSelectedPlanilla(validPlanillas[0].id)
+    }
+  }, [selectedTournament, planillas])
+
   const loadInitial = async () => {
     setLoading(true)
     try {
@@ -67,7 +76,13 @@ export function Apuestas() {
     if (!newPlanillaName.trim()) return
     setCreatingPlanilla(true)
     try {
-      const { data } = await api.post('/planillas', { nombre_planilla: newPlanillaName.trim() })
+      const tournamentCtx = noBeetsInTournament && selectedTournament !== 'all'
+        ? selectedTournament
+        : undefined
+      const { data } = await api.post('/planillas', {
+        nombre_planilla: newPlanillaName.trim(),
+        ...(tournamentCtx ? { tournament_id: tournamentCtx } : {}),
+      })
       const created: Planilla = data.data
       setPlanillas(prev => [...prev, created])
       setSelectedPlanilla(created.id)
@@ -104,9 +119,14 @@ export function Apuestas() {
   }
 
   const selectedTournamentName = tournaments.find(tour => tour.id === selectedTournament)?.name
-  // Disabled si el torneo seleccionado no tiene ninguna apuesta propia (ni partidos ni pronósticos)
-  const noBeetsInTournament = selectedTournament !== 'all'
-    && (tournamentMatches.length === 0 || !tournamentMatches.some(m => bets[m.id]))
+
+  // Planillas que participan en el torneo seleccionado (via relación N:N)
+  const planillasForTournament = selectedTournament === 'all'
+    ? planillas
+    : planillas.filter(p => p.tournament_ids?.includes(selectedTournament))
+
+  // Disabled cuando el torneo seleccionado no tiene planillas asociadas
+  const noBeetsInTournament = selectedTournament !== 'all' && planillasForTournament.length === 0
 
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
@@ -132,7 +152,7 @@ export function Apuestas() {
                   : 'border-gray-200 t-text-nav'
               }`}
             >
-              {planillas.map((p) => (
+              {planillasForTournament.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre_planilla}</option>
               ))}
             </select>

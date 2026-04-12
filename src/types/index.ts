@@ -60,6 +60,7 @@ export interface Planilla {
   exactos_count?: number
   total_bets?: number
   created_at?: string
+  tournament_ids?: string[]
 }
 
 export interface RankingEntry {
