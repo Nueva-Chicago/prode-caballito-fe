@@ -266,6 +266,25 @@ export function Matriz() {
           0%   { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
+        @keyframes neon-pulse {
+          0%, 100% { box-shadow: 0 0 4px #84cc16, 0 0 8px #84cc16; }
+          50%       { box-shadow: 0 0 8px #bef264, 0 0 16px #a3e635; }
+        }
+        .badge-unlocked {
+          display: inline-flex;
+          align-items: center;
+          gap: 2px;
+          padding: 2px 6px;
+          border-radius: 5px;
+          font-size: 11px;
+          font-weight: 900;
+          background: linear-gradient(135deg, #bef264 0%, #84cc16 100%);
+          color: #1a2e05;
+          animation: neon-pulse 2s ease-in-out infinite;
+          white-space: nowrap;
+          cursor: default;
+          letter-spacing: 0.02em;
+        }
         .badge-paid {
           background: linear-gradient(90deg, #92400e 0%, #d97706 30%, #fde68a 50%, #d97706 70%, #92400e 100%);
           background-size: 200% 100%;
@@ -421,11 +440,11 @@ export function Matriz() {
                       const unlockStatus = unlocks.get(`${r.user_id}_${m.id}`)
                       if (isMe || isCutoffPassed || unlockStatus === 'approved') {
                         if (!b) return <td key={m.id} className="px-1 py-1.5 text-center text-gray-300">—</td>
-                        // Apuesta desbloqueada (aprobada por admin) — resaltada en teal
+                        // Apuesta desbloqueada (aprobada) — badge fluor neon
                         if (!isMe && !isCutoffPassed && unlockStatus === 'approved') {
                           return (
                             <td key={m.id} className="px-1 py-1.5 text-center">
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded font-bold text-[11px] bg-teal-50 text-teal-700 border border-teal-200 ring-1 ring-teal-300">
+                              <span className="badge-unlocked" title="Desbloqueada ✓">
                                 🔓 {b.home}-{b.away}
                               </span>
                             </td>
