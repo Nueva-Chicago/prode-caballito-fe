@@ -351,8 +351,11 @@ export function Matriz() {
                     <td className="px-2 py-1.5 text-center font-black text-[#0042A5]">{r.puntos_totales}</td>
                     {allMatches.map((m) => {
                       const b = playerBets[m.id]
-                      if (!b) return <td key={m.id} className="px-1 py-1.5 text-center text-gray-300">—</td>
+                      const isCutoffPassed = new Date() > new Date(m.time_cutoff)
+
+                      // Partido terminado: mostrar resultado coloreado
                       if (m.estado === 'finished' && m.resultado_local !== undefined) {
+                        if (!b) return <td key={m.id} className="px-1 py-1.5 text-center text-gray-300">—</td>
                         const res = calcularPuntaje(
                           { goles_local: b.home, goles_visitante: b.away },
                           { resultado_local: m.resultado_local, resultado_visitante: m.resultado_visitante! }
@@ -372,9 +375,24 @@ export function Matriz() {
                           </td>
                         )
                       }
+
+                      // Partido pendiente — propia fila o ya pasó el cutoff: mostrar apuesta
+                      if (isMe || isCutoffPassed) {
+                        if (!b) return <td key={m.id} className="px-1 py-1.5 text-center text-gray-300">—</td>
+                        return (
+                          <td key={m.id} className="px-1 py-1.5 text-center text-gray-500 font-medium">
+                            {b.home}-{b.away}
+                          </td>
+                        )
+                      }
+
+                      // Partido pendiente — otro jugador, antes del cutoff: ocultar
                       return (
-                        <td key={m.id} className="px-1 py-1.5 text-center text-gray-500 font-medium">
-                          {b.home}-{b.away}
+                        <td key={m.id} className="px-1 py-1.5 text-center">
+                          {b
+                            ? <span className="inline-block px-1.5 py-0.5 rounded text-[13px] bg-gray-100 select-none" title="Visible al cierre del partido">🔒</span>
+                            : <span className="text-gray-200">—</span>
+                          }
                         </td>
                       )
                     })}
