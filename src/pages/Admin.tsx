@@ -7,7 +7,19 @@ import { Spinner } from '@/components/ui/Spinner'
 import { useToastStore } from '@/store/toastStore'
 import type { Match, Tournament } from '@/types'
 
-type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos'
+type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'desbloqueos'
+
+interface UnlockRequest {
+  id: string
+  status: 'pending' | 'approved' | 'rejected'
+  requester_name: string
+  requester_email: string
+  target_name: string
+  home_team: string
+  away_team: string
+  start_time: string
+  created_at: string
+}
 
 export function Admin() {
   const { show } = useToastStore()
@@ -23,8 +35,11 @@ export function Admin() {
     home_team: '', away_team: '', start_time: '', tournament_id: '', halftime_minutes: '15',
   })
   const [resultForm, setResultForm] = useState({ resultado_local: '', resultado_visitante: '' })
+  const [unlockRequests, setUnlockRequests] = useState<UnlockRequest[]>([])
+  const [loadingUnlocks, setLoadingUnlocks] = useState(false)
 
   useEffect(() => { loadData() }, [])
+  useEffect(() => { if (tab === 'desbloqueos') loadUnlockRequests() }, [tab])
 
   const loadData = async () => {
     setLoading(true)
@@ -116,11 +131,44 @@ export function Admin() {
     setShowMatchModal(true)
   }
 
+  const loadUnlockRequests = async () => {
+    setLoadingUnlocks(true)
+    try {
+      const res = await api.get('/bets/unlock-requests')
+      setUnlockRequests(res.data.data || [])
+    } catch {
+      show('Error al cargar solicitudes', 'error')
+    } finally {
+      setLoadingUnlocks(false)
+    }
+  }
+
+  const handleApproveUnlock = async (id: string) => {
+    try {
+      await api.put(`/bets/unlock-requests/${id}/approve`)
+      show('Solicitud aprobada ✓', 'success')
+      setUnlockRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved' } : r))
+    } catch {
+      show('Error al aprobar', 'error')
+    }
+  }
+
+  const handleRejectUnlock = async (id: string) => {
+    try {
+      await api.put(`/bets/unlock-requests/${id}/reject`)
+      show('Solicitud rechazada', 'info')
+      setUnlockRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'rejected' } : r))
+    } catch {
+      show('Error al rechazar', 'error')
+    }
+  }
+
   const tabs: { id: Tab; label: string }[] = [
     { id: 'partidos', label: '⚽ Partidos' },
     { id: 'planillas', label: '📋 Planillas' },
     { id: 'usuarios', label: '👥 Usuarios' },
     { id: 'torneos', label: '🏆 Torneos' },
+    { id: 'desbloqueos', label: '🔓 Desbloqueos' },
   ]
 
   return (
@@ -155,6 +203,65 @@ export function Admin() {
 
       {/* Tab: Planillas y Usuarios */}
       {(tab === 'planillas' || tab === 'usuarios') && <AdminSubTab tab={tab} />}
+
+      {/* Tab: Desbloqueos */}
+      {tab === 'desbloqueos' && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              {unlockRequests.filter(r => r.status === 'pending').length} solicitudes pendientes
+            </p>
+            <button onClick={loadUnlockRequests} className="text-xs text-[#0042A5] font-medium hover:underline">
+              Actualizar
+            </button>
+          </div>
+          {loadingUnlocks ? (
+            <div className="flex justify-center py-10"><Spinner /></div>
+          ) : unlockRequests.length === 0 ? (
+            <div className="text-center py-10 text-gray-400 text-sm">No hay solicitudes</div>
+          ) : (
+            <div className="space-y-2">
+              {unlockRequests.map((r) => (
+                <div key={r.id} className={`bg-white rounded-xl border p-4 flex items-start gap-3 ${r.status === 'pending' ? 'border-orange-200' : 'border-gray-100'}`}>
+                  <div className="text-xl shrink-0">{r.status === 'pending' ? '⏳' : r.status === 'approved' ? '✅' : '❌'}</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-[#001A4B]">
+                      {r.requester_name}
+                      <span className="font-normal text-gray-400"> quiere ver apuesta de </span>
+                      {r.target_name}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">{r.home_team} vs {r.away_team}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {format(new Date(r.created_at), "d MMM yyyy HH:mm", { locale: es })}
+                    </p>
+                  </div>
+                  {r.status === 'pending' && (
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        onClick={() => handleApproveUnlock(r.id)}
+                        className="text-xs bg-green-600 text-white font-bold px-3 py-1.5 rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        Aprobar
+                      </button>
+                      <button
+                        onClick={() => handleRejectUnlock(r.id)}
+                        className="text-xs bg-red-100 text-red-600 font-bold px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors"
+                      >
+                        Rechazar
+                      </button>
+                    </div>
+                  )}
+                  {r.status !== 'pending' && (
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full shrink-0 ${r.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                      {r.status === 'approved' ? 'Aprobada' : 'Rechazada'}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Modal partido */}
       <Modal open={showMatchModal} onClose={() => setShowMatchModal(false)} title={editMatch ? 'Editar Partido' : 'Nuevo Partido'}>

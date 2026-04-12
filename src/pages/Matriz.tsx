@@ -141,7 +141,7 @@ export function Matriz() {
   const [loading, setLoading] = useState(true)
   const [loadingTournament, setLoadingTournament] = useState(false)
   const [activeCell, setActiveCell] = useState<ActiveCell | null>(null)
-  const [unlocks, setUnlocks] = useState<Set<string>>(new Set())
+  const [unlocks, setUnlocks] = useState<Map<string, 'approved' | 'pending'>>(new Map())
   const [pendingUnlock, setPendingUnlock] = useState<{ targetUserId: string; targetName: string; match: Match } | null>(null)
   const [unlocking, setUnlocking] = useState(false)
   const tableRef = useRef<HTMLDivElement>(null)
@@ -158,28 +158,26 @@ export function Matriz() {
       setRanking(rRes.data.data.ranking)
       setBets(bRes.data.data)
       setTournaments(tRes.data.data || [])
-      const keys = (uRes.data.data || []).map((u: { target_user_id: string; match_id: string }) =>
-        `${u.target_user_id}_${u.match_id}`
-      )
-      setUnlocks(new Set(keys))
+      const unlocksMap = new Map<string, 'approved' | 'pending'>()
+      ;(uRes.data.data || []).forEach((u: { target_user_id: string; match_id: string; status: string }) => {
+        unlocksMap.set(`${u.target_user_id}_${u.match_id}`, u.status as 'approved' | 'pending')
+      })
+      setUnlocks(unlocksMap)
     }).finally(() => setLoading(false))
   }, [])
 
-  const handleUnlock = async () => {
+  const handleRequestUnlock = async () => {
     if (!pendingUnlock) return
     setUnlocking(true)
     try {
-      await api.post('/bets/unlock-view', {
+      await api.post('/bets/request-unlock', {
         target_user_id: pendingUnlock.targetUserId,
         match_id: pendingUnlock.match.id,
       })
       const key = `${pendingUnlock.targetUserId}_${pendingUnlock.match.id}`
-      setUnlocks(prev => new Set([...prev, key]))
+      setUnlocks(prev => new Map([...prev, [key, 'pending']]))
       setPendingUnlock(null)
     } catch {
-      // backend no deployado aún — unlock optimista igual
-      const key = `${pendingUnlock.targetUserId}_${pendingUnlock.match.id}`
-      setUnlocks(prev => new Set([...prev, key]))
       setPendingUnlock(null)
     } finally {
       setUnlocking(false)
@@ -368,9 +366,9 @@ export function Matriz() {
                         )
                       }
 
-                      // Partido pendiente — propia fila, cutoff pasado, o desbloqueado
-                      const isUnlocked = unlocks.has(`${r.user_id}_${m.id}`)
-                      if (isMe || isCutoffPassed || isUnlocked) {
+                      // Partido pendiente — propia fila, cutoff pasado, o aprobado
+                      const unlockStatus = unlocks.get(`${r.user_id}_${m.id}`)
+                      if (isMe || isCutoffPassed || unlockStatus === 'approved') {
                         if (!b) return <td key={m.id} className="px-1 py-1.5 text-center text-gray-300">—</td>
                         return (
                           <td key={m.id} className="px-1 py-1.5 text-center text-gray-500 font-medium">
@@ -379,14 +377,23 @@ export function Matriz() {
                         )
                       }
 
-                      // Partido pendiente — otro jugador, antes del cutoff, no desbloqueado
+                      // Solicitud pendiente de aprobación
+                      if (unlockStatus === 'pending') {
+                        return (
+                          <td key={m.id} className="px-1 py-1.5 text-center">
+                            <span className="inline-block text-[13px]" title="Solicitud pendiente de aprobación">⏳</span>
+                          </td>
+                        )
+                      }
+
+                      // Sin solicitud — mostrar candado o —
                       return (
                         <td key={m.id} className="px-1 py-1.5 text-center">
                           {b
                             ? <span
                                 onClick={(e) => { e.stopPropagation(); setPendingUnlock({ targetUserId: r.user_id, targetName: r.user_name, match: m }) }}
                                 className="inline-block px-1.5 py-0.5 rounded text-[13px] bg-gray-100 select-none cursor-pointer hover:bg-gray-200 transition-colors"
-                                title="Click para ver la apuesta"
+                                title="Solicitar ver esta apuesta"
                               >🔒</span>
                             : <span className="text-gray-200">—</span>
                           }
@@ -411,12 +418,13 @@ export function Matriz() {
             </div>
             <div className="text-center mb-5">
               <div className="text-3xl mb-2">🔓</div>
-              <h3 className="font-bold text-[#001A4B] text-base">Ver apuesta de {pendingUnlock.targetName}</h3>
-              <p className="text-sm text-gray-500 mt-1">
+              <h3 className="font-bold text-[#001A4B] text-base">Solicitar ver apuesta</h3>
+              <p className="text-sm text-gray-600 mt-1 font-medium">{pendingUnlock.targetName}</p>
+              <p className="text-xs text-gray-500 mt-0.5">
                 {pendingUnlock.match.home_team} vs {pendingUnlock.match.away_team}
               </p>
-              <p className="text-xs text-gray-400 mt-2">
-                Una vez desbloqueada, podés ver su pronóstico para este partido para siempre.
+              <p className="text-xs text-gray-400 mt-3 leading-relaxed">
+                Los administradores recibirán un email con tu solicitud. Una vez aprobada, podrás ver el pronóstico de este partido.
               </p>
             </div>
             <div className="flex gap-3">
@@ -424,9 +432,9 @@ export function Matriz() {
                 className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
                 Cancelar
               </button>
-              <button onClick={handleUnlock} disabled={unlocking}
+              <button onClick={handleRequestUnlock} disabled={unlocking}
                 className="flex-1 bg-[#001A4B] text-white text-sm font-bold py-3 rounded-xl hover:bg-[#002870] transition-colors disabled:opacity-50">
-                {unlocking ? '...' : 'Desbloquear'}
+                {unlocking ? '...' : 'Enviar solicitud'}
               </button>
             </div>
           </div>
