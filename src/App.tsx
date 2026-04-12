@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { useTeamBadgesStore } from '@/store/teamBadgesStore'
 import { applyTheme } from '@/utils/theme'
 import { Navbar } from '@/components/layout/Navbar'
 import { ToastContainer } from '@/components/ui/Toast'
@@ -40,10 +41,13 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const { user } = useAuthStore()
+  const loadBadges = useTeamBadgesStore(s => s.load)
 
   useEffect(() => {
     applyTheme(user?.tema_equipo ?? 'neutral')
   }, [user?.tema_equipo])
+
+  useEffect(() => { loadBadges() }, [])
 
   return (
     <BrowserRouter>

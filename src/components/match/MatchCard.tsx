@@ -5,6 +5,7 @@ import { api } from '@/api/client'
 import { useToastStore } from '@/store/toastStore'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
 import { teamFlag } from '@/utils/teamFlags'
+import { useTeamBadgesStore, getTeamBadge } from '@/store/teamBadgesStore'
 import type { Match, Bet } from '@/types'
 
 interface Props {
@@ -16,16 +17,20 @@ interface Props {
   readonly?: boolean
 }
 
-function TeamFlag({ team }: { team: string }) {
+function TeamDisplay({ team }: { team: string }) {
+  const badges = useTeamBadgesStore(s => s.badges)
+  const badgeUrl = getTeamBadge(team, badges)
   const flag = teamFlag(team)
   return (
     <div
       className="flex items-center justify-center overflow-hidden"
       style={{ width: 64, height: 44, borderRadius: 8, background: 'var(--flag-bg, #f1f5f9)' }}
     >
-      {flag
-        ? <span style={{ fontSize: 32, lineHeight: 1 }}>{flag}</span>
-        : <span className="text-[#001A4B] font-black text-lg leading-none">—</span>
+      {badgeUrl
+        ? <img src={badgeUrl} alt={team} className="w-full h-full object-contain p-1" />
+        : flag
+          ? <span style={{ fontSize: 32, lineHeight: 1 }}>{flag}</span>
+          : <span className="text-[#001A4B] font-black text-lg leading-none">—</span>
       }
     </div>
   )
@@ -106,7 +111,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
           <span className="text-[34px] font-[500] text-[#001A4B] leading-none tabular-nums">
             {isFinished ? match.resultado_local : '—'}
           </span>
-          <TeamFlag team={match.home_team} />
+          <TeamDisplay team={match.home_team} />
           <span className="text-xs font-semibold text-[#001A4B] text-center leading-tight">
             {match.home_team}
           </span>
@@ -141,7 +146,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
           <span className="text-[34px] font-[500] text-[#001A4B] leading-none tabular-nums">
             {isFinished ? match.resultado_visitante : '—'}
           </span>
-          <TeamFlag team={match.away_team} />
+          <TeamDisplay team={match.away_team} />
           <span className="text-xs font-semibold text-[#001A4B] text-center leading-tight">
             {match.away_team}
           </span>

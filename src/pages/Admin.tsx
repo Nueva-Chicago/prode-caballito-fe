@@ -5,9 +5,11 @@ import { api } from '@/api/client'
 import { Modal } from '@/components/ui/Modal'
 import { Spinner } from '@/components/ui/Spinner'
 import { useToastStore } from '@/store/toastStore'
+import { useTeamBadgesStore } from '@/store/teamBadgesStore'
+import { teamFlag } from '@/utils/teamFlags'
 import type { Match, Tournament } from '@/types'
 
-type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'desbloqueos'
+type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'desbloqueos' | 'escudos'
 
 interface UnlockRequest {
   id: string
@@ -169,6 +171,7 @@ export function Admin() {
     { id: 'usuarios', label: '👥 Usuarios' },
     { id: 'torneos', label: '🏆 Torneos' },
     { id: 'desbloqueos', label: '🔓 Desbloqueos' },
+    { id: 'escudos',     label: '🛡️ Escudos' },
   ]
 
   return (
@@ -262,6 +265,9 @@ export function Admin() {
           )}
         </div>
       )}
+
+      {/* Tab: Escudos */}
+      {tab === 'escudos' && <EscudosTab matches={matches} />}
 
       {/* Modal partido */}
       <Modal open={showMatchModal} onClose={() => setShowMatchModal(false)} title={editMatch ? 'Editar Partido' : 'Nuevo Partido'}>
@@ -641,6 +647,146 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
           ))}
         </tbody>
       </table>
+    </div>
+  )
+}
+
+/* ── EscudosTab ──────────────────────────────────────────────────────── */
+function EscudosTab({ matches }: { matches: Match[] }) {
+  const { show } = useToastStore()
+  const { badges, setBadge, removeBadge } = useTeamBadgesStore()
+  const [editTeam, setEditTeam] = useState<string | null>(null)
+  const [urlInput, setUrlInput] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [newTeam, setNewTeam] = useState('')
+  const [newUrl, setNewUrl] = useState('')
+
+  // Equipos únicos de todos los partidos
+  const teams = Array.from(new Set(
+    matches.flatMap(m => [m.home_team, m.away_team])
+  )).sort()
+
+  const teamsWithBadge = teams.filter(t => badges[t.toUpperCase().trim()])
+  const teamsWithoutBadge = teams.filter(t => !badges[t.toUpperCase().trim()])
+
+  const handleSave = async (teamName: string, url: string) => {
+    if (!url.trim()) return
+    setSaving(true)
+    try {
+      await api.put ? api.post('/teams/badges', { team_name: teamName, badge_url: url }) : null
+      await api.post('/teams/badges', { team_name: teamName, badge_url: url })
+      setBadge(teamName, url)
+      show(`Escudo de ${teamName} guardado ✓`, 'success')
+      setEditTeam(null)
+      setNewTeam('')
+      setNewUrl('')
+    } catch {
+      show('Error al guardar escudo', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDelete = async (teamName: string) => {
+    try {
+      await api.delete(`/teams/badges/${encodeURIComponent(teamName)}`)
+      removeBadge(teamName)
+      show('Escudo eliminado', 'info')
+    } catch {
+      show('Error al eliminar', 'error')
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Agregar nuevo escudo manual */}
+      <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-3">
+        <h3 className="text-sm font-semibold text-[#001A4B]">Agregar escudo manualmente</h3>
+        <div className="flex gap-2 flex-wrap">
+          <input
+            value={newTeam}
+            onChange={e => setNewTeam(e.target.value)}
+            placeholder="Nombre del equipo (ej: Brazil)"
+            className="flex-1 min-w-40 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+          />
+          <input
+            value={newUrl}
+            onChange={e => setNewUrl(e.target.value)}
+            placeholder="URL del escudo (https://...)"
+            className="flex-1 min-w-52 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+          />
+          {newUrl && (
+            <img src={newUrl} alt="" className="w-10 h-10 object-contain rounded border border-gray-200"
+              onError={e => (e.currentTarget.style.display = 'none')} />
+          )}
+          <button
+            onClick={() => handleSave(newTeam, newUrl)}
+            disabled={saving || !newTeam || !newUrl}
+            className="bg-[#001A4B] text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-[#002870] disabled:opacity-50"
+          >
+            Guardar
+          </button>
+        </div>
+      </div>
+
+      {/* Equipos sin escudo */}
+      {teamsWithoutBadge.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <div className="px-4 py-2 bg-orange-50 border-b border-orange-100">
+            <p className="text-xs font-semibold text-orange-700">Sin escudo ({teamsWithoutBadge.length})</p>
+          </div>
+          {teamsWithoutBadge.map(team => (
+            <div key={team} className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 last:border-0">
+              <span className="text-lg w-8 text-center">{teamFlag(team) || '🏳️'}</span>
+              <span className="flex-1 text-sm font-medium text-gray-700">{team}</span>
+              {editTeam === team ? (
+                <div className="flex gap-2 items-center">
+                  <input
+                    value={urlInput}
+                    onChange={e => setUrlInput(e.target.value)}
+                    placeholder="URL del escudo..."
+                    autoFocus
+                    className="border border-gray-200 rounded-lg px-2 py-1 text-xs w-52 focus:outline-none focus:ring-1 focus:ring-[#0042A5]"
+                  />
+                  {urlInput && (
+                    <img src={urlInput} alt="" className="w-8 h-8 object-contain rounded border"
+                      onError={e => (e.currentTarget.style.display = 'none')} />
+                  )}
+                  <button onClick={() => handleSave(team, urlInput)} disabled={saving}
+                    className="text-xs bg-green-600 text-white font-bold px-2 py-1 rounded-lg">✓</button>
+                  <button onClick={() => setEditTeam(null)}
+                    className="text-xs bg-gray-100 text-gray-600 font-bold px-2 py-1 rounded-lg">✕</button>
+                </div>
+              ) : (
+                <button onClick={() => { setEditTeam(team); setUrlInput('') }}
+                  className="text-xs bg-[#0042A5] text-white font-bold px-3 py-1 rounded-lg hover:bg-[#003080]">
+                  + Agregar
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Equipos con escudo */}
+      {teamsWithBadge.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <div className="px-4 py-2 bg-green-50 border-b border-green-100">
+            <p className="text-xs font-semibold text-green-700">Con escudo ({teamsWithBadge.length})</p>
+          </div>
+          {teamsWithBadge.map(team => (
+            <div key={team} className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 last:border-0">
+              <img src={badges[team.toUpperCase().trim()]} alt={team}
+                className="w-8 h-8 object-contain rounded border border-gray-100" />
+              <span className="flex-1 text-sm font-medium text-gray-700">{team}</span>
+              <button onClick={() => handleDelete(team)}
+                className="text-xs bg-red-100 text-red-600 font-bold px-2 py-1 rounded-lg hover:bg-red-200">
+                Quitar
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
