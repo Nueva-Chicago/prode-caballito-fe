@@ -39,10 +39,12 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
     return () => document.removeEventListener('mousedown', handle)
   }, [onClose])
 
-  // Calcular posición: intenta abajo del badge, ajusta si se sale del viewport
-  const top = cell.rect.bottom + window.scrollY + 6
-  const rawLeft = cell.rect.left + window.scrollX - 60
-  const left = Math.max(8, Math.min(rawLeft, window.innerWidth - 220))
+  // fixed usa coordenadas de viewport directamente — no le afecta el scroll horizontal de la tabla
+  const popW = 210
+  const rawTop  = cell.rect.bottom + 6
+  const rawLeft = cell.rect.left + cell.rect.width / 2 - popW / 2
+  const top  = rawTop + popW > window.innerHeight ? cell.rect.top - 6 - 220 : rawTop
+  const left = Math.max(8, Math.min(rawLeft, window.innerWidth - popW - 8))
 
   const { match, bet, result } = cell
   const isExactoLocal = bet.home === match.resultado_local
@@ -65,7 +67,7 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
   return (
     <div
       ref={popRef}
-      style={{ position: 'absolute', top, left, zIndex: 9999, width: 210 }}
+      style={{ position: 'fixed', top, left, zIndex: 9999, width: 210 }}
       className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-pop"
     >
       {/* Header con equipos */}
@@ -281,12 +283,10 @@ export function Matriz() {
           No hay partidos en este torneo todavía
         </div>
       ) : (
-        <div ref={tableRef} className="overflow-x-auto" style={{ position: 'relative' }}>
-          {/* Popover */}
-          {activeCell && (
-            <BetPopover cell={activeCell} onClose={() => setActiveCell(null)} />
-          )}
-
+        {activeCell && (
+          <BetPopover cell={activeCell} onClose={() => setActiveCell(null)} />
+        )}
+        <div ref={tableRef} className="overflow-x-auto">
           <table className="text-xs border-collapse min-w-max">
             <thead>
               <tr className="bg-[#001A4B] text-white">
