@@ -30,6 +30,12 @@ export function Ranking() {
       {myEntry && (
         <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] rounded-xl p-4 text-white flex items-center gap-4">
           <div className="text-3xl font-black">#{myEntry.position}</div>
+          {myEntry.user_avatar
+            ? <img src={myEntry.user_avatar} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-white/30 shrink-0" />
+            : <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-lg shrink-0">
+                {myEntry.user_name[0].toUpperCase()}
+              </div>
+          }
           <div className="flex-1">
             <p className="font-semibold">{myEntry.user_name}</p>
             <p className="text-white/60 text-xs">{myEntry.nombre_planilla}</p>
@@ -67,13 +73,21 @@ export function Ranking() {
               <span className="text-sm font-bold text-gray-400">
                 {i < 3 ? MEDAL[i] : r.position}
               </span>
-              <div className="min-w-0">
-                <p className={`text-sm font-semibold truncate ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
-                  {r.user_name} {isMe && <span className="text-xs">(vos)</span>}
-                </p>
-                <p className="text-xs text-gray-400 truncate">{r.nombre_planilla}
-                  {!r.precio_pagado && <span className="ml-1 text-orange-400 font-medium">· no oficial</span>}
-                </p>
+              <div className="min-w-0 flex items-center gap-2.5">
+                {r.user_avatar
+                  ? <img src={r.user_avatar} alt="" className="w-8 h-8 rounded-full object-cover shrink-0 border border-gray-100" />
+                  : <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${isMe ? 'bg-[#0042A5] text-white' : 'bg-gray-200 text-gray-600'}`}>
+                      {r.user_name[0].toUpperCase()}
+                    </div>
+                }
+                <div className="min-w-0">
+                  <p className={`text-sm font-semibold truncate ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
+                    {r.user_name} {isMe && <span className="text-xs font-normal">(vos)</span>}
+                  </p>
+                  <p className="text-xs text-gray-400 truncate">{r.nombre_planilla}
+                    {!r.precio_pagado && <span className="ml-1 text-orange-400 font-medium">· no oficial</span>}
+                  </p>
+                </div>
               </div>
               <span className="text-xs text-center text-gray-600">{r.exactos_count}</span>
               <span className={`text-xs text-center hidden sm:block px-1.5 py-0.5 rounded-full ${r.aciertos_celeste > 0 ? POINT_COLORS.celeste : 'text-gray-300'}`}>
