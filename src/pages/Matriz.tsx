@@ -9,14 +9,6 @@ import type { Match, RankingEntry, Tournament } from '@/types'
 
 type BetMap = Record<string, Record<string, { home: number; away: number }>>
 
-interface TournamentRankingEntry {
-  user_id: string
-  user_name: string
-  user_avatar?: string
-  puntos: number
-  posicion?: number
-  position?: number
-}
 
 interface ActiveCell {
   matchId: string
@@ -146,7 +138,6 @@ export function Matriz() {
   const [bets, setBets] = useState<BetMap>({})
   const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [selectedTournament, setSelectedTournament] = useState<string>('all')
-  const [tournamentRanking, setTournamentRanking] = useState<TournamentRankingEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingTournament, setLoadingTournament] = useState(false)
   const [activeCell, setActiveCell] = useState<ActiveCell | null>(null)
@@ -196,11 +187,7 @@ export function Matriz() {
   }
 
   useEffect(() => {
-    if (selectedTournament === 'all') return
-    setLoadingTournament(true)
-    api.get(`/tournaments/${selectedTournament}/ranking`)
-      .then(({ data }) => setTournamentRanking(data.data || []))
-      .finally(() => setLoadingTournament(false))
+    setLoadingTournament(false)
   }, [selectedTournament])
 
   const handleBadgeClick = useCallback((
@@ -231,36 +218,12 @@ export function Matriz() {
   const pendingMatches = filteredMatches.filter(m => m.estado !== 'finished')
   const allMatches = [...finishedMatches, ...pendingMatches]
 
+  // En modo torneo: mostrar jugadores del ranking global que tengan apuestas en el torneo
   const rows: RankingEntry[] = isTournamentMode
-    ? tournamentRanking.map((tr, i) => ({
-        planilla_id: tr.user_id,
-        user_id: tr.user_id,
-        user_name: tr.user_name,
-        user_avatar: tr.user_avatar,
-        nombre_planilla: '',
-        puntos_totales: tr.puntos,
-        position: tr.posicion || tr.position || i + 1,
-        precio_pagado: true,
-        exactos_count: 0,
-        aciertos_celeste: 0,
-        aciertos_rojo: 0,
-        aciertos_verde: 0,
-        aciertos_amarillo: 0,
-        is_virtual: false,
-      } as RankingEntry))
+    ? ranking.filter(r => allMatches.some(m => bets[r.planilla_id]?.[m.id]))
     : ranking
 
-  const getBetsForRow = (r: RankingEntry) => {
-    if (!isTournamentMode) return bets[r.planilla_id] || {}
-    for (const [planillaId, planillaBets] of Object.entries(bets)) {
-      const hasMatchBets = allMatches.some(m => planillaBets[m.id])
-      if (hasMatchBets) {
-        const rankEntry = ranking.find(rank => rank.planilla_id === planillaId && rank.user_id === r.user_id)
-        if (rankEntry) return planillaBets
-      }
-    }
-    return {}
-  }
+  const getBetsForRow = (r: RankingEntry) => bets[r.planilla_id] || {}
 
   return (
     <div className="px-2 py-4 space-y-3" onClick={() => setActiveCell(null)}>
