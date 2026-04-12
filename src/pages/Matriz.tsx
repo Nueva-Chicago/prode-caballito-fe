@@ -137,7 +137,7 @@ export function Matriz() {
   const [ranking, setRanking] = useState<RankingEntry[]>([])
   const [bets, setBets] = useState<BetMap>({})
   const [tournaments, setTournaments] = useState<Tournament[]>([])
-  const [selectedTournament, setSelectedTournament] = useState<string>('all')
+  const [selectedTournament, setSelectedTournament] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [loadingTournament, setLoadingTournament] = useState(false)
   const [activeCell, setActiveCell] = useState<ActiveCell | null>(null)
@@ -157,7 +157,10 @@ export function Matriz() {
       setMatches(mRes.data.data.matches)
       setRanking(rRes.data.data.ranking)
       setBets(bRes.data.data)
-      setTournaments(tRes.data.data || [])
+      const tourList = tRes.data.data || []
+      setTournaments(tourList)
+      // Seleccionar el primer torneo por defecto
+      if (tourList.length > 0) setSelectedTournament(tourList[0].id)
       const unlocksMap = new Map<string, 'approved' | 'pending'>()
       ;(uRes.data.data || []).forEach((u: { target_user_id: string; match_id: string; status: string }) => {
         unlocksMap.set(`${u.target_user_id}_${u.match_id}`, u.status as 'approved' | 'pending')
@@ -208,16 +211,15 @@ export function Matriz() {
 
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
-  const isTournamentMode = selectedTournament !== 'all'
-  const filteredMatches = isTournamentMode
+  const filteredMatches = selectedTournament
     ? matches.filter(m => m.tournament_id === selectedTournament)
     : matches
   const finishedMatches = filteredMatches.filter(m => m.estado === 'finished')
-  const pendingMatches = filteredMatches.filter(m => m.estado !== 'finished')
+  const pendingMatches  = filteredMatches.filter(m => m.estado !== 'finished')
   const allMatches = [...finishedMatches, ...pendingMatches]
 
-  // En modo torneo: mostrar jugadores del ranking global que tengan apuestas en el torneo
-  const rows: RankingEntry[] = isTournamentMode
+  // Mostrar jugadores del ranking que tengan apuestas en los partidos del torneo
+  const rows: RankingEntry[] = selectedTournament
     ? ranking.filter(r => allMatches.some(m => bets[r.planilla_id]?.[m.id]))
     : ranking
 
@@ -243,12 +245,6 @@ export function Matriz() {
 
         {tournaments.length > 0 && (
           <div className="flex gap-1 flex-wrap">
-            <button
-              onClick={(e) => { e.stopPropagation(); setSelectedTournament('all') }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === 'all' ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
-            >
-              Global
-            </button>
             {tournaments.map(t => (
               <button
                 key={t.id}
