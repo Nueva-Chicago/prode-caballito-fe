@@ -150,6 +150,9 @@ export function Matriz() {
   const [loading, setLoading] = useState(true)
   const [loadingTournament, setLoadingTournament] = useState(false)
   const [activeCell, setActiveCell] = useState<ActiveCell | null>(null)
+  const [unlocks, setUnlocks] = useState<Set<string>>(new Set())
+  const [pendingUnlock, setPendingUnlock] = useState<{ targetUserId: string; targetName: string; match: Match } | null>(null)
+  const [unlocking, setUnlocking] = useState(false)
   const tableRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -158,13 +161,39 @@ export function Matriz() {
       api.get('/ranking?limit=200&include_unpaid=true'),
       api.get('/bets/all-for-matrix'),
       api.get('/tournaments'),
-    ]).then(([mRes, rRes, bRes, tRes]) => {
+      api.get('/bets/my-unlocks').catch(() => ({ data: { data: [] } })),
+    ]).then(([mRes, rRes, bRes, tRes, uRes]) => {
       setMatches(mRes.data.data.matches)
       setRanking(rRes.data.data.ranking)
       setBets(bRes.data.data)
       setTournaments(tRes.data.data || [])
+      const keys = (uRes.data.data || []).map((u: { target_user_id: string; match_id: string }) =>
+        `${u.target_user_id}_${u.match_id}`
+      )
+      setUnlocks(new Set(keys))
     }).finally(() => setLoading(false))
   }, [])
+
+  const handleUnlock = async () => {
+    if (!pendingUnlock) return
+    setUnlocking(true)
+    try {
+      await api.post('/bets/unlock-view', {
+        target_user_id: pendingUnlock.targetUserId,
+        match_id: pendingUnlock.match.id,
+      })
+      const key = `${pendingUnlock.targetUserId}_${pendingUnlock.match.id}`
+      setUnlocks(prev => new Set([...prev, key]))
+      setPendingUnlock(null)
+    } catch {
+      // backend no deployado aún — unlock optimista igual
+      const key = `${pendingUnlock.targetUserId}_${pendingUnlock.match.id}`
+      setUnlocks(prev => new Set([...prev, key]))
+      setPendingUnlock(null)
+    } finally {
+      setUnlocking(false)
+    }
+  }
 
   useEffect(() => {
     if (selectedTournament === 'all') return
@@ -376,8 +405,9 @@ export function Matriz() {
                         )
                       }
 
-                      // Partido pendiente — propia fila o ya pasó el cutoff: mostrar apuesta
-                      if (isMe || isCutoffPassed) {
+                      // Partido pendiente — propia fila, cutoff pasado, o desbloqueado
+                      const isUnlocked = unlocks.has(`${r.user_id}_${m.id}`)
+                      if (isMe || isCutoffPassed || isUnlocked) {
                         if (!b) return <td key={m.id} className="px-1 py-1.5 text-center text-gray-300">—</td>
                         return (
                           <td key={m.id} className="px-1 py-1.5 text-center text-gray-500 font-medium">
@@ -386,11 +416,15 @@ export function Matriz() {
                         )
                       }
 
-                      // Partido pendiente — otro jugador, antes del cutoff: ocultar
+                      // Partido pendiente — otro jugador, antes del cutoff, no desbloqueado
                       return (
                         <td key={m.id} className="px-1 py-1.5 text-center">
                           {b
-                            ? <span className="inline-block px-1.5 py-0.5 rounded text-[13px] bg-gray-100 select-none" title="Visible al cierre del partido">🔒</span>
+                            ? <span
+                                onClick={(e) => { e.stopPropagation(); setPendingUnlock({ targetUserId: r.user_id, targetName: r.user_name, match: m }) }}
+                                className="inline-block px-1.5 py-0.5 rounded text-[13px] bg-gray-100 select-none cursor-pointer hover:bg-gray-200 transition-colors"
+                                title="Click para ver la apuesta"
+                              >🔒</span>
                             : <span className="text-gray-200">—</span>
                           }
                         </td>
@@ -402,6 +436,38 @@ export function Matriz() {
             </tbody>
           </table>
         </div>
+      )}
+      {/* Sheet de confirmación de unlock */}
+      {pendingUnlock && (
+        <>
+          <div className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm" onClick={() => setPendingUnlock(null)} />
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl max-w-lg mx-auto p-6"
+            style={{ animation: 'slideUp 0.2s ease-out both' }}>
+            <div className="flex justify-center mb-4">
+              <div className="w-10 h-1 rounded-full bg-gray-200" />
+            </div>
+            <div className="text-center mb-5">
+              <div className="text-3xl mb-2">🔓</div>
+              <h3 className="font-bold text-[#001A4B] text-base">Ver apuesta de {pendingUnlock.targetName}</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                {pendingUnlock.match.home_team} vs {pendingUnlock.match.away_team}
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                Una vez desbloqueada, podés ver su pronóstico para este partido para siempre.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setPendingUnlock(null)}
+                className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
+                Cancelar
+              </button>
+              <button onClick={handleUnlock} disabled={unlocking}
+                className="flex-1 bg-[#001A4B] text-white text-sm font-bold py-3 rounded-xl hover:bg-[#002870] transition-colors disabled:opacity-50">
+                {unlocking ? '...' : 'Desbloquear'}
+              </button>
+            </div>
+          </div>
+        </>
       )}
     </div>
   )
