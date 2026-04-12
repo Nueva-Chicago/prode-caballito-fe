@@ -541,7 +541,107 @@ function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResu
 }
 
 /* ── TorneosTab ──────────────────────────────────────────────────────── */
-type TournamentWithCount = Tournament & { match_count?: number }
+type TournamentWithCount = Tournament & {
+  match_count?: number
+  finished_count?: number
+  first_match_time?: string
+  last_match_time?: string
+}
+
+function TournamentProgressBars({ t }: { t: TournamentWithCount }) {
+  const now = new Date()
+  const total = t.match_count ?? 0
+  const finished = t.finished_count ?? 0
+  const matchPct = total > 0 ? Math.round((finished / total) * 100) : 0
+
+  // Estado de apuestas
+  const firstMatch = t.first_match_time ? new Date(t.first_match_time) : null
+  const lastMatch = t.last_match_time ? new Date(t.last_match_time) : null
+  const startRef = t.start_date ? new Date(t.start_date) : firstMatch
+  const endRef = t.end_date ? new Date(t.end_date) : lastMatch
+
+  let betLabel = ''
+  let betPct = 0
+  let betColor = 'bg-green-500'
+  let betStatus: 'future' | 'open' | 'closed' = 'future'
+
+  if (!startRef) {
+    betLabel = 'Sin fechas definidas'
+    betStatus = 'future'
+  } else if (now < startRef) {
+    const totalMs = startRef.getTime() - (startRef.getTime() - 60 * 24 * 3600000)
+    const elapsed = now.getTime() - (startRef.getTime() - 60 * 24 * 3600000)
+    betPct = Math.max(0, Math.min(100, Math.round((elapsed / totalMs) * 100)))
+    const daysLeft = Math.ceil((startRef.getTime() - now.getTime()) / (1000 * 3600 * 24))
+    betLabel = `${daysLeft}d para cerrar apuestas`
+    betColor = daysLeft > 30 ? 'bg-green-500' : daysLeft > 7 ? 'bg-yellow-400' : 'bg-red-500'
+    betStatus = 'future'
+    betPct = Math.max(5, 100 - betPct) // bar depletes as deadline approaches
+  } else if (endRef && now > endRef) {
+    betPct = 100
+    betLabel = 'Torneo finalizado'
+    betColor = 'bg-gray-400'
+    betStatus = 'closed'
+  } else {
+    betStatus = 'open'
+    if (endRef) {
+      const totalMs = endRef.getTime() - startRef.getTime()
+      const elapsed = now.getTime() - startRef.getTime()
+      betPct = Math.round((elapsed / totalMs) * 100)
+      const daysLeft = Math.ceil((endRef.getTime() - now.getTime()) / (1000 * 3600 * 24))
+      betLabel = `En curso · ${daysLeft}d restantes`
+    } else {
+      betLabel = 'En curso'
+    }
+    betColor = 'bg-blue-500'
+  }
+
+  if (total === 0) return null
+
+  return (
+    <div className="px-4 pb-3 space-y-2">
+      {/* Barra 1: Avance de partidos */}
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">⚽ Partidos</span>
+          <span className="text-[10px] font-bold text-gray-600">
+            {finished === total && total > 0
+              ? <span className="text-green-600">✓ Todos terminados</span>
+              : <>{finished}/{total} terminados</>
+            }
+          </span>
+        </div>
+        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all ${finished === total && total > 0 ? 'bg-green-500' : 'bg-[#0042A5]'}`}
+            style={{ width: `${matchPct}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Barra 2: Estado de apuestas */}
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">⏱ Apuestas</span>
+          <span className={`text-[10px] font-bold ${
+            betStatus === 'closed' ? 'text-gray-400' :
+            betStatus === 'open' ? 'text-blue-600' :
+            betColor.includes('red') ? 'text-red-600' :
+            betColor.includes('yellow') ? 'text-yellow-600' : 'text-green-600'
+          }`}>
+            {betLabel}
+          </span>
+        </div>
+        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all ${betColor}`}
+            style={{ width: `${betStatus === 'closed' ? 100 : betPct}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const EMPTY_TOURNAMENT_FORM = {
   name: '', fase: '', description: '',
@@ -707,6 +807,9 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
                 </button>
               </div>
             </div>
+
+            {/* Barras de progreso */}
+            <TournamentProgressBars t={t} />
 
             {/* Panel de edición */}
             {editingId === t.id && (
