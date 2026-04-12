@@ -212,7 +212,10 @@ export function Matriz() {
                         )
                         return (
                           <td key={m.id} className="px-1 py-1.5 text-center">
-                            <span className={`inline-block px-1.5 py-0.5 rounded font-bold text-[11px] ${POINT_COLORS[res.color]}`}>
+                            <span
+                              title={res.puntos === 0 ? 'Sin puntos' : `${res.puntos} pt${res.puntos !== 1 ? 's' : ''}${res.bonus ? ' (+1 bonus)' : ''}`}
+                              className={`inline-block px-1.5 py-0.5 rounded font-bold text-[11px] cursor-default ${POINT_COLORS[res.color]}`}
+                            >
                               {b.home}-{b.away}
                             </span>
                           </td>
