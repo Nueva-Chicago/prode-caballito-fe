@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { User } from '@/types'
+import { applyTheme } from '@/utils/theme'
 
 interface AuthStore {
   user: User | null
@@ -12,7 +13,11 @@ interface AuthStore {
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
   user: (() => {
-    try { return JSON.parse(localStorage.getItem('user') || 'null') } catch { return null }
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || 'null')
+      if (u?.tema_equipo) applyTheme(u.tema_equipo)
+      return u
+    } catch { return null }
   })(),
   token: localStorage.getItem('token'),
 
@@ -20,12 +25,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     localStorage.setItem('token', token)
     localStorage.setItem('refreshToken', refreshToken)
     localStorage.setItem('user', JSON.stringify(user))
+    applyTheme(user.tema_equipo)
     set({ user, token })
   },
 
   updateUser: (partial) => {
     const updated = { ...get().user, ...partial } as User
     localStorage.setItem('user', JSON.stringify(updated))
+    if (partial.tema_equipo) applyTheme(partial.tema_equipo)
     set({ user: updated })
   },
 
@@ -33,6 +40,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     localStorage.removeItem('token')
     localStorage.removeItem('refreshToken')
     localStorage.removeItem('user')
+    applyTheme('neutral')
     set({ user: null, token: null })
   },
 
