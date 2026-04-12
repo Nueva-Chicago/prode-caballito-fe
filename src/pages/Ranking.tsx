@@ -72,7 +72,7 @@ export function Ranking() {
           { resultado_local: m.resultado_local!, resultado_visitante: m.resultado_visitante! }
         )
         totalPts += res.puntos
-        if (res.color === 'red') totalExactos++
+        if (res.color === 'rojo') totalExactos++
       })
       pts.set(r.planilla_id, totalPts)
       exactos.set(r.planilla_id, totalExactos)

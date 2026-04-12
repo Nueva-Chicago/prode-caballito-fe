@@ -989,9 +989,9 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                                   <p className="text-sm font-semibold text-[#001A4B] group-hover:text-[#0042A5]">
                                     {String(p.nombre_planilla || 'Planilla')}
                                   </p>
-                                  {p.tournament_name && (
+                                  {p.tournament_name ? (
                                     <p className="text-xs text-gray-400 mt-0.5">{String(p.tournament_name)}</p>
-                                  )}
+                                  ) : null}
                                 </div>
                                 <div className="text-right shrink-0">
                                   <p className="text-sm font-black text-[#0042A5]">{String(p.puntos_totales || 0)} pts</p>
