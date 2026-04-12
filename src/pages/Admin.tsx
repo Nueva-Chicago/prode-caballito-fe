@@ -541,12 +541,23 @@ function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResu
 }
 
 /* ── TorneosTab ──────────────────────────────────────────────────────── */
+type TournamentWithCount = Tournament & { match_count?: number }
+
+const EMPTY_TOURNAMENT_FORM = {
+  name: '', fase: '', description: '',
+  start_date: '', end_date: '', is_active: true,
+}
+
 function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () => void }) {
   const { show } = useToastStore()
-  const [allTournaments, setAllTournaments] = useState<(Tournament & { match_count?: number })[]>([])
+  const [allTournaments, setAllTournaments] = useState<TournamentWithCount[]>([])
   const [loadingAll, setLoadingAll] = useState(true)
-  const [form, setForm] = useState({ name: '', fase: '', description: '' })
+  const [createForm, setCreateForm] = useState(EMPTY_TOURNAMENT_FORM)
   const [saving, setSaving] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState(EMPTY_TOURNAMENT_FORM)
+  const [applyingCutoff, setApplyingCutoff] = useState<string | null>(null)
+  const [cutoffMinutes, setCutoffMinutes] = useState<Record<string, string>>({})
 
   const loadAll = async () => {
     setLoadingAll(true)
@@ -566,9 +577,9 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
     e.preventDefault()
     setSaving(true)
     try {
-      await api.post('/tournaments', form)
+      await api.post('/tournaments', createForm)
       show('Torneo creado ✓', 'success')
-      setForm({ name: '', fase: '', description: '' })
+      setCreateForm(EMPTY_TOURNAMENT_FORM)
       loadAll(); onRefresh()
     } catch {
       show('Error al crear torneo', 'error')
@@ -577,27 +588,80 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
     }
   }
 
-  const handleToggle = async (t: Tournament) => {
+  const openEdit = (t: TournamentWithCount) => {
+    if (editingId === t.id) { setEditingId(null); return }
+    setEditingId(t.id)
+    setEditForm({
+      name: t.name,
+      fase: t.fase,
+      description: t.description || '',
+      start_date: t.start_date ? t.start_date.slice(0, 10) : '',
+      end_date: t.end_date ? t.end_date.slice(0, 10) : '',
+      is_active: t.is_active,
+    })
+  }
+
+  const handleSaveEdit = async (id: string) => {
+    setSaving(true)
     try {
-      await api.put(`/tournaments/${t.id}`, { is_active: !t.is_active })
-      show(`Torneo ${!t.is_active ? 'activado' : 'desactivado'} ✓`, 'success')
+      await api.put(`/tournaments/${id}`, editForm)
+      show('Torneo actualizado ✓', 'success')
+      setEditingId(null)
       loadAll(); onRefresh()
     } catch {
-      show('Error', 'error')
+      show('Error al guardar', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleApplyCutoff = async (tournamentId: string) => {
+    const mins = parseInt(cutoffMinutes[tournamentId] || '')
+    if (isNaN(mins) || mins < 0) { show('Ingresá un número válido de minutos', 'error'); return }
+    setApplyingCutoff(tournamentId)
+    try {
+      // Fetch matches for this tournament and update each
+      const { data: mData } = await api.get('/matches?limit=500')
+      const tournamentMatches = (mData.data.matches || []).filter(
+        (m: Record<string, unknown>) => m.tournament_id === tournamentId
+      )
+      await Promise.all(
+        tournamentMatches.map((m: Record<string, unknown>) =>
+          api.put(`/matches/${m.id}`, { halftime_minutes: mins })
+        )
+      )
+      show(`Cierre de ${mins} min aplicado a ${tournamentMatches.length} partidos ✓`, 'success')
+    } catch {
+      show('Error al aplicar cierre', 'error')
+    } finally {
+      setApplyingCutoff(null)
     }
   }
 
   return (
     <div className="space-y-4">
+      {/* Formulario nuevo torneo */}
       <form onSubmit={handleCreate} className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm space-y-3">
         <h3 className="font-semibold text-[#001A4B] text-sm">Nuevo Torneo</h3>
         <div className="grid grid-cols-2 gap-3">
-          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+          <input value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
             placeholder="Nombre del torneo" required
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
-          <input value={form.fase} onChange={(e) => setForm({ ...form, fase: e.target.value })}
+          <input value={createForm.fase} onChange={(e) => setCreateForm({ ...createForm, fase: e.target.value })}
             placeholder="Fase (Grupos, Octavos...)" required
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Fecha inicio</label>
+            <input type="date" value={createForm.start_date} onChange={(e) => setCreateForm({ ...createForm, start_date: e.target.value })}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Fecha fin</label>
+            <input type="date" value={createForm.end_date} onChange={(e) => setCreateForm({ ...createForm, end_date: e.target.value })}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+          </div>
         </div>
         <button type="submit" disabled={saving}
           className="bg-[#FFDF00] text-[#001A4B] text-sm font-bold px-4 py-2 rounded-lg hover:bg-yellow-400 disabled:opacity-50">
@@ -605,33 +669,125 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
         </button>
       </form>
 
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="bg-gray-50 px-4 py-2 border-b border-gray-100">
-          <p className="text-xs font-semibold text-gray-500">Todos los torneos · activá/desactivá para que aparezcan en la app</p>
-        </div>
+      {/* Lista de torneos */}
+      <div className="space-y-2">
         {loadingAll ? (
           <div className="py-6 flex justify-center"><Spinner size="sm" /></div>
         ) : allTournaments.length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-6">No hay torneos</p>
         ) : allTournaments.map((t) => (
-          <div key={t.id} className="flex items-center justify-between px-4 py-3 border-b border-gray-50 last:border-0">
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-semibold text-[#001A4B]">{t.name}</p>
-                {t.match_count != null && t.match_count > 0 && (
-                  <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full font-medium">
-                    {t.match_count} partidos
-                  </span>
-                )}
+          <div key={t.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            {/* Cabecera del torneo */}
+            <div className="flex items-center justify-between px-4 py-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm font-semibold text-[#001A4B]">{t.name}</p>
+                  <span className="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{t.fase}</span>
+                  {t.match_count != null && t.match_count > 0 && (
+                    <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-full font-medium">
+                      {t.match_count} partidos
+                    </span>
+                  )}
+                  {t.start_date && (
+                    <span className="text-[10px] text-gray-400">
+                      {format(new Date(t.start_date), "d MMM yyyy", { locale: es })}
+                      {t.end_date && ` → ${format(new Date(t.end_date), "d MMM yyyy", { locale: es })}`}
+                    </span>
+                  )}
+                </div>
+                {t.description && <p className="text-xs text-gray-400 mt-0.5 truncate">{t.description}</p>}
               </div>
-              <p className="text-xs text-gray-400">{t.fase}</p>
+              <div className="flex items-center gap-2 shrink-0 ml-3">
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${t.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                  {t.is_active ? '● Activo' : '○ Inactivo'}
+                </span>
+                <button onClick={() => openEdit(t)}
+                  className={`text-xs px-3 py-1.5 rounded-lg font-medium border transition-all ${editingId === t.id ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}>
+                  {editingId === t.id ? 'Cancelar' : 'Editar'}
+                </button>
+              </div>
             </div>
-            <button onClick={() => handleToggle(t)}
-              className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-colors ${
-                t.is_active ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-              }`}>
-              {t.is_active ? '● Activo' : '○ Inactivo'}
-            </button>
+
+            {/* Panel de edición */}
+            {editingId === t.id && (
+              <div className="border-t border-gray-100 bg-gray-50 px-4 py-4 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Nombre</label>
+                    <input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Fase</label>
+                    <input value={editForm.fase} onChange={(e) => setEditForm({ ...editForm, fase: e.target.value })}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
+                  <input value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                    placeholder="Descripción opcional..."
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Fecha inicio</label>
+                    <input type="date" value={editForm.start_date} onChange={(e) => setEditForm({ ...editForm, start_date: e.target.value })}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Fecha fin</label>
+                    <input type="date" value={editForm.end_date} onChange={(e) => setEditForm({ ...editForm, end_date: e.target.value })}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={editForm.is_active}
+                      onChange={(e) => setEditForm({ ...editForm, is_active: e.target.checked })}
+                      className="w-4 h-4 rounded accent-[#0042A5]" />
+                    <span className="text-xs font-medium text-gray-700">Visible en la app</span>
+                  </label>
+                </div>
+
+                {/* Cierre de pronósticos */}
+                <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                  <p className="text-xs font-semibold text-[#001A4B] mb-2">⏱ Cierre de pronósticos</p>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Establecé cuántos minutos antes del inicio se cierran los pronósticos para todos los partidos de este torneo.
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number" min={0} max={10080}
+                      value={cutoffMinutes[t.id] || ''}
+                      onChange={(e) => setCutoffMinutes({ ...cutoffMinutes, [t.id]: e.target.value })}
+                      placeholder="ej: 45"
+                      className="w-24 border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+                    />
+                    <span className="text-xs text-gray-500">minutos antes del partido</span>
+                    <button
+                      type="button"
+                      onClick={() => handleApplyCutoff(t.id)}
+                      disabled={applyingCutoff === t.id || !cutoffMinutes[t.id]}
+                      className="text-xs bg-[#0042A5] text-white font-bold px-3 py-1.5 rounded-lg hover:bg-[#003080] disabled:opacity-40 ml-auto"
+                    >
+                      {applyingCutoff === t.id ? 'Aplicando...' : 'Aplicar a todos'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-1">
+                  <button type="button" onClick={() => handleSaveEdit(t.id)} disabled={saving}
+                    className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50">
+                    Guardar cambios
+                  </button>
+                  <button type="button" onClick={() => setEditingId(null)}
+                    className="text-sm text-gray-500 hover:text-gray-700 px-3 py-2">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
