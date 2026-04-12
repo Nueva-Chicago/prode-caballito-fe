@@ -136,33 +136,41 @@ export function Profile() {
       {/* Tema de equipo */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
         <h3 className="font-bold text-[#001A4B] mb-4">🎨 Tema Visual</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* isolate crea stacking context propio → las cards escaladas no se escapan del container */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 isolate">
           {Object.entries(TEAM_THEMES).map(([key, theme]) => {
             const isActive = user.tema_equipo === key
+            // Para colores claros (ej. Huracán blanco) usamos el secundario como fondo del preview
+            const isLightPrimary = theme.primary === '#FFFFFF' || theme.primary === '#ffffff'
+            const previewBg   = isLightPrimary ? theme.secondary : theme.primary
+            const previewDot  = isLightPrimary ? theme.primary   : theme.secondary
+            const previewIcon = isLightPrimary ? theme.primary   : theme.secondary
             return (
               <button
                 key={key}
                 onClick={() => handleThemeChange(key)}
-                className="rounded-xl overflow-hidden transition-all hover:scale-105 focus:outline-none"
+                className="rounded-xl overflow-hidden transition-all focus:outline-none"
                 style={{
                   boxShadow: isActive
-                    ? `0 0 0 3px ${theme.primary}, 0 4px 12px rgba(0,0,0,0.15)`
-                    : '0 1px 4px rgba(0,0,0,0.08)',
-                  transform: isActive ? 'scale(1.04)' : undefined,
+                    ? `0 0 0 3px ${isLightPrimary ? theme.secondary : theme.primary}, 0 4px 12px rgba(0,0,0,0.15)`
+                    : '0 1px 4px rgba(0,0,0,0.10)',
+                  transform: isActive ? 'scale(1.05)' : undefined,
+                  zIndex: isActive ? 1 : undefined,
+                  position: 'relative',
                 }}
               >
                 {/* Preview del navbar */}
-                <div className="h-7 flex items-center gap-1.5 px-2" style={{ background: theme.primary }}>
-                  <span className="text-[10px]" style={{ color: theme.secondary }}>⚽</span>
-                  <span className="flex-1 h-1.5 rounded-full opacity-40 bg-white" />
-                  <span className="w-3 h-3 rounded-full" style={{ background: theme.secondary }} />
+                <div className="h-7 flex items-center gap-1.5 px-2" style={{ background: previewBg }}>
+                  <span className="text-[10px]" style={{ color: previewIcon }}>⚽</span>
+                  <span className="flex-1 h-1.5 rounded-full opacity-40" style={{ background: previewIcon }} />
+                  <span className="w-3 h-3 rounded-full" style={{ background: previewDot }} />
                 </div>
                 {/* Nombre */}
                 <div
                   className="py-2 px-2 text-xs font-semibold text-center"
                   style={{
-                    background: isActive ? theme.primary : '#f9fafb',
-                    color: isActive ? theme.secondary : '#374151',
+                    background: isActive ? previewBg : '#f9fafb',
+                    color: isActive ? previewDot : '#374151',
                   }}
                 >
                   {theme.name}
