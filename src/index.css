@@ -10,70 +10,77 @@
   --theme-nav-bg-2:    #002B7F;
   --theme-primary:     #0042A5;
   --theme-secondary:   #FFDF00;
-  --theme-accent-text: #001A4B;   /* text sobre fondo secondary */
-  --theme-on-primary:  #ffffff;
-}
-
-[data-theme="boca"] {
-  --theme-nav-bg:      #001A4B;
-  --theme-nav-bg-2:    #00102e;
-  --theme-primary:     #003087;
-  --theme-secondary:   #FFDF00;
   --theme-accent-text: #001A4B;
   --theme-on-primary:  #ffffff;
 }
 
-[data-theme="river"] {
-  --theme-nav-bg:      #CC0000;
-  --theme-nav-bg-2:    #a30000;
-  --theme-primary:     #CC0000;
-  --theme-secondary:   #ffffff;
-  --theme-accent-text: #CC0000;
-  --theme-on-primary:  #ffffff;
-}
-
-[data-theme="independiente"] {
-  --theme-nav-bg:      #8B0000;
-  --theme-nav-bg-2:    #660000;
-  --theme-primary:     #CC0000;
-  --theme-secondary:   #ffffff;
-  --theme-accent-text: #8B0000;
-  --theme-on-primary:  #ffffff;
-}
-
-[data-theme="racing"] {
-  --theme-nav-bg:      #1a5fa8;
-  --theme-nav-bg-2:    #0e4a8a;
-  --theme-primary:     #75AADB;
-  --theme-secondary:   #ffffff;
-  --theme-accent-text: #1a5fa8;
-  --theme-on-primary:  #ffffff;
-}
-
-[data-theme="san_lorenzo"] {
+/* Boca Juniors — azul profundo / oro cálido */
+[data-theme="boca"] {
   --theme-nav-bg:      #001A4B;
-  --theme-nav-bg-2:    #000d28;
-  --theme-primary:     #001A4B;
+  --theme-nav-bg-2:    #00102E;
+  --theme-primary:     #003087;
+  --theme-secondary:   #F5C500;
+  --theme-accent-text: #001A4B;
+  --theme-on-primary:  #ffffff;
+}
+
+/* River Plate — rojo vivo sobre blanco (La Banda) */
+[data-theme="river"] {
+  --theme-nav-bg:      #B30000;
+  --theme-nav-bg-2:    #880000;
+  --theme-primary:     #C8102E;
+  --theme-secondary:   #FFFFFF;
+  --theme-accent-text: #B30000;
+  --theme-on-primary:  #ffffff;
+}
+
+/* Independiente — carmín muy oscuro (El Rojo del Abasto) */
+[data-theme="independiente"] {
+  --theme-nav-bg:      #5B0000;
+  --theme-nav-bg-2:    #3D0000;
+  --theme-primary:     #8B0000;
+  --theme-secondary:   #FFFFFF;
+  --theme-accent-text: #5B0000;
+  --theme-on-primary:  #ffffff;
+}
+
+/* Racing Club — celeste cielo + blanco (La Academia) */
+[data-theme="racing"] {
+  --theme-nav-bg:      #1A6BAA;
+  --theme-nav-bg-2:    #0E5490;
+  --theme-primary:     #4BA6D1;
+  --theme-secondary:   #FFFFFF;
+  --theme-accent-text: #1A6BAA;
+  --theme-on-primary:  #ffffff;
+}
+
+/* San Lorenzo — azul cobalto + rojo (El Ciclón) */
+[data-theme="sanlorenzo"] {
+  --theme-nav-bg:      #00237D;
+  --theme-nav-bg-2:    #001660;
+  --theme-primary:     #0033A0;
   --theme-secondary:   #CC0000;
-  --theme-accent-text: #ffffff;
+  --theme-accent-text: #FFFFFF;
   --theme-on-primary:  #ffffff;
 }
 
+/* Estudiantes de La Plata — granate oscuro (Pincharratas) */
 [data-theme="estudiantes"] {
-  --theme-nav-bg:      #8B0000;
-  --theme-nav-bg-2:    #660000;
-  --theme-primary:     #CC0000;
-  --theme-secondary:   #ffffff;
-  --theme-accent-text: #8B0000;
+  --theme-nav-bg:      #6B0018;
+  --theme-nav-bg-2:    #4D0012;
+  --theme-primary:     #9E001A;
+  --theme-secondary:   #FFFFFF;
+  --theme-accent-text: #6B0018;
   --theme-on-primary:  #ffffff;
 }
 
+/* Huracán — negro/carbón + rojo vivo (El Globo) */
 [data-theme="huracan"] {
-  --theme-nav-bg:      #1a1a1a;
-  --theme-nav-bg-2:    #000000;
-  --theme-primary:     #c8102e;
-  --theme-secondary:   #c8102e;
-  --theme-accent-text: #ffffff;
+  --theme-nav-bg:      #1A1A1A;
+  --theme-nav-bg-2:    #0A0A0A;
+  --theme-primary:     #D42B2B;
+  --theme-secondary:   #FFFFFF;
+  --theme-accent-text: #1A1A1A;
   --theme-on-primary:  #ffffff;
 }
 

@@ -141,10 +141,10 @@ export function Profile() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 isolate">
           {Object.entries(TEAM_THEMES).map(([key, theme]) => {
             const isActive = user.tema_equipo === key
-            const isLightPrimary = theme.primary === '#FFFFFF' || theme.primary === '#ffffff'
-            const previewBg   = isLightPrimary ? theme.secondary : theme.primary
-            const previewDot  = isLightPrimary ? theme.primary   : theme.secondary
-            const previewIcon = isLightPrimary ? theme.primary   : theme.secondary
+            // Pattern override: si hay patron de camiseta usarlo como fondo del strip
+            const stripeBg  = theme.pattern ?? theme.primary
+            const fgColor   = theme.fg ?? theme.secondary
+            const ringColor = theme.ring ?? theme.primary
             return (
               <button
                 key={key}
@@ -152,23 +152,25 @@ export function Profile() {
                 className="rounded-xl overflow-hidden transition-all focus:outline-none"
                 style={{
                   boxShadow: isActive
-                    ? `0 0 0 3px ${isLightPrimary ? theme.secondary : theme.primary}, 0 4px 12px rgba(0,0,0,0.15)`
+                    ? `0 0 0 3px ${ringColor}, 0 4px 12px rgba(0,0,0,0.15)`
                     : '0 1px 4px rgba(0,0,0,0.10)',
                   transform: isActive ? 'scale(1.05)' : undefined,
                   zIndex: isActive ? 1 : undefined,
                   position: 'relative',
                 }}
               >
-                <div className="h-7 flex items-center gap-1.5 px-2" style={{ background: previewBg }}>
-                  <span className="text-[10px]" style={{ color: previewIcon }}>⚽</span>
-                  <span className="flex-1 h-1.5 rounded-full opacity-40" style={{ background: previewIcon }} />
-                  <span className="w-3 h-3 rounded-full" style={{ background: previewDot }} />
+                {/* Strip con patrón de camiseta */}
+                <div className="h-8 flex items-center gap-1.5 px-2" style={{ background: stripeBg }}>
+                  <span className="text-[11px] drop-shadow" style={{ color: fgColor }}>⚽</span>
+                  <span className="flex-1 h-1.5 rounded-full opacity-50 drop-shadow" style={{ background: fgColor }} />
+                  <span className="w-3 h-3 rounded-full border border-white/30" style={{ background: fgColor }} />
                 </div>
+                {/* Etiqueta del nombre */}
                 <div
-                  className="py-2 px-2 text-xs font-semibold text-center"
+                  className="py-1.5 px-2 text-xs font-semibold text-center"
                   style={{
-                    background: isActive ? previewBg : '#f9fafb',
-                    color: isActive ? previewDot : '#374151',
+                    background: isActive ? theme.primary : '#f9fafb',
+                    color: isActive ? theme.secondary : '#374151',
                   }}
                 >
                   {theme.name}
