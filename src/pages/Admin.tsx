@@ -642,13 +642,31 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
 function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
   const { show } = useToastStore()
   const [data, setData] = useState<Record<string, unknown>[]>([])
+  const [unlockCounts, setUnlockCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const url = tab === 'planillas' ? '/planillas/admin/all' : '/users'
-    api.get(url).then(({ data: d }) => {
-      setData(tab === 'planillas' ? d.data : d.data.users)
-    }).catch(() => show('Error al cargar', 'error')).finally(() => setLoading(false))
+    if (tab === 'usuarios') {
+      Promise.allSettled([
+        api.get('/users'),
+        api.get('/bets/unlock-requests'),
+      ]).then(([uRes, urRes]) => {
+        if (uRes.status === 'fulfilled') setData(uRes.value.data.data.users || [])
+        else show('Error al cargar usuarios', 'error')
+        if (urRes.status === 'fulfilled') {
+          const counts: Record<string, number> = {}
+          for (const r of (urRes.value.data.data || [])) {
+            const uid = String(r.requester_user_id)
+            counts[uid] = (counts[uid] || 0) + 1
+          }
+          setUnlockCounts(counts)
+        }
+      }).finally(() => setLoading(false))
+    } else {
+      api.get('/planillas/admin/all').then(({ data: d }) => {
+        setData(d.data)
+      }).catch(() => show('Error al cargar', 'error')).finally(() => setLoading(false))
+    }
   }, [tab])
 
   const handlePaid = async (id: string, current: boolean) => {
@@ -701,24 +719,37 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
         <thead>
           <tr className="bg-gray-50 text-xs text-gray-500 border-b">
             <th className="text-left px-4 py-2 font-semibold">Nombre</th>
-            <th className="text-left px-4 py-2 font-semibold">Email</th>
+            <th className="text-left px-4 py-2 font-semibold hidden md:table-cell">Email</th>
             <th className="text-center px-4 py-2 font-semibold">Rol</th>
             <th className="text-center px-4 py-2 font-semibold">Verificado</th>
+            <th className="text-center px-4 py-2 font-semibold">Solicitudes</th>
           </tr>
         </thead>
         <tbody>
-          {data.map((u) => (
-            <tr key={String(u.id)} className="border-b border-gray-50">
-              <td className="px-4 py-2 font-medium text-[#001A4B]">{String(u.nombre || '')}</td>
-              <td className="px-4 py-2 text-gray-500 text-xs">{String(u.email || '')}</td>
-              <td className="px-4 py-2 text-center">
-                <span className={`text-xs px-2 py-0.5 rounded-full ${u.rol === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                  {String(u.rol || '')}
-                </span>
-              </td>
-              <td className="px-4 py-2 text-center text-sm">{u.email_verified ? '✅' : '❌'}</td>
-            </tr>
-          ))}
+          {data.map((u) => {
+            const uid = String(u.id)
+            const reqCount = unlockCounts[uid] || 0
+            return (
+              <tr key={uid} className="border-b border-gray-50 hover:bg-gray-50/50">
+                <td className="px-4 py-2 font-medium text-[#001A4B]">{String(u.nombre || '')}</td>
+                <td className="px-4 py-2 text-gray-500 text-xs hidden md:table-cell">{String(u.email || '')}</td>
+                <td className="px-4 py-2 text-center">
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${u.rol === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {String(u.rol || '')}
+                  </span>
+                </td>
+                <td className="px-4 py-2 text-center text-sm">{u.email_verified ? '✅' : '❌'}</td>
+                <td className="px-4 py-2 text-center">
+                  {reqCount > 0
+                    ? <span className="inline-flex items-center gap-1 text-xs bg-orange-100 text-orange-700 font-semibold px-2 py-0.5 rounded-full">
+                        🔓 {reqCount}
+                      </span>
+                    : <span className="text-gray-300 text-xs">—</span>
+                  }
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>
