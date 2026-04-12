@@ -3,14 +3,16 @@ import { api } from '@/api/client'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Spinner } from '@/components/ui/Spinner'
 import { useToastStore } from '@/store/toastStore'
-import type { Match, Bet, Planilla } from '@/types'
+import type { Match, Bet, Planilla, Tournament } from '@/types'
 
 export function Apuestas() {
   const { show } = useToastStore()
   const [matches, setMatches] = useState<Match[]>([])
   const [bets, setBets] = useState<Record<string, Bet>>({})
   const [planillas, setPlanillas] = useState<Planilla[]>([])
+  const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [selectedPlanilla, setSelectedPlanilla] = useState<string>('')
+  const [selectedTournament, setSelectedTournament] = useState<string>('all')
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'todos' | 'pendientes' | 'finalizados'>('todos')
   const [search, setSearch] = useState('')
@@ -26,11 +28,13 @@ export function Apuestas() {
   const loadInitial = async () => {
     setLoading(true)
     try {
-      const [matchRes, planRes] = await Promise.all([
-        api.get('/matches?limit=100'),
+      const [matchRes, planRes, tourRes] = await Promise.all([
+        api.get('/matches?limit=200'),
         api.get('/planillas'),
+        api.get('/tournaments').catch(() => ({ data: { data: [] } })),
       ])
       setMatches(matchRes.data.data.matches)
+      setTournaments(tourRes.data.data || [])
       const pl: Planilla[] = planRes.data.data
       setPlanillas(pl)
       if (pl.length > 0) {
@@ -54,7 +58,11 @@ export function Apuestas() {
     }
   }
 
-  const filtered = matches.filter((m) => {
+  const tournamentMatches = selectedTournament === 'all'
+    ? matches
+    : matches.filter(m => m.tournament_id === selectedTournament)
+
+  const filtered = tournamentMatches.filter((m) => {
     if (filter === 'pendientes' && m.estado === 'finished') return false
     if (filter === 'finalizados' && m.estado !== 'finished') return false
     if (search) {
@@ -65,8 +73,8 @@ export function Apuestas() {
   })
 
   const progress = {
-    done: Object.keys(bets).length,
-    total: matches.filter(m => m.estado !== 'finished').length
+    done: Object.keys(bets).filter(mid => tournamentMatches.find(m => m.id === mid)).length,
+    total: tournamentMatches.filter(m => m.estado !== 'finished').length,
   }
 
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
@@ -98,6 +106,27 @@ export function Apuestas() {
       {planillas.length === 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-800">
           No tenés planillas. Creá una desde tu perfil para poder apostar.
+        </div>
+      )}
+
+      {/* Selector de torneo */}
+      {tournaments.length > 0 && (
+        <div className="flex gap-1 flex-wrap">
+          <button
+            onClick={() => setSelectedTournament('all')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === 'all' ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+          >
+            Todos
+          </button>
+          {tournaments.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setSelectedTournament(t.id)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === t.id ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+            >
+              {t.name}
+            </button>
+          ))}
         </div>
       )}
 
