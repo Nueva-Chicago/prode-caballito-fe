@@ -31,7 +31,7 @@ export function Admin() {
     try {
       const [mRes, tRes] = await Promise.all([
         api.get('/matches?limit=200'),
-        api.get('/tournaments'),
+        api.get('/tournaments/admin/all'),
       ])
       setMatches(mRes.data.data.matches)
       setTournaments(tRes.data.data)
