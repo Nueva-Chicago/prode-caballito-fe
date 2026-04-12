@@ -84,6 +84,8 @@ export function Apuestas() {
     ? matches
     : matches.filter(m => m.tournament_id === selectedTournament)
 
+  const pendingMatches = tournamentMatches.filter(m => m.estado !== 'finished')
+
   const filtered = tournamentMatches.filter((m) => {
     if (filter === 'pendientes' && m.estado === 'finished') return false
     if (filter === 'finalizados' && m.estado !== 'finished') return false
@@ -96,8 +98,14 @@ export function Apuestas() {
 
   const progress = {
     done: Object.keys(bets).filter(mid => tournamentMatches.find(m => m.id === mid)).length,
-    total: tournamentMatches.filter(m => m.estado !== 'finished').length,
+    total: pendingMatches.length,
   }
+
+  // Torneo seleccionado sin ninguna apuesta aún (hay partidos pero no aposté)
+  const selectedTournamentName = tournaments.find(t => t.id === selectedTournament)?.name
+  const noBeetsInTournament = selectedTournament !== 'all'
+    && pendingMatches.length > 0
+    && !pendingMatches.some(m => bets[m.id])
 
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
@@ -116,7 +124,12 @@ export function Apuestas() {
             <select
               value={selectedPlanilla}
               onChange={(e) => setSelectedPlanilla(e.target.value)}
-              className="w-full appearance-none border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5] pr-8 t-text-nav font-medium"
+              disabled={noBeetsInTournament}
+              className={`w-full appearance-none border rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5] pr-8 font-medium transition-all ${
+                noBeetsInTournament
+                  ? 'border-gray-200 text-gray-400 cursor-not-allowed opacity-60'
+                  : 'border-gray-200 t-text-nav'
+              }`}
             >
               {planillas.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre_planilla}</option>
@@ -130,13 +143,42 @@ export function Apuestas() {
           </div>
         )}
         <button
-          onClick={() => setShowNewPlanilla(true)}
+          onClick={() => {
+            if (noBeetsInTournament && selectedTournamentName) {
+              setNewPlanillaName(selectedTournamentName)
+            }
+            setShowNewPlanilla(true)
+          }}
           className="shrink-0 w-10 h-10 rounded-xl t-bg-primary text-white font-bold text-lg flex items-center justify-center hover:opacity-90 transition-opacity"
           title="Nueva planilla"
         >
           +
         </button>
       </div>
+
+      {/* Banner: torneo sin planilla activa */}
+      {noBeetsInTournament && planillas.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
+          <span className="text-xl shrink-0">📋</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-blue-800">
+              No tenés pronósticos en {selectedTournamentName}
+            </p>
+            <p className="text-xs text-blue-600 mt-0.5">
+              Tu planilla actual no tiene apuestas en este torneo. Podés seguir usando la misma o crear una nueva.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              setNewPlanillaName(selectedTournamentName || '')
+              setShowNewPlanilla(true)
+            }}
+            className="shrink-0 t-btn-primary text-xs px-3 py-2"
+          >
+            + Nueva
+          </button>
+        </div>
+      )}
 
       {/* Modal nueva planilla */}
       {showNewPlanilla && (

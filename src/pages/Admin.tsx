@@ -1150,18 +1150,19 @@ function EscudosTab({ matches }: { matches: Match[] }) {
   const teamsWithoutBadge = teams.filter(t => !badges[t.toUpperCase().trim()])
 
   const handleSave = async (teamName: string, url: string) => {
-    if (!url.trim()) return
+    if (!url.trim() || !teamName.trim()) return
     setSaving(true)
     try {
-      await api.put ? api.post('/teams/badges', { team_name: teamName, badge_url: url }) : null
-      await api.post('/teams/badges', { team_name: teamName, badge_url: url })
-      setBadge(teamName, url)
-      show(`Escudo de ${teamName} guardado ✓`, 'success')
+      const normalizedName = teamName.trim().toUpperCase()
+      await api.post('/teams/badges', { team_name: normalizedName, badge_url: url.trim() })
+      setBadge(normalizedName, url.trim())
+      show(`Escudo de ${normalizedName} guardado ✓`, 'success')
       setEditTeam(null)
       setNewTeam('')
       setNewUrl('')
-    } catch {
-      show('Error al guardar escudo', 'error')
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al guardar escudo'
+      show(msg, 'error')
     } finally {
       setSaving(false)
     }
