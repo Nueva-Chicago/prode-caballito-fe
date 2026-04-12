@@ -27,11 +27,14 @@ export function Navbar() {
   if (!user) return null
 
   return (
-    <nav className="bg-[#001A4B] text-white shadow-lg sticky top-0 z-40">
+    <nav
+      className="text-white shadow-lg sticky top-0 z-40"
+      style={{ background: 'var(--theme-nav-bg)' }}
+    >
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 font-bold text-lg shrink-0">
-          <span className="text-[#FFDF00]">⚽</span>
+          <span style={{ color: 'var(--theme-secondary)' }}>⚽</span>
           <span className="hidden sm:block text-sm font-semibold">PRODE Caballito</span>
         </Link>
 
@@ -41,17 +44,22 @@ export function Navbar() {
             <Link
               key={l.to}
               to={l.to}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                location.pathname === l.to
-                  ? 'bg-white/20 text-[#FFDF00]'
-                  : 'hover:bg-white/10'
-              }`}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10"
+              style={location.pathname === l.to
+                ? { background: 'rgba(255,255,255,0.18)', color: 'var(--theme-secondary)' }
+                : undefined}
             >
               {l.label}
             </Link>
           ))}
           {isAdmin() && (
-            <Link to="/admin" className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${location.pathname.startsWith('/admin') ? 'bg-white/20 text-[#FFDF00]' : 'hover:bg-white/10'}`}>
+            <Link
+              to="/admin"
+              className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10"
+              style={location.pathname.startsWith('/admin')
+                ? { background: 'rgba(255,255,255,0.18)', color: 'var(--theme-secondary)' }
+                : undefined}
+            >
               Admin
             </Link>
           )}
@@ -62,7 +70,12 @@ export function Navbar() {
           <Link to="/profile" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             {user.foto_url
               ? <img src={user.foto_url} alt="" className="w-8 h-8 rounded-full object-cover border-2 border-white/30" />
-              : <div className="w-8 h-8 rounded-full bg-[#0042A5] flex items-center justify-center text-sm font-bold">{user.nombre[0].toUpperCase()}</div>
+              : <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                  style={{ background: 'var(--theme-primary)', color: 'var(--theme-on-primary)' }}
+                >
+                  {user.nombre[0].toUpperCase()}
+                </div>
             }
             <span className="hidden sm:block text-sm max-w-[120px] truncate">{user.nombre}</span>
           </Link>
@@ -81,7 +94,10 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden bg-[#002B7F] border-t border-white/10 px-4 py-3 flex flex-col gap-1">
+        <div
+          className="md:hidden border-t border-white/10 px-4 py-3 flex flex-col gap-1"
+          style={{ background: 'var(--theme-nav-bg-2)' }}
+        >
           {navLinks.map((l) => (
             <Link key={l.to} to={l.to} onClick={() => setMenuOpen(false)}
               className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-sm">
