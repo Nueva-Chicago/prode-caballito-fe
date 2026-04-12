@@ -197,6 +197,7 @@ export function Admin() {
       {/* Tab: Torneos */}
       {tab === 'torneos' && <TorneosTab tournaments={tournaments} onRefresh={loadData} />}
 
+
       {/* Tab: Planillas y Usuarios — placeholder */}
       {(tab === 'planillas' || tab === 'usuarios') && (
         <AdminSubTab tab={tab} />
@@ -270,10 +271,26 @@ export function Admin() {
   )
 }
 
-function TorneosTab({ tournaments, onRefresh }: { tournaments: Tournament[], onRefresh: () => void }) {
+function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () => void }) {
   const { show } = useToastStore()
+  const [allTournaments, setAllTournaments] = useState<(Tournament & { match_count?: number })[]>([])
+  const [loadingAll, setLoadingAll] = useState(true)
   const [form, setForm] = useState({ name: '', fase: '', description: '' })
   const [saving, setSaving] = useState(false)
+
+  const loadAll = async () => {
+    setLoadingAll(true)
+    try {
+      const { data } = await api.get('/tournaments/admin/all')
+      setAllTournaments(data.data)
+    } catch {
+      show('Error al cargar torneos', 'error')
+    } finally {
+      setLoadingAll(false)
+    }
+  }
+
+  useEffect(() => { loadAll() }, [])
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -282,6 +299,7 @@ function TorneosTab({ tournaments, onRefresh }: { tournaments: Tournament[], onR
       await api.post('/tournaments', form)
       show('Torneo creado ✓', 'success')
       setForm({ name: '', fase: '', description: '' })
+      loadAll()
       onRefresh()
     } catch {
       show('Error al crear torneo', 'error')
@@ -293,6 +311,8 @@ function TorneosTab({ tournaments, onRefresh }: { tournaments: Tournament[], onR
   const handleToggle = async (t: Tournament) => {
     try {
       await api.put(`/tournaments/${t.id}`, { is_active: !t.is_active })
+      show(`Torneo ${!t.is_active ? 'activado' : 'desactivado'} ✓`, 'success')
+      loadAll()
       onRefresh()
     } catch {
       show('Error', 'error')
@@ -301,6 +321,7 @@ function TorneosTab({ tournaments, onRefresh }: { tournaments: Tournament[], onR
 
   return (
     <div className="space-y-4">
+      {/* Crear torneo */}
       <form onSubmit={handleCreate} className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm space-y-3">
         <h3 className="font-semibold text-[#001A4B] text-sm">Nuevo Torneo</h3>
         <div className="grid grid-cols-2 gap-3">
@@ -317,20 +338,42 @@ function TorneosTab({ tournaments, onRefresh }: { tournaments: Tournament[], onR
         </button>
       </form>
 
+      {/* Lista completa — activos e inactivos */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        {tournaments.length === 0 && <p className="text-sm text-gray-400 text-center py-6">No hay torneos</p>}
-        {tournaments.map((t) => (
-          <div key={t.id} className="flex items-center justify-between px-4 py-3 border-b border-gray-50 last:border-0">
-            <div>
-              <p className="text-sm font-semibold text-[#001A4B]">{t.name}</p>
-              <p className="text-xs text-gray-400">{t.fase}</p>
+        <div className="bg-gray-50 px-4 py-2 border-b border-gray-100">
+          <p className="text-xs font-semibold text-gray-500">Todos los torneos · activá/desactivá para que aparezcan en la app</p>
+        </div>
+        {loadingAll ? (
+          <div className="py-6 flex justify-center"><Spinner size="sm" /></div>
+        ) : allTournaments.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-6">No hay torneos</p>
+        ) : (
+          allTournaments.map((t) => (
+            <div key={t.id} className="flex items-center justify-between px-4 py-3 border-b border-gray-50 last:border-0">
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-[#001A4B]">{t.name}</p>
+                  {t.match_count != null && t.match_count > 0 && (
+                    <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full font-medium">
+                      {t.match_count} partidos
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400">{t.fase}</p>
+              </div>
+              <button
+                onClick={() => handleToggle(t)}
+                className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-colors ${
+                  t.is_active
+                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                }`}
+              >
+                {t.is_active ? '● Activo' : '○ Inactivo'}
+              </button>
             </div>
-            <button onClick={() => handleToggle(t)}
-              className={`text-xs px-3 py-1 rounded-full font-medium ${t.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-              {t.is_active ? 'Activo' : 'Inactivo'}
-            </button>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   )
