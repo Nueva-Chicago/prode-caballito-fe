@@ -4,7 +4,7 @@ import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Spinner } from '@/components/ui/Spinner'
-import type { Match, Bet, Planilla, RankingEntry } from '@/types'
+import type { Match, Bet, Planilla, RankingEntry, Tournament } from '@/types'
 
 export function Home() {
   const { user } = useAuthStore()
@@ -12,23 +12,25 @@ export function Home() {
   const [bets, setBets] = useState<Record<string, Bet>>({})
   const [planilla, setPlanilla] = useState<Planilla | null>(null)
   const [ranking, setRanking] = useState<RankingEntry[]>([])
+  const [tournaments, setTournaments] = useState<Tournament[]>([])
+  const [selectedTournament, setSelectedTournament] = useState<string>('all')
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'partidos' | 'ranking'>('partidos')
 
-  useEffect(() => {
-    loadData()
-  }, [])
+  useEffect(() => { loadData() }, [])
 
   const loadData = async () => {
     setLoading(true)
     try {
-      const [matchRes, planillaRes, rankRes] = await Promise.all([
-        api.get('/matches?limit=100'),
+      const [matchRes, planillaRes, rankRes, tourRes] = await Promise.all([
+        api.get('/matches?limit=200'),
         api.get('/planillas'),
         api.get('/ranking?limit=10'),
+        api.get('/tournaments').catch(() => ({ data: { data: [] } })),
       ])
       setMatches(matchRes.data.data.matches)
       setRanking(rankRes.data.data.ranking)
+      setTournaments(tourRes.data.data || [])
 
       const planillas: Planilla[] = planillaRes.data.data
       if (planillas.length > 0) {
@@ -46,11 +48,23 @@ export function Home() {
     }
   }
 
-  const upcoming = matches.filter(m => m.estado !== 'finished').slice(0, 5)
-  const finished = matches.filter(m => m.estado === 'finished').slice(0, 3)
-  const progress = planilla
-    ? { done: Object.keys(bets).length, total: upcoming.length }
-    : null
+  // Matches filtrados por torneo seleccionado
+  const tournamentMatches = selectedTournament === 'all'
+    ? matches
+    : matches.filter(m => m.tournament_id === selectedTournament)
+
+  const pendingMatches = tournamentMatches.filter(m => m.estado !== 'finished')
+  const finishedMatches = tournamentMatches.filter(m => m.estado === 'finished')
+
+  // Progreso: apuestas hechas sobre partidos pendientes del torneo
+  const progress = planilla ? {
+    done: pendingMatches.filter(m => bets[m.id]).length,
+    total: pendingMatches.length,
+  } : null
+
+  // Partidos para mostrar en el tab
+  const upcoming = pendingMatches.slice(0, 5)
+  const recentFinished = finishedMatches.slice(0, 3)
 
   if (loading) return (
     <div className="flex justify-center py-20"><Spinner size="lg" /></div>
@@ -58,10 +72,42 @@ export function Home() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-      {/* Header bienvenida */}
+
+      {/* Header bienvenida + progreso */}
       <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] rounded-2xl p-5 text-white">
         <h1 className="text-xl font-bold">¡Hola, {user?.nombre}! 👋</h1>
-        <p className="text-white/70 text-sm mt-1">PRODE Caballito Qatar 2026</p>
+        <p className="text-white/70 text-sm mt-0.5">PRODE Caballito</p>
+
+        {/* Selector de torneo */}
+        {tournaments.length > 0 && (
+          <div className="flex gap-1.5 flex-wrap mt-3">
+            <button
+              onClick={() => setSelectedTournament('all')}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all ${
+                selectedTournament === 'all'
+                  ? 'bg-white text-[#001A4B] border-white'
+                  : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'
+              }`}
+            >
+              Todos
+            </button>
+            {tournaments.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setSelectedTournament(t.id)}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all ${
+                  selectedTournament === t.id
+                    ? 'bg-white text-[#001A4B] border-white'
+                    : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'
+                }`}
+              >
+                {t.name}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Barra de progreso */}
         {progress && (
           <div className="mt-3">
             <div className="flex justify-between text-xs mb-1 text-white/80">
@@ -71,7 +117,7 @@ export function Home() {
             <div className="bg-white/20 rounded-full h-2">
               <div
                 className="bg-[#FFDF00] h-2 rounded-full transition-all"
-                style={{ width: `${progress.total ? (progress.done / progress.total) * 100 : 0}%` }}
+                style={{ width: `${progress.total ? Math.min((progress.done / progress.total) * 100, 100) : 0}%` }}
               />
             </div>
           </div>
@@ -98,7 +144,7 @@ export function Home() {
       <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
         {(['partidos', 'ranking'] as const).map((tab) => (
           <button key={tab} onClick={() => setActiveTab(tab)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all capitalize ${activeTab === tab ? 'bg-white shadow text-[#0042A5]' : 'text-gray-500 hover:text-gray-700'}`}>
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab ? 'bg-white shadow text-[#0042A5]' : 'text-gray-500 hover:text-gray-700'}`}>
             {tab === 'partidos' ? 'Próximos partidos' : 'Top ranking'}
           </button>
         ))}
@@ -120,10 +166,10 @@ export function Home() {
               onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
             />
           ))}
-          {finished.length > 0 && (
+          {recentFinished.length > 0 && (
             <>
               <h3 className="text-sm font-semibold text-gray-500 mt-4">Últimos resultados</h3>
-              {finished.map((m) => (
+              {recentFinished.map((m) => (
                 <MatchCard key={m.id} match={m} bet={bets[m.id]} readonly />
               ))}
             </>
