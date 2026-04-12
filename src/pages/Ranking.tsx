@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
@@ -22,6 +22,12 @@ export function Ranking() {
   const [selected, setSelected] = useState<RankingEntry | null>(null)
   const [shared, setShared] = useState(false)
 
+  // Favoritos
+  const [favorites, setFavorites] = useState<Set<string>>(new Set())
+  const [togglingFav, setTogglingFav] = useState<string | null>(null)
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false)
+
+  // Datos para ranking por torneo
   const [bets, setBets] = useState<BetMap | null>(null)
   const [allMatches, setAllMatches] = useState<Match[] | null>(null)
   const [loadingTournament, setLoadingTournament] = useState(false)
@@ -30,9 +36,13 @@ export function Ranking() {
     Promise.allSettled([
       api.get('/ranking?limit=200'),
       api.get('/tournaments'),
-    ]).then(([rRes, tRes]) => {
+      api.get('/ranking/favorites').catch(() => ({ data: { data: [] } })),
+    ]).then(([rRes, tRes, fRes]) => {
       if (rRes.status === 'fulfilled') setRanking(rRes.value.data.data.ranking || [])
       if (tRes.status === 'fulfilled') setTournaments(tRes.value.data.data || [])
+      if (fRes.status === 'fulfilled') {
+        setFavorites(new Set(fRes.value.data.data || []))
+      }
     }).finally(() => setLoading(false))
   }, [])
 
@@ -92,7 +102,13 @@ export function Ranking() {
   }, [selectedTournamentId, bets, allMatches, ranking])
 
   const selectedTournament = tournaments.find(tour => tour.id === selectedTournamentId)
-  const displayRanking = selectedTournamentId ? (tournamentRanking ?? []) : ranking
+  const baseRanking = selectedTournamentId ? (tournamentRanking ?? []) : ranking
+
+  // Filtro de favoritos aplicado sobre el ranking base
+  const displayRanking = showOnlyFavorites
+    ? baseRanking.filter(r => favorites.has(r.planilla_id))
+    : baseRanking
+
   const isLoadingDisplay = loading || (selectedTournamentId && loadingTournament)
 
   const handleShare = async (r: RankingEntry) => {
@@ -107,7 +123,24 @@ export function Ranking() {
     }
   }
 
-  const myEntry = displayRanking.find((r) => r.user_id === user?.id)
+  const handleToggleFavorite = useCallback(async (planillaId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (togglingFav) return
+    setTogglingFav(planillaId)
+    try {
+      const { data } = await api.post(`/ranking/favorites/${planillaId}`, {})
+      setFavorites(prev => {
+        const next = new Set(prev)
+        if (data.action === 'added') next.add(planillaId)
+        else next.delete(planillaId)
+        return next
+      })
+    } catch { /* silent */ } finally {
+      setTogglingFav(null)
+    }
+  }, [togglingFav])
+
+  const myEntry = baseRanking.find((r) => r.user_id === user?.id)
 
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
@@ -117,7 +150,7 @@ export function Ranking() {
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
       <h1 className="text-xl font-bold t-text-nav">{t.ranking.title}</h1>
 
-      {/* Selector de torneo */}
+      {/* Selector de torneo + Favoritos */}
       <div className="flex gap-2 flex-wrap">
         <button
           onClick={() => setSelectedTournamentId('')}
@@ -129,6 +162,24 @@ export function Ranking() {
         >
           {t.ranking.global}
         </button>
+
+        {/* Tab Favoritos */}
+        <button
+          onClick={() => setShowOnlyFavorites(v => !v)}
+          className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
+            showOnlyFavorites
+              ? 'bg-yellow-400 text-yellow-900 border-yellow-400 shadow-sm'
+              : 'bg-white text-gray-600 border-gray-200 hover:border-yellow-300 hover:text-yellow-600'
+          }`}
+        >
+          {t.ranking.favorites}
+          {favorites.size > 0 && (
+            <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full font-bold ${showOnlyFavorites ? 'bg-yellow-600 text-white' : 'bg-gray-100 text-gray-500'}`}>
+              {favorites.size}
+            </span>
+          )}
+        </button>
+
         {tournaments.map(tour => {
           const futureStart = tour.start_date ? new Date(tour.start_date) > now : false
           const hasFinished = (tour.finished_count ?? 0) > 0
@@ -165,7 +216,7 @@ export function Ranking() {
       ) : (
         <>
           {/* Mi posición */}
-          {myEntry && (
+          {myEntry && !showOnlyFavorites && (
             <div
               onClick={() => setSelected(myEntry)}
               className="t-gradient-hero rounded-xl p-4 text-white flex items-center gap-4 cursor-pointer hover:opacity-90 transition-opacity"
@@ -190,33 +241,54 @@ export function Ranking() {
             </div>
           )}
 
-          {selectedTournamentId && tournamentRanking !== null && tournamentRanking.length === 0 && (
+          {/* Estado vacío: sin resultados o sin favoritos */}
+          {selectedTournamentId && tournamentRanking !== null && tournamentRanking.length === 0 && !showOnlyFavorites && (
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
               <p className="text-sm text-blue-700 font-medium">{t.ranking.noResults}</p>
               <p className="text-xs text-blue-500 mt-1">{t.ranking.noResultsDesc}</p>
             </div>
           )}
 
+          {showOnlyFavorites && displayRanking.length === 0 && (
+            <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-6 text-center">
+              <div className="text-3xl mb-2">⭐</div>
+              <p className="text-sm text-yellow-800 font-semibold">{t.ranking.noFavorites}</p>
+              <p className="text-xs text-yellow-600 mt-1">{t.ranking.noFavoritesDesc}</p>
+            </div>
+          )}
+
+          {/* Tabla */}
           {displayRanking.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-              {selectedTournament && (
-                <div className="t-bg-nav px-4 py-2">
-                  <p className="text-xs font-semibold text-white/80">{selectedTournament.name} · {selectedTournament.fase}</p>
+              {(selectedTournament || showOnlyFavorites) && (
+                <div className="t-bg-nav px-4 py-2 flex items-center gap-2">
+                  {showOnlyFavorites && <span className="text-yellow-400 text-sm">⭐</span>}
+                  <p className="text-xs font-semibold text-white/80">
+                    {showOnlyFavorites
+                      ? selectedTournament
+                        ? `${t.ranking.favorites} · ${selectedTournament.name}`
+                        : t.ranking.favorites
+                      : `${selectedTournament!.name} · ${selectedTournament!.fase}`
+                    }
+                  </p>
                 </div>
               )}
-              <div className="grid grid-cols-[2rem_1fr_auto_auto] gap-2 px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 border-b">
+              <div className="grid grid-cols-[2rem_1fr_auto_auto_2rem] gap-2 px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 border-b">
                 <span>#</span>
                 <span>{t.ranking.player}</span>
                 <span className="text-center">{t.ranking.exact}</span>
                 <span className="text-right">{t.ranking.pts}</span>
+                <span />
               </div>
               {displayRanking.map((r, i) => {
                 const isMe = r.user_id === user?.id
+                const isFav = favorites.has(r.planilla_id)
+                const isToggling = togglingFav === r.planilla_id
                 return (
                   <div
                     key={r.planilla_id}
                     onClick={() => setSelected(r)}
-                    className={`grid grid-cols-[2rem_1fr_auto_auto] gap-2 items-center px-4 py-3 cursor-pointer transition-colors ${i < displayRanking.length - 1 ? 'border-b border-gray-50' : ''} ${isMe ? 't-row-me' : 'hover:bg-gray-50'}`}
+                    className={`grid grid-cols-[2rem_1fr_auto_auto_2rem] gap-2 items-center px-4 py-3 cursor-pointer transition-colors ${i < displayRanking.length - 1 ? 'border-b border-gray-50' : ''} ${isMe ? 't-row-me' : 'hover:bg-gray-50'}`}
                   >
                     <span className="text-sm font-bold text-gray-400">
                       {i < 3 ? MEDAL[i] : r.position}
@@ -239,6 +311,17 @@ export function Ranking() {
                     </div>
                     <span className="text-xs text-center text-gray-600">{r.exactos_count}</span>
                     <span className="font-black t-text-primary text-right">{r.puntos_totales}</span>
+                    {/* Botón favorito — no mostrar en fila propia */}
+                    {!isMe ? (
+                      <button
+                        onClick={(e) => handleToggleFavorite(r.planilla_id, e)}
+                        disabled={isToggling}
+                        title={isFav ? t.ranking.unfollow : t.ranking.follow}
+                        className={`text-base leading-none transition-all disabled:opacity-40 hover:scale-125 ${isFav ? 'opacity-100' : 'opacity-20 hover:opacity-60'}`}
+                      >
+                        {isToggling ? '…' : isFav ? '⭐' : '☆'}
+                      </button>
+                    ) : <span />}
                   </div>
                 )
               })}
@@ -281,17 +364,34 @@ export function Ranking() {
                     <span className="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full font-medium ml-1">{t.ranking.noOfficial}</span>
                   )}
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="text-3xl font-black text-[#0042A5]">{selected.puntos_totales}</p>
-                  <p className="text-xs text-gray-400">{t.ranking.points}</p>
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <div className="text-right">
+                    <p className="text-3xl font-black text-[#0042A5]">{selected.puntos_totales}</p>
+                    <p className="text-xs text-gray-400">{t.ranking.points}</p>
+                  </div>
+                  {/* Favorito desde el drawer */}
+                  {selected.user_id !== user?.id && (
+                    <button
+                      onClick={(e) => handleToggleFavorite(selected.planilla_id, e)}
+                      disabled={togglingFav === selected.planilla_id}
+                      className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${
+                        favorites.has(selected.planilla_id)
+                          ? 'bg-yellow-400 border-yellow-400 text-yellow-900'
+                          : 'bg-white border-gray-200 text-gray-500 hover:border-yellow-300 hover:text-yellow-600'
+                      }`}
+                    >
+                      {favorites.has(selected.planilla_id) ? '⭐' : '☆'}
+                      {favorites.has(selected.planilla_id) ? t.ranking.unfollow : t.ranking.follow}
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-2 mt-5">
                 {[
-                  { label: t.ranking.exact,   value: selected.exactos_count,   color: 'text-red-500' },
+                  { label: t.ranking.exact,     value: selected.exactos_count,    color: 'text-red-500' },
                   { label: t.ranking.extraBonus, value: selected.aciertos_celeste, color: 'text-sky-500' },
-                  { label: t.ranking.partial,  value: selected.aciertos_verde,  color: 'text-green-600' },
-                  { label: t.ranking.tendency, value: selected.aciertos_amarillo, color: 'text-yellow-500' },
+                  { label: t.ranking.partial,    value: selected.aciertos_verde,   color: 'text-green-600' },
+                  { label: t.ranking.tendency,   value: selected.aciertos_amarillo, color: 'text-yellow-500' },
                 ].map(({ label, value, color }) => (
                   <div key={label} className="bg-gray-50 rounded-xl p-3 text-center">
                     <p className={`text-xl font-black ${color}`}>{value || 0}</p>

@@ -62,6 +62,11 @@ export const es = {
     shareText: (n: string, p: number, pts: number) => `${n} está #${p} en el PRODE Caballito con ${pts} puntos 🏆`,
     position: 'posición',
     points: 'puntos',
+    favorites: '⭐ Favoritos',
+    noFavorites: 'No seguís a nadie todavía',
+    noFavoritesDesc: 'Tocá la ⭐ en cualquier jugador para seguirlo',
+    follow: 'Seguir',
+    unfollow: 'Dejar de seguir',
   },
   matrix: {
     title: '📊 Matriz de Pronósticos',
