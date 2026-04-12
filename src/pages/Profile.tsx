@@ -135,18 +135,42 @@ export function Profile() {
 
       {/* Tema de equipo */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-        <h3 className="font-bold text-[#001A4B] mb-3">🎨 Tema Visual</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {Object.entries(TEAM_THEMES).map(([key, theme]) => (
-            <button
-              key={key}
-              onClick={() => handleThemeChange(key)}
-              className={`p-3 rounded-xl border-2 text-sm font-medium transition-all ${user.tema_equipo === key ? 'border-[#0042A5] bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
-              style={{ borderLeftColor: theme.primary, borderLeftWidth: 4 }}
-            >
-              {theme.name}
-            </button>
-          ))}
+        <h3 className="font-bold text-[#001A4B] mb-4">🎨 Tema Visual</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {Object.entries(TEAM_THEMES).map(([key, theme]) => {
+            const isActive = user.tema_equipo === key
+            return (
+              <button
+                key={key}
+                onClick={() => handleThemeChange(key)}
+                className="rounded-xl overflow-hidden transition-all hover:scale-105 focus:outline-none"
+                style={{
+                  boxShadow: isActive
+                    ? `0 0 0 3px ${theme.primary}, 0 4px 12px rgba(0,0,0,0.15)`
+                    : '0 1px 4px rgba(0,0,0,0.08)',
+                  transform: isActive ? 'scale(1.04)' : undefined,
+                }}
+              >
+                {/* Preview del navbar */}
+                <div className="h-7 flex items-center gap-1.5 px-2" style={{ background: theme.primary }}>
+                  <span className="text-[10px]" style={{ color: theme.secondary }}>⚽</span>
+                  <span className="flex-1 h-1.5 rounded-full opacity-40 bg-white" />
+                  <span className="w-3 h-3 rounded-full" style={{ background: theme.secondary }} />
+                </div>
+                {/* Nombre */}
+                <div
+                  className="py-2 px-2 text-xs font-semibold text-center"
+                  style={{
+                    background: isActive ? theme.primary : '#f9fafb',
+                    color: isActive ? theme.secondary : '#374151',
+                  }}
+                >
+                  {theme.name}
+                  {isActive && <span className="ml-1">✓</span>}
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
 
