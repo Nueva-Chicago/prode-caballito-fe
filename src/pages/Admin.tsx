@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { api } from '@/api/client'
@@ -641,9 +642,16 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
 /* ── AdminSubTab ─────────────────────────────────────────────────────── */
 function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
   const { show } = useToastStore()
+  const navigate = useNavigate()
   const [data, setData] = useState<Record<string, unknown>[]>([])
   const [unlockCounts, setUnlockCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
+  // Detalle usuario
+  const [expandedUserId, setExpandedUserId] = useState<string | null>(null)
+  const [userPlanillas, setUserPlanillas] = useState<Record<string, unknown>[]>([])
+  const [loadingPlanillas, setLoadingPlanillas] = useState(false)
+  const [planillaTournamentFilter, setPlanillaTournamentFilter] = useState<string>('all')
+  const [allPlanillas, setAllPlanillas] = useState<Record<string, unknown>[] | null>(null)
 
   useEffect(() => {
     if (tab === 'usuarios') {
@@ -668,6 +676,26 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
       }).catch(() => show('Error al cargar', 'error')).finally(() => setLoading(false))
     }
   }, [tab])
+
+  const handleUserClick = useCallback(async (uid: string) => {
+    if (expandedUserId === uid) { setExpandedUserId(null); return }
+    setExpandedUserId(uid)
+    setPlanillaTournamentFilter('all')
+    setLoadingPlanillas(true)
+    try {
+      let pl = allPlanillas
+      if (!pl) {
+        const { data: d } = await api.get('/planillas/admin/all')
+        pl = d.data || []
+        setAllPlanillas(pl)
+      }
+      setUserPlanillas((pl || []).filter(p => String(p.user_id) === uid))
+    } catch {
+      show('Error al cargar planillas', 'error')
+    } finally {
+      setLoadingPlanillas(false)
+    }
+  }, [expandedUserId, allPlanillas, show])
 
   const handlePaid = async (id: string, current: boolean) => {
     try {
@@ -713,6 +741,14 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
     )
   }
 
+  // Torneos únicos de las planillas del usuario expandido
+  const userTournaments = Array.from(new Set(
+    userPlanillas.map(p => String(p.tournament_name || '')).filter(Boolean)
+  ))
+  const filteredPlanillas = planillaTournamentFilter === 'all'
+    ? userPlanillas
+    : userPlanillas.filter(p => String(p.tournament_name || '') === planillaTournamentFilter)
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       <table className="w-full text-sm">
@@ -729,9 +765,17 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
           {data.map((u) => {
             const uid = String(u.id)
             const reqCount = unlockCounts[uid] || 0
+            const isExpanded = expandedUserId === uid
             return (
-              <tr key={uid} className="border-b border-gray-50 hover:bg-gray-50/50">
-                <td className="px-4 py-2 font-medium text-[#001A4B]">{String(u.nombre || '')}</td>
+              <>
+              <tr key={uid}
+                className={`border-b border-gray-50 cursor-pointer transition-colors ${isExpanded ? 'bg-blue-50' : 'hover:bg-gray-50/50'}`}
+                onClick={() => handleUserClick(uid)}
+              >
+                <td className="px-4 py-2 font-medium text-[#001A4B] flex items-center gap-2">
+                  <span className="text-gray-400 text-xs">{isExpanded ? '▾' : '▸'}</span>
+                  {String(u.nombre || '')}
+                </td>
                 <td className="px-4 py-2 text-gray-500 text-xs hidden md:table-cell">{String(u.email || '')}</td>
                 <td className="px-4 py-2 text-center">
                   <span className={`text-xs px-2 py-0.5 rounded-full ${u.rol === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
@@ -748,6 +792,67 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                   }
                 </td>
               </tr>
+              {/* Panel expandible de planillas */}
+              {isExpanded && (
+                <tr key={`${uid}-detail`} className="bg-blue-50/60 border-b border-blue-100">
+                  <td colSpan={5} className="px-6 py-4">
+                    {loadingPlanillas ? (
+                      <div className="flex justify-center py-4"><Spinner /></div>
+                    ) : userPlanillas.length === 0 ? (
+                      <p className="text-sm text-gray-400 text-center py-2">Este usuario no tiene planillas</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {/* Filtro de torneos */}
+                        <div className="flex gap-1.5 flex-wrap">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setPlanillaTournamentFilter('all') }}
+                            className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all ${planillaTournamentFilter === 'all' ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200'}`}
+                          >
+                            Todos ({userPlanillas.length})
+                          </button>
+                          {userTournaments.map(t => (
+                            <button
+                              key={t}
+                              onClick={(e) => { e.stopPropagation(); setPlanillaTournamentFilter(t) }}
+                              className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all ${planillaTournamentFilter === t ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200'}`}
+                            >
+                              {t} ({userPlanillas.filter(p => String(p.tournament_name || '') === t).length})
+                            </button>
+                          ))}
+                        </div>
+                        {/* Lista de planillas */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {filteredPlanillas.map(p => (
+                            <button
+                              key={String(p.id)}
+                              onClick={(e) => { e.stopPropagation(); navigate(`/planilla/${p.id}`) }}
+                              className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-left hover:border-[#0042A5] hover:shadow-sm transition-all group"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm font-semibold text-[#001A4B] group-hover:text-[#0042A5]">
+                                    {String(p.nombre_planilla || 'Planilla')}
+                                  </p>
+                                  {p.tournament_name && (
+                                    <p className="text-xs text-gray-400 mt-0.5">{String(p.tournament_name)}</p>
+                                  )}
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <p className="text-sm font-black text-[#0042A5]">{String(p.puntos_totales || 0)} pts</p>
+                                  <p className={`text-xs font-medium mt-0.5 ${p.precio_pagado ? 'text-green-600' : 'text-orange-500'}`}>
+                                    {p.precio_pagado ? 'Pagada' : 'Sin pagar'}
+                                  </p>
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              )}
+              </>
             )
           })}
         </tbody>
