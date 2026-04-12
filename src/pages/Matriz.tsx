@@ -268,6 +268,32 @@ export function Matriz() {
           100% { opacity: 1; transform: scale(1) translateY(0); }
         }
         .animate-pop { animation: pop 0.15s ease-out both; }
+
+        @keyframes shimmer {
+          0%   { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        .badge-paid {
+          background: linear-gradient(90deg, #92400e 0%, #d97706 30%, #fde68a 50%, #d97706 70%, #92400e 100%);
+          background-size: 200% 100%;
+          animation: shimmer 2.4s linear infinite;
+          color: #451a03;
+          font-weight: 900;
+          font-size: 10px;
+          border-radius: 5px;
+          padding: 2px 5px;
+          display: inline-flex;
+          align-items: center;
+          gap: 2px;
+          letter-spacing: 0.02em;
+          box-shadow: 0 0 0 1px #d97706, 0 1px 4px rgba(217,119,6,0.4);
+          cursor: default;
+          user-select: none;
+          white-space: nowrap;
+        }
+        .badge-paid:hover {
+          box-shadow: 0 0 0 1px #d97706, 0 2px 8px rgba(217,119,6,0.6);
+        }
       `}</style>
 
       <div className="max-w-7xl mx-auto px-2 flex items-start justify-between flex-wrap gap-3">
@@ -412,11 +438,23 @@ export function Matriz() {
                         )
                       }
 
-                      // Solicitud pendiente de aprobación
+                      // Solicitud pendiente — badge "golden ticket"
                       if (unlockStatus === 'pending') {
+                        const isPaid = !unlockConfig.free
                         return (
                           <td key={m.id} className="px-1 py-1.5 text-center">
-                            <span className="inline-block text-[13px]" title="Solicitud pendiente de aprobación">⏳</span>
+                            {isPaid
+                              ? <span
+                                  className="badge-paid"
+                                  title="Pago enviado · esperando aprobación del admin"
+                                >
+                                  🪙 $
+                                </span>
+                              : <span
+                                  className="inline-block text-[13px]"
+                                  title="Solicitud pendiente de aprobación"
+                                >⏳</span>
+                            }
                           </td>
                         )
                       }
