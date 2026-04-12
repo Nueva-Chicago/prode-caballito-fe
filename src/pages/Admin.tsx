@@ -5,7 +5,7 @@ import { api } from '@/api/client'
 import { Modal } from '@/components/ui/Modal'
 import { Spinner } from '@/components/ui/Spinner'
 import { useToastStore } from '@/store/toastStore'
-import { useTeamBadgesStore } from '@/store/teamBadgesStore'
+import { useTeamBadgesStore, getTeamBadge } from '@/store/teamBadgesStore'
 import { teamFlag } from '@/utils/teamFlags'
 import type { Match, Tournament } from '@/types'
 
@@ -46,14 +46,14 @@ export function Admin() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [mRes, tRes] = await Promise.all([
+      const [mRes, tRes] = await Promise.allSettled([
         api.get('/matches?limit=200'),
         api.get('/tournaments/admin/all'),
       ])
-      setMatches(mRes.data.data.matches)
-      setTournaments(tRes.data.data)
-    } catch {
-      show('Error al cargar datos', 'error')
+      if (mRes.status === 'fulfilled') setMatches(mRes.value.data.data.matches || [])
+      else show('Error al cargar partidos', 'error')
+      if (tRes.status === 'fulfilled') setTournaments(tRes.value.data.data || [])
+      else show('Error al cargar torneos', 'error')
     } finally {
       setLoading(false)
     }
@@ -277,11 +277,13 @@ export function Admin() {
               <label className="block text-xs font-medium text-gray-600 mb-1">Equipo Local</label>
               <input value={matchForm.home_team} onChange={(e) => setMatchForm({ ...matchForm, home_team: e.target.value })}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" required />
+              <TeamBadgeInput teamName={matchForm.home_team} />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Equipo Visitante</label>
               <input value={matchForm.away_team} onChange={(e) => setMatchForm({ ...matchForm, away_team: e.target.value })}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" required />
+              <TeamBadgeInput teamName={matchForm.away_team} />
             </div>
           </div>
           <div>
@@ -337,6 +339,66 @@ export function Admin() {
   )
 }
 
+/* ── TeamBadgeInput ──────────────────────────────────────────────────── */
+function TeamBadgeInput({ teamName }: { teamName: string }) {
+  const { badges, setBadge } = useTeamBadgesStore()
+  const { show } = useToastStore()
+  const current = teamName ? getTeamBadge(teamName, badges) : null
+  const flag = teamName ? teamFlag(teamName) : null
+  const [url, setUrl] = useState(current || '')
+  const [preview, setPreview] = useState(current || '')
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    const c = teamName ? (getTeamBadge(teamName, badges) || '') : ''
+    setUrl(c)
+    setPreview(c)
+  }, [teamName, badges])
+
+  const handleSave = async () => {
+    if (!teamName.trim() || !url.trim()) return
+    setSaving(true)
+    try {
+      await api.post('/teams/badges', { team_name: teamName, badge_url: url })
+      setBadge(teamName, url)
+      show(`Escudo de ${teamName} guardado ✓`, 'success')
+    } catch {
+      show('Error al guardar escudo', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="mt-1.5 flex items-center gap-2">
+      <div className="w-9 h-9 rounded-lg border border-gray-200 overflow-hidden flex items-center justify-center bg-gray-50 shrink-0">
+        {preview
+          ? <img src={preview} alt="" className="w-full h-full object-contain p-0.5"
+              onError={() => setPreview('')} />
+          : flag
+            ? <span style={{ fontSize: 22 }}>{flag}</span>
+            : <span className="text-[10px] text-gray-300">—</span>
+        }
+      </div>
+      <input
+        type="text"
+        value={url}
+        onChange={(e) => { setUrl(e.target.value); setPreview(e.target.value) }}
+        placeholder="URL del escudo (png/svg)..."
+        className="flex-1 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#0042A5]"
+      />
+      <button
+        type="button"
+        onClick={handleSave}
+        disabled={saving || !url.trim() || !teamName.trim()}
+        className="text-xs bg-[#0042A5] text-white px-3 py-1.5 rounded-lg hover:bg-[#003080] disabled:opacity-40 shrink-0 font-medium"
+      >
+        {saving ? '...' : 'Guardar'}
+      </button>
+    </div>
+  )
+}
+
 /* ── PartidosTab ─────────────────────────────────────────────────────── */
 interface PartidosTabProps {
   matches: Match[]
@@ -349,55 +411,70 @@ interface PartidosTabProps {
 }
 
 function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResult, onDelete }: PartidosTabProps) {
-  const [filter, setFilter] = useState('all')
+  const [selectedTournamentId, setSelectedTournamentId] = useState<string | null>(null)
 
-  const filtered = filter === 'all'
-    ? matches
-    : filter === 'none'
-      ? matches.filter(m => !m.tournament_id)
-      : matches.filter(m => m.tournament_id === filter)
+  const selectedTournament = tournaments.find(t => t.id === selectedTournamentId)
+  const filtered = selectedTournamentId
+    ? matches.filter(m => m.tournament_id === selectedTournamentId)
+    : []
 
-  const filterOptions = [
-    { id: 'all', label: `Todos`, count: matches.length },
-    ...tournaments.map(t => ({
-      id: t.id,
-      label: t.name,
-      count: matches.filter(m => m.tournament_id === t.id).length,
-    })),
-    ...(matches.some(m => !m.tournament_id)
-      ? [{ id: 'none', label: 'Sin torneo', count: matches.filter(m => !m.tournament_id).length }]
-      : []),
-  ]
+  // Pantalla: selección de torneo
+  if (!selectedTournamentId) {
+    return (
+      <div className="space-y-4">
+        <p className="text-sm text-gray-500">Seleccioná un torneo para gestionar sus partidos</p>
+        {loading ? <Spinner /> : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {tournaments.map(t => {
+              const count = matches.filter(m => m.tournament_id === t.id).length
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setSelectedTournamentId(t.id)}
+                  className="bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-[#0042A5] hover:shadow-sm transition-all group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-[#001A4B] group-hover:text-[#0042A5]">{t.name}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">{t.fase}</p>
+                    </div>
+                    <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-medium">
+                      {count} partidos
+                    </span>
+                  </div>
+                </button>
+              )
+            })}
+            {tournaments.length === 0 && (
+              <p className="text-sm text-gray-400 col-span-2 text-center py-8">No hay torneos. Creá uno en la pestaña Torneos.</p>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
 
+  // Pantalla: partidos del torneo seleccionado
   return (
     <div className="space-y-3">
-      {/* Filtros por torneo */}
-      <div className="flex gap-1.5 flex-wrap">
-        {filterOptions.map(opt => (
-          <button
-            key={opt.id}
-            onClick={() => setFilter(opt.id)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-              filter === opt.id
-                ? 'bg-[#001A4B] text-white border-[#001A4B]'
-                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
-            }`}
-          >
-            {opt.label}
-            <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
-              filter === opt.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
-            }`}>
-              {opt.count}
-            </span>
-          </button>
-        ))}
+      {/* Header con volver */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => setSelectedTournamentId(null)}
+          className="text-sm text-[#0042A5] hover:underline flex items-center gap-1"
+        >
+          ← Torneos
+        </button>
+        <span className="text-gray-300">|</span>
+        <p className="text-sm font-semibold text-[#001A4B]">{selectedTournament?.name}</p>
+        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{selectedTournament?.fase}</span>
       </div>
 
-      {/* Header */}
+      {/* Acciones */}
       <div className="flex justify-between items-center">
         <p className="text-sm text-gray-500">{filtered.length} partidos</p>
         <button
-          onClick={() => onNewMatch(filter !== 'all' && filter !== 'none' ? filter : '')}
+          onClick={() => onNewMatch(selectedTournamentId)}
           className="bg-[#FFDF00] text-[#001A4B] text-sm font-bold px-4 py-2 rounded-xl hover:bg-yellow-400 transition-colors"
         >
           + Nuevo partido
@@ -426,9 +503,6 @@ function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResu
                     <span className="font-medium text-[#001A4B]">{m.home_team}</span>
                     <span className="text-gray-400 mx-1">vs</span>
                     <span className="font-medium text-[#001A4B]">{m.away_team}</span>
-                    {filter === 'all' && m.tournament_name && (
-                      <span className="ml-2 text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{m.tournament_name}</span>
-                    )}
                   </td>
                   <td className="px-4 py-3 text-gray-500 text-xs hidden md:table-cell">
                     {format(new Date(m.start_time), "d MMM HH:mm", { locale: es })}
