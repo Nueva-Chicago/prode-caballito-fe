@@ -128,6 +128,8 @@ export function Matriz() {
   const [payStep, setPayStep] = useState<'info' | 'reference'>('info')
   const [paymentRef, setPaymentRef] = useState('')
   const [unlockConfig, setUnlockConfig] = useState<{ price: number; currency: string; payment_link: string; free: boolean }>({ price: 0, currency: 'ARS', payment_link: '', free: true })
+  const [favorites, setFavorites] = useState<Set<string>>(new Set())
+  const [togglingFav, setTogglingFav] = useState<string | null>(null)
   const tableRef = useRef<HTMLDivElement>(null)
 
   const parseUnlocks = (data: { target_user_id: string; match_id: string; status: string }[]) => {
@@ -151,7 +153,8 @@ export function Matriz() {
       api.get('/tournaments'),
       api.get('/bets/my-unlocks').catch(() => ({ data: { data: [] } })),
       api.get('/bets/unlock-price').catch(() => ({ data: { data: { price: 0, currency: 'ARS', payment_link: '', free: true } } })),
-    ]).then(([mRes, rRes, bRes, tRes, uRes, priceRes]) => {
+      api.get('/ranking/favorites').catch(() => ({ data: { data: [] } })),
+    ]).then(([mRes, rRes, bRes, tRes, uRes, priceRes, favRes]) => {
       setMatches(mRes.data.data.matches)
       setRanking(rRes.data.data.ranking)
       setBets(bRes.data.data)
@@ -160,6 +163,7 @@ export function Matriz() {
       if (tourList.length > 0) setSelectedTournament(tourList[0].id)
       setUnlocks(parseUnlocks(uRes.data.data || []))
       if (priceRes.data.data) setUnlockConfig(priceRes.data.data)
+      setFavorites(new Set(favRes.data.data || []))
     }).finally(() => setLoading(false))
   }, [])
 
@@ -202,6 +206,21 @@ export function Matriz() {
   useEffect(() => {
     setLoadingTournament(false)
   }, [selectedTournament])
+
+  const handleToggleFavorite = useCallback(async (planillaId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (togglingFav) return
+    setTogglingFav(planillaId)
+    try {
+      const { data } = await api.post(`/ranking/favorites/${planillaId}`, {})
+      setFavorites(prev => {
+        const next = new Set(prev)
+        if (data.action === 'added') next.add(planillaId)
+        else next.delete(planillaId)
+        return next
+      })
+    } catch { /* silent */ } finally { setTogglingFav(null) }
+  }, [togglingFav])
 
   const handleBadgeClick = useCallback((
     e: React.MouseEvent<HTMLSpanElement>,
@@ -400,7 +419,7 @@ export function Matriz() {
                               {r.user_name[0].toUpperCase()}
                             </div>
                         }
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className={`truncate max-w-[105px] font-semibold ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
                             {r.user_name}
                           </div>
@@ -408,6 +427,16 @@ export function Matriz() {
                             <div className="text-[10px] text-gray-400 truncate max-w-[105px]">{r.nombre_planilla}</div>
                           )}
                         </div>
+                        {!isMe && (
+                          <button
+                            onClick={(e) => handleToggleFavorite(r.planilla_id, e)}
+                            disabled={togglingFav === r.planilla_id}
+                            className="shrink-0 text-sm leading-none opacity-60 hover:opacity-100 transition-opacity disabled:opacity-30"
+                            title={favorites.has(r.planilla_id) ? t.ranking.unfollow : t.ranking.follow}
+                          >
+                            {favorites.has(r.planilla_id) ? '⭐' : '☆'}
+                          </button>
+                        )}
                       </div>
                     </td>
                     <td className="px-2 py-1.5 text-center font-black text-[#0042A5]">{pts}</td>
