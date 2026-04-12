@@ -24,9 +24,7 @@ export function Admin() {
   })
   const [resultForm, setResultForm] = useState({ resultado_local: '', resultado_visitante: '' })
 
-  useEffect(() => {
-    loadData()
-  }, [])
+  useEffect(() => { loadData() }, [])
 
   const loadData = async () => {
     setLoading(true)
@@ -112,6 +110,12 @@ export function Admin() {
     setShowResultModal(true)
   }
 
+  const openNewMatch = (tournamentId = '') => {
+    setEditMatch(null)
+    setMatchForm({ home_team: '', away_team: '', start_time: '', tournament_id: tournamentId, halftime_minutes: '15' })
+    setShowMatchModal(true)
+  }
+
   const tabs: { id: Tab; label: string }[] = [
     { id: 'partidos', label: '⚽ Partidos' },
     { id: 'planillas', label: '📋 Planillas' },
@@ -135,73 +139,22 @@ export function Admin() {
 
       {/* Tab: Partidos */}
       {tab === 'partidos' && (
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-500">{matches.length} partidos</p>
-            <button onClick={() => { setEditMatch(null); setMatchForm({ home_team: '', away_team: '', start_time: '', tournament_id: '', halftime_minutes: '15' }); setShowMatchModal(true) }}
-              className="bg-[#FFDF00] text-[#001A4B] text-sm font-bold px-4 py-2 rounded-xl hover:bg-yellow-400 transition-colors">
-              + Nuevo partido
-            </button>
-          </div>
-          {loading ? <Spinner /> : (
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-gray-50 text-xs text-gray-500 border-b">
-                    <th className="text-left px-4 py-2 font-semibold">Partido</th>
-                    <th className="text-left px-4 py-2 font-semibold hidden md:table-cell">Fecha</th>
-                    <th className="text-center px-4 py-2 font-semibold">Estado</th>
-                    <th className="text-center px-4 py-2 font-semibold">Resultado</th>
-                    <th className="text-right px-4 py-2 font-semibold">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {matches.map((m) => (
-                    <tr key={m.id} className="border-b border-gray-50 hover:bg-gray-50/50">
-                      <td className="px-4 py-3">
-                        <span className="font-medium text-[#001A4B]">{m.home_team}</span>
-                        <span className="text-gray-400 mx-1">vs</span>
-                        <span className="font-medium text-[#001A4B]">{m.away_team}</span>
-                        {m.tournament_name && <span className="ml-2 text-xs text-gray-400">[{m.tournament_name}]</span>}
-                      </td>
-                      <td className="px-4 py-3 text-gray-500 text-xs hidden md:table-cell">
-                        {format(new Date(m.start_time), "d MMM HH:mm", { locale: es })}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${m.estado === 'finished' ? 'bg-green-100 text-green-700' : m.estado === 'live' ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-blue-100 text-blue-700'}`}>
-                          {m.estado}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center font-mono font-bold">
-                        {m.estado === 'finished' ? `${m.resultado_local}-${m.resultado_visitante}` : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex gap-1 justify-end">
-                          <button onClick={() => openEdit(m)} className="text-xs text-blue-600 hover:underline px-2 py-1">Editar</button>
-                          {m.estado !== 'finished'
-                            ? <button onClick={() => openResult(m)} className="text-xs text-green-600 hover:underline px-2 py-1">Resultado</button>
-                            : <button onClick={() => openResult(m)} className="text-xs text-orange-500 hover:underline px-2 py-1">Corregir</button>
-                          }
-                          <button onClick={() => handleDeleteMatch(m.id)} className="text-xs text-red-400 hover:underline px-2 py-1">×</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <PartidosTab
+          matches={matches}
+          tournaments={tournaments}
+          loading={loading}
+          onNewMatch={openNewMatch}
+          onEdit={openEdit}
+          onResult={openResult}
+          onDelete={handleDeleteMatch}
+        />
       )}
 
       {/* Tab: Torneos */}
       {tab === 'torneos' && <TorneosTab tournaments={tournaments} onRefresh={loadData} />}
 
-
-      {/* Tab: Planillas y Usuarios — placeholder */}
-      {(tab === 'planillas' || tab === 'usuarios') && (
-        <AdminSubTab tab={tab} />
-      )}
+      {/* Tab: Planillas y Usuarios */}
+      {(tab === 'planillas' || tab === 'usuarios') && <AdminSubTab tab={tab} />}
 
       {/* Modal partido */}
       <Modal open={showMatchModal} onClose={() => setShowMatchModal(false)} title={editMatch ? 'Editar Partido' : 'Nuevo Partido'}>
@@ -271,6 +224,135 @@ export function Admin() {
   )
 }
 
+/* ── PartidosTab ─────────────────────────────────────────────────────── */
+interface PartidosTabProps {
+  matches: Match[]
+  tournaments: Tournament[]
+  loading: boolean
+  onNewMatch: (tournamentId: string) => void
+  onEdit: (m: Match) => void
+  onResult: (m: Match) => void
+  onDelete: (id: string) => void
+}
+
+function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResult, onDelete }: PartidosTabProps) {
+  const [filter, setFilter] = useState('all')
+
+  const filtered = filter === 'all'
+    ? matches
+    : filter === 'none'
+      ? matches.filter(m => !m.tournament_id)
+      : matches.filter(m => m.tournament_id === filter)
+
+  const filterOptions = [
+    { id: 'all', label: `Todos`, count: matches.length },
+    ...tournaments.map(t => ({
+      id: t.id,
+      label: t.name,
+      count: matches.filter(m => m.tournament_id === t.id).length,
+    })),
+    ...(matches.some(m => !m.tournament_id)
+      ? [{ id: 'none', label: 'Sin torneo', count: matches.filter(m => !m.tournament_id).length }]
+      : []),
+  ]
+
+  return (
+    <div className="space-y-3">
+      {/* Filtros por torneo */}
+      <div className="flex gap-1.5 flex-wrap">
+        {filterOptions.map(opt => (
+          <button
+            key={opt.id}
+            onClick={() => setFilter(opt.id)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+              filter === opt.id
+                ? 'bg-[#001A4B] text-white border-[#001A4B]'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+            }`}
+          >
+            {opt.label}
+            <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
+              filter === opt.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+            }`}>
+              {opt.count}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <p className="text-sm text-gray-500">{filtered.length} partidos</p>
+        <button
+          onClick={() => onNewMatch(filter !== 'all' && filter !== 'none' ? filter : '')}
+          className="bg-[#FFDF00] text-[#001A4B] text-sm font-bold px-4 py-2 rounded-xl hover:bg-yellow-400 transition-colors"
+        >
+          + Nuevo partido
+        </button>
+      </div>
+
+      {/* Tabla */}
+      {loading ? <Spinner /> : (
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 text-xs text-gray-500 border-b">
+                <th className="text-left px-4 py-2 font-semibold">Partido</th>
+                <th className="text-left px-4 py-2 font-semibold hidden md:table-cell">Fecha</th>
+                <th className="text-center px-4 py-2 font-semibold">Estado</th>
+                <th className="text-center px-4 py-2 font-semibold">Resultado</th>
+                <th className="text-right px-4 py-2 font-semibold">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400 text-sm">No hay partidos en este torneo</td></tr>
+              ) : filtered.map((m) => (
+                <tr key={m.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                  <td className="px-4 py-3">
+                    <span className="font-medium text-[#001A4B]">{m.home_team}</span>
+                    <span className="text-gray-400 mx-1">vs</span>
+                    <span className="font-medium text-[#001A4B]">{m.away_team}</span>
+                    {filter === 'all' && m.tournament_name && (
+                      <span className="ml-2 text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{m.tournament_name}</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-gray-500 text-xs hidden md:table-cell">
+                    {format(new Date(m.start_time), "d MMM HH:mm", { locale: es })}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                      m.estado === 'finished' ? 'bg-green-100 text-green-700' :
+                      m.estado === 'live' ? 'bg-red-100 text-red-600 animate-pulse' :
+                      'bg-blue-100 text-blue-700'
+                    }`}>
+                      {m.estado}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center font-mono font-bold">
+                    {m.estado === 'finished' ? `${m.resultado_local}-${m.resultado_visitante}` : '—'}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex gap-1 justify-end">
+                      <button onClick={() => onEdit(m)} className="text-xs text-blue-600 hover:underline px-2 py-1">Editar</button>
+                      {m.estado !== 'finished'
+                        ? <button onClick={() => onResult(m)} className="text-xs text-green-600 hover:underline px-2 py-1">Resultado</button>
+                        : <button onClick={() => onResult(m)} className="text-xs text-orange-500 hover:underline px-2 py-1">Corregir</button>
+                      }
+                      <button onClick={() => onDelete(m.id)} className="text-xs text-red-400 hover:underline px-2 py-1">×</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ── TorneosTab ──────────────────────────────────────────────────────── */
 function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () => void }) {
   const { show } = useToastStore()
   const [allTournaments, setAllTournaments] = useState<(Tournament & { match_count?: number })[]>([])
@@ -299,8 +381,7 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
       await api.post('/tournaments', form)
       show('Torneo creado ✓', 'success')
       setForm({ name: '', fase: '', description: '' })
-      loadAll()
-      onRefresh()
+      loadAll(); onRefresh()
     } catch {
       show('Error al crear torneo', 'error')
     } finally {
@@ -312,8 +393,7 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
     try {
       await api.put(`/tournaments/${t.id}`, { is_active: !t.is_active })
       show(`Torneo ${!t.is_active ? 'activado' : 'desactivado'} ✓`, 'success')
-      loadAll()
-      onRefresh()
+      loadAll(); onRefresh()
     } catch {
       show('Error', 'error')
     }
@@ -321,7 +401,6 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
 
   return (
     <div className="space-y-4">
-      {/* Crear torneo */}
       <form onSubmit={handleCreate} className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm space-y-3">
         <h3 className="font-semibold text-[#001A4B] text-sm">Nuevo Torneo</h3>
         <div className="grid grid-cols-2 gap-3">
@@ -338,7 +417,6 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
         </button>
       </form>
 
-      {/* Lista completa — activos e inactivos */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="bg-gray-50 px-4 py-2 border-b border-gray-100">
           <p className="text-xs font-semibold text-gray-500">Todos los torneos · activá/desactivá para que aparezcan en la app</p>
@@ -347,38 +425,33 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
           <div className="py-6 flex justify-center"><Spinner size="sm" /></div>
         ) : allTournaments.length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-6">No hay torneos</p>
-        ) : (
-          allTournaments.map((t) => (
-            <div key={t.id} className="flex items-center justify-between px-4 py-3 border-b border-gray-50 last:border-0">
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-[#001A4B]">{t.name}</p>
-                  {t.match_count != null && t.match_count > 0 && (
-                    <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full font-medium">
-                      {t.match_count} partidos
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs text-gray-400">{t.fase}</p>
+        ) : allTournaments.map((t) => (
+          <div key={t.id} className="flex items-center justify-between px-4 py-3 border-b border-gray-50 last:border-0">
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold text-[#001A4B]">{t.name}</p>
+                {t.match_count != null && t.match_count > 0 && (
+                  <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full font-medium">
+                    {t.match_count} partidos
+                  </span>
+                )}
               </div>
-              <button
-                onClick={() => handleToggle(t)}
-                className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-colors ${
-                  t.is_active
-                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                }`}
-              >
-                {t.is_active ? '● Activo' : '○ Inactivo'}
-              </button>
+              <p className="text-xs text-gray-400">{t.fase}</p>
             </div>
-          ))
-        )}
+            <button onClick={() => handleToggle(t)}
+              className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-colors ${
+                t.is_active ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+              }`}>
+              {t.is_active ? '● Activo' : '○ Inactivo'}
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   )
 }
 
+/* ── AdminSubTab ─────────────────────────────────────────────────────── */
 function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
   const { show } = useToastStore()
   const [data, setData] = useState<Record<string, unknown>[]>([])
@@ -452,7 +525,9 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
               <td className="px-4 py-2 font-medium text-[#001A4B]">{String(u.nombre || '')}</td>
               <td className="px-4 py-2 text-gray-500 text-xs">{String(u.email || '')}</td>
               <td className="px-4 py-2 text-center">
-                <span className={`text-xs px-2 py-0.5 rounded-full ${u.rol === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>{String(u.rol || '')}</span>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${u.rol === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                  {String(u.rol || '')}
+                </span>
               </td>
               <td className="px-4 py-2 text-center text-sm">{u.email_verified ? '✅' : '❌'}</td>
             </tr>
