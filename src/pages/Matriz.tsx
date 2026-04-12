@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { api } from '@/api/client'
 import { Spinner } from '@/components/ui/Spinner'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
@@ -39,11 +40,15 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
     return () => document.removeEventListener('mousedown', handle)
   }, [onClose])
 
-  // fixed usa coordenadas de viewport directamente — no le afecta el scroll horizontal de la tabla
-  const popW = 210
-  const rawTop  = cell.rect.bottom + 6
+  // Responsive: en móvil ocupa casi todo el ancho, en desktop ancho fijo
+  const popW = Math.min(220, window.innerWidth - 24)
+  const popH = 200 // altura estimada del popover
+  const rawTop  = cell.rect.bottom + 8
   const rawLeft = cell.rect.left + cell.rect.width / 2 - popW / 2
-  const top  = rawTop + popW > window.innerHeight ? cell.rect.top - 6 - 220 : rawTop
+  // Flip: si no cabe abajo, va arriba
+  const top  = rawTop + popH > window.innerHeight - 16
+    ? Math.max(8, cell.rect.top - 8 - popH)
+    : rawTop
   const left = Math.max(8, Math.min(rawLeft, window.innerWidth - popW - 8))
 
   const { match, bet, result } = cell
@@ -64,10 +69,10 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
 
   const color = result.color as string
 
-  return (
+  return createPortal(
     <div
       ref={popRef}
-      style={{ position: 'fixed', top, left, zIndex: 9999, width: 210 }}
+      style={{ position: 'fixed', top, left, zIndex: 9999, width: popW }}
       className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-pop"
     >
       {/* Header con equipos */}
@@ -129,7 +134,8 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
           </p>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -276,6 +282,10 @@ export function Matriz() {
         <span className="text-gray-400 ml-1">· Click en un resultado para ver el detalle</span>
       </div>
 
+      {activeCell && (
+        <BetPopover cell={activeCell} onClose={() => setActiveCell(null)} />
+      )}
+
       {loadingTournament ? (
         <div className="flex justify-center py-10"><Spinner /></div>
       ) : allMatches.length === 0 ? (
@@ -283,9 +293,6 @@ export function Matriz() {
           No hay partidos en este torneo todavía
         </div>
       ) : (
-        {activeCell && (
-          <BetPopover cell={activeCell} onClose={() => setActiveCell(null)} />
-        )}
         <div ref={tableRef} className="overflow-x-auto">
           <table className="text-xs border-collapse min-w-max">
             <thead>
