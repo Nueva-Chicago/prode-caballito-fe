@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { api } from '@/api/client'
 import { Spinner } from '@/components/ui/Spinner'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
@@ -17,6 +17,120 @@ interface TournamentRankingEntry {
   position?: number
 }
 
+interface ActiveCell {
+  matchId: string
+  rowKey: string
+  bet: { home: number; away: number }
+  match: Match
+  result: { puntos: number; bonus: boolean; color: string }
+  rect: DOMRect
+}
+
+/* ── Popover de detalle ──────────────────────────────────────────── */
+function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }) {
+  const popRef = useRef<HTMLDivElement>(null)
+
+  // Cerrar al click afuera
+  useEffect(() => {
+    const handle = (e: MouseEvent) => {
+      if (popRef.current && !popRef.current.contains(e.target as Node)) onClose()
+    }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [onClose])
+
+  // Calcular posición: intenta abajo del badge, ajusta si se sale del viewport
+  const top = cell.rect.bottom + window.scrollY + 6
+  const rawLeft = cell.rect.left + window.scrollX - 60
+  const left = Math.max(8, Math.min(rawLeft, window.innerWidth - 220))
+
+  const { match, bet, result } = cell
+  const isExactoLocal = bet.home === match.resultado_local
+  const isExactoVisitante = bet.away === match.resultado_visitante
+
+  const LABEL: Record<string, string> = {
+    celeste:  '¡Exacto + bonus! 🔥',
+    rojo:     'Exacto 🎯',
+    verde:    'Parcialmente exacto',
+    amarillo: 'Ganador correcto',
+    gris:     'Sin puntos',
+  }
+
+  const ICON: Record<string, string> = {
+    celeste: '🏆', rojo: '🎯', verde: '✅', amarillo: '👍', gris: '❌',
+  }
+
+  const color = result.color as string
+
+  return (
+    <div
+      ref={popRef}
+      style={{ position: 'absolute', top, left, zIndex: 9999, width: 210 }}
+      className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-pop"
+    >
+      {/* Header con equipos */}
+      <div className="bg-gray-50 border-b border-gray-100 px-4 py-2.5">
+        <div className="flex items-center justify-between gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+          <span className="truncate">{match.home_team}</span>
+          <span className="text-gray-300">vs</span>
+          <span className="truncate text-right">{match.away_team}</span>
+        </div>
+        {/* Resultado real */}
+        <div className="flex items-center justify-center gap-3 mt-1">
+          <span className="text-2xl font-black text-gray-800">{match.resultado_local}</span>
+          <span className="text-xs text-gray-300 font-bold">—</span>
+          <span className="text-2xl font-black text-gray-800">{match.resultado_visitante}</span>
+        </div>
+      </div>
+
+      {/* Detalle apuesta */}
+      <div className="px-4 py-3 space-y-2.5">
+        {/* Pronóstico del usuario */}
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-400">Tu pronóstico</span>
+          <div className="flex items-center gap-1.5">
+            <span className={`text-sm font-black ${isExactoLocal ? 'text-green-600' : 'text-gray-700'}`}>
+              {bet.home}
+            </span>
+            <span className="text-gray-300 text-xs">-</span>
+            <span className={`text-sm font-black ${isExactoVisitante ? 'text-green-600' : 'text-gray-700'}`}>
+              {bet.away}
+            </span>
+          </div>
+        </div>
+
+        {/* Puntos obtenidos */}
+        <div className={`flex items-center justify-between rounded-xl px-3 py-2 ${
+          color === 'celeste' ? 'bg-sky-50' :
+          color === 'rojo'    ? 'bg-red-50' :
+          color === 'verde'   ? 'bg-green-50' :
+          color === 'amarillo'? 'bg-yellow-50' :
+                                'bg-gray-50'
+        }`}>
+          <span className="text-xs font-semibold text-gray-600">
+            {ICON[color]} {LABEL[color]}
+          </span>
+          <span className={`text-lg font-black ${
+            color === 'celeste' ? 'text-sky-500' :
+            color === 'rojo'    ? 'text-red-500' :
+            color === 'verde'   ? 'text-green-600' :
+            color === 'amarillo'? 'text-yellow-500' :
+                                  'text-gray-400'
+          }`}>
+            {result.puntos > 0 ? `+${result.puntos}` : '0'}
+          </span>
+        </div>
+
+        {result.bonus && (
+          <p className="text-[11px] text-sky-500 font-medium text-center">
+            Incluye +1 bonus por exacto en partido de ≥4 goles
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function Matriz() {
   const { user } = useAuthStore()
   const [matches, setMatches] = useState<Match[]>([])
@@ -27,6 +141,7 @@ export function Matriz() {
   const [tournamentRanking, setTournamentRanking] = useState<TournamentRankingEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingTournament, setLoadingTournament] = useState(false)
+  const [activeCell, setActiveCell] = useState<ActiveCell | null>(null)
   const tableRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -51,20 +166,34 @@ export function Matriz() {
       .finally(() => setLoadingTournament(false))
   }, [selectedTournament])
 
+  const handleBadgeClick = useCallback((
+    e: React.MouseEvent<HTMLSpanElement>,
+    matchId: string,
+    rowKey: string,
+    bet: { home: number; away: number },
+    match: Match,
+    result: { puntos: number; bonus: boolean; color: string }
+  ) => {
+    e.stopPropagation()
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    // Toggle: cerrar si ya estaba abierto el mismo
+    if (activeCell?.matchId === matchId && activeCell?.rowKey === rowKey) {
+      setActiveCell(null)
+      return
+    }
+    setActiveCell({ matchId, rowKey, bet, match, result, rect })
+  }, [activeCell])
+
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
   const isTournamentMode = selectedTournament !== 'all'
-
-  // Filtrar partidos según el modo
   const filteredMatches = isTournamentMode
     ? matches.filter(m => m.tournament_id === selectedTournament)
     : matches
-
   const finishedMatches = filteredMatches.filter(m => m.estado === 'finished')
   const pendingMatches = filteredMatches.filter(m => m.estado !== 'finished')
   const allMatches = [...finishedMatches, ...pendingMatches]
 
-  // En modo torneo usar tournamentRanking, sino el global
   const rows: RankingEntry[] = isTournamentMode
     ? tournamentRanking.map((tr, i) => ({
         planilla_id: tr.user_id,
@@ -84,17 +213,11 @@ export function Matriz() {
       } as RankingEntry))
     : ranking
 
-  // En modo torneo las apuestas se buscan por planilla del usuario (primer planilla encontrada)
-  // El BetMap ya tiene todas las apuestas, filtramos por matches del torneo
   const getBetsForRow = (r: RankingEntry) => {
     if (!isTournamentMode) return bets[r.planilla_id] || {}
-    // Buscar en todas las planillas del usuario cuál tiene apuestas para estos partidos
     for (const [planillaId, planillaBets] of Object.entries(bets)) {
       const hasMatchBets = allMatches.some(m => planillaBets[m.id])
       if (hasMatchBets) {
-        // Verificar si esta planilla pertenece al usuario correcto
-        // Como no tenemos esa info directamente, usamos la primera planilla con apuestas que coincida
-        // con el ranking global
         const rankEntry = ranking.find(rank => rank.planilla_id === planillaId && rank.user_id === r.user_id)
         if (rankEntry) return planillaBets
       }
@@ -103,7 +226,15 @@ export function Matriz() {
   }
 
   return (
-    <div className="px-2 py-4 space-y-3">
+    <div className="px-2 py-4 space-y-3" onClick={() => setActiveCell(null)}>
+      <style>{`
+        @keyframes pop {
+          0%   { opacity: 0; transform: scale(0.92) translateY(-4px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-pop { animation: pop 0.15s ease-out both; }
+      `}</style>
+
       <div className="max-w-7xl mx-auto px-2 flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-xl font-bold text-[#001A4B]">📊 Matriz de Pronósticos</h1>
@@ -112,11 +243,10 @@ export function Matriz() {
           </p>
         </div>
 
-        {/* Selector torneo */}
         {tournaments.length > 0 && (
           <div className="flex gap-1 flex-wrap">
             <button
-              onClick={() => setSelectedTournament('all')}
+              onClick={(e) => { e.stopPropagation(); setSelectedTournament('all') }}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === 'all' ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
             >
               Global
@@ -124,7 +254,7 @@ export function Matriz() {
             {tournaments.map(t => (
               <button
                 key={t.id}
-                onClick={() => setSelectedTournament(t.id)}
+                onClick={(e) => { e.stopPropagation(); setSelectedTournament(t.id) }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === t.id ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
               >
                 {t.name}
@@ -135,12 +265,13 @@ export function Matriz() {
       </div>
 
       {/* Leyenda */}
-      <div className="max-w-7xl mx-auto px-2 flex gap-2 flex-wrap text-xs">
+      <div className="max-w-7xl mx-auto px-2 flex gap-2 flex-wrap text-xs items-center">
         {(['celeste','rojo','verde','amarillo','gris'] as const).map((c) => (
           <span key={c} className={`px-2 py-0.5 rounded font-medium ${POINT_COLORS[c]}`}>
             {c === 'celeste' ? '4pts' : c === 'rojo' ? '3pts' : c === 'verde' ? '2pts' : c === 'amarillo' ? '1pt' : 'sin acierto'}
           </span>
         ))}
+        <span className="text-gray-400 ml-1">· Click en un resultado para ver el detalle</span>
       </div>
 
       {loadingTournament ? (
@@ -150,8 +281,12 @@ export function Matriz() {
           No hay partidos en este torneo todavía
         </div>
       ) : (
-        /* Tabla scrolleable */
-        <div ref={tableRef} className="overflow-x-auto">
+        <div ref={tableRef} className="overflow-x-auto" style={{ position: 'relative' }}>
+          {/* Popover */}
+          {activeCell && (
+            <BetPopover cell={activeCell} onClose={() => setActiveCell(null)} />
+          )}
+
           <table className="text-xs border-collapse min-w-max">
             <thead>
               <tr className="bg-[#001A4B] text-white">
@@ -182,22 +317,20 @@ export function Matriz() {
                 const isMe = r.user_id === user?.id
                 const playerBets = isTournamentMode ? getBetsForRow(r) : (bets[r.planilla_id] || {})
                 const rowBg = isMe ? 'bg-blue-50' : ri % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                const rowKey = `${r.planilla_id}-${ri}`
                 return (
-                  <tr key={`${r.planilla_id}-${ri}`} className={`${rowBg} hover:bg-yellow-50/50 transition-colors`}>
+                  <tr key={rowKey} className={`${rowBg} hover:bg-yellow-50/50 transition-colors`}>
                     <td className={`sticky left-0 px-2 py-1.5 font-medium z-10 border-r border-gray-100 ${rowBg}`}>
                       <div className="flex items-center gap-2">
-                        {/* Posición */}
                         <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isMe ? 'bg-[#0042A5] text-white' : 'bg-gray-200 text-gray-600'}`}>
                           {r.position}
                         </span>
-                        {/* Avatar */}
                         {r.user_avatar
                           ? <img src={r.user_avatar} alt="" className="w-6 h-6 rounded-full object-cover shrink-0 border border-gray-100" />
                           : <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isMe ? 'bg-[#0042A5] text-white' : 'bg-gray-300 text-gray-600'}`}>
                               {r.user_name[0].toUpperCase()}
                             </div>
                         }
-                        {/* Nombre + planilla */}
                         <div className="min-w-0">
                           <div className={`truncate max-w-[105px] font-semibold ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
                             {r.user_name}
@@ -217,11 +350,15 @@ export function Matriz() {
                           { goles_local: b.home, goles_visitante: b.away },
                           { resultado_local: m.resultado_local, resultado_visitante: m.resultado_visitante! }
                         )
+                        const isActive = activeCell?.matchId === m.id && activeCell?.rowKey === rowKey
                         return (
                           <td key={m.id} className="px-1 py-1.5 text-center">
                             <span
-                              title={res.puntos === 0 ? 'Sin puntos' : `${res.puntos} pt${res.puntos !== 1 ? 's' : ''}${res.bonus ? ' (+1 bonus)' : ''}`}
-                              className={`inline-block px-1.5 py-0.5 rounded font-bold text-[11px] cursor-default ${POINT_COLORS[res.color]}`}
+                              onClick={(e) => handleBadgeClick(e, m.id, rowKey, b, m, res)}
+                              className={`inline-block px-1.5 py-0.5 rounded font-bold text-[11px] cursor-pointer select-none transition-all
+                                ${POINT_COLORS[res.color]}
+                                ${isActive ? 'ring-2 ring-offset-1 ring-gray-400 scale-110' : 'hover:scale-105 hover:shadow-md'}
+                              `}
                             >
                               {b.home}-{b.away}
                             </span>
