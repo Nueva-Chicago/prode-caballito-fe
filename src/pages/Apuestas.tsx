@@ -72,23 +72,27 @@ export function Apuestas() {
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-[#001A4B]">Pronósticos</h1>
-        <span className="text-sm text-gray-500">{progress.done}/{progress.total} completados</span>
+        <span className="text-sm text-gray-400">{progress.done}/{progress.total} completados</span>
       </div>
 
       {/* Selector de planilla */}
       {planillas.length > 1 && (
-        <select
-          value={selectedPlanilla}
-          onChange={(e) => setSelectedPlanilla(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
-        >
-          {planillas.map((p) => (
-            <option key={p.id} value={p.id}>{p.nombre_planilla}</option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={selectedPlanilla}
+            onChange={(e) => setSelectedPlanilla(e.target.value)}
+            className="w-full appearance-none border border-gray-200 rounded-xl px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5] pr-10"
+          >
+            {planillas.map((p) => (
+              <option key={p.id} value={p.id}>{p.nombre_planilla}</option>
+            ))}
+          </select>
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">▼</span>
+        </div>
       )}
 
       {planillas.length === 0 && (
@@ -97,13 +101,22 @@ export function Apuestas() {
         </div>
       )}
 
-      {/* Filtros */}
-      <div className="flex gap-2 flex-wrap">
+      {/* Filtros + búsqueda */}
+      <div className="flex gap-2 items-center flex-wrap">
         <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
-          {(['todos', 'pendientes', 'finalizados'] as const).map((f) => (
-            <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-all capitalize ${filter === f ? 'bg-white shadow text-[#0042A5]' : 'text-gray-500'}`}>
-              {f}
+          {([
+            { key: 'todos',       label: 'Todos' },
+            { key: 'pendientes',  label: 'Pendientes' },
+            { key: 'finalizados', label: 'Finalizados' },
+          ] as const).map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setFilter(key)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                filter === key ? 'bg-white shadow text-[#0042A5]' : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {label}
             </button>
           ))}
         </div>
@@ -112,7 +125,7 @@ export function Apuestas() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar equipo..."
-          className="flex-1 min-w-32 border border-gray-200 rounded-lg px-3 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-[#0042A5]"
+          className="flex-1 min-w-32 border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#0042A5] bg-white"
         />
       </div>
 
