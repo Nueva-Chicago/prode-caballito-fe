@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
+import { useT } from '@/hooks/useT'
 import { Modal } from '@/components/ui/Modal'
 import { Spinner } from '@/components/ui/Spinner'
 import type { Planilla } from '@/types'
@@ -11,6 +12,7 @@ import { TEAM_THEMES } from '@/types'
 export function Profile() {
   const { user, updateUser } = useAuthStore()
   const { show } = useToastStore()
+  const t = useT()
   const fileRef = useRef<HTMLInputElement>(null)
   const [planillas, setPlanillas] = useState<Planilla[]>([])
   const [loading, setLoading] = useState(true)
@@ -30,9 +32,9 @@ export function Profile() {
       await api.put(`/users/${user!.id}`, { nombre })
       updateUser({ nombre })
       setEditName(false)
-      show('Nombre actualizado', 'success')
+      show(t.profile.nameUpdated, 'success')
     } catch {
-      show('Error al actualizar', 'error')
+      show(t.profile.errorUpdate, 'error')
     }
   }
 
@@ -47,9 +49,9 @@ export function Profile() {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       updateUser({ foto_url: data.data.foto_url })
-      show('Foto actualizada ✓', 'success')
+      show(t.profile.photoUpdated, 'success')
     } catch {
-      show('Error al subir foto', 'error')
+      show(t.profile.errorPhoto, 'error')
     } finally {
       setUploadingPhoto(false)
     }
@@ -62,20 +64,20 @@ export function Profile() {
       setPlanillas([...planillas, data.data])
       setShowNewPlanilla(false)
       setNewPlanillaName('')
-      show('Planilla creada ✓', 'success')
+      show(t.profile.planillaCreated, 'success')
     } catch {
-      show('Error al crear planilla', 'error')
+      show(t.profile.errorCreate, 'error')
     }
   }
 
   const handleDeletePlanilla = async (id: string) => {
-    if (!confirm('¿Eliminar esta planilla? Se perderán todos los pronósticos.')) return
+    if (!confirm(t.profile.deleteConfirm)) return
     try {
       await api.delete(`/planillas/${id}`)
       setPlanillas(planillas.filter(p => p.id !== id))
-      show('Planilla eliminada', 'info')
+      show(t.profile.planillaDeleted, 'info')
     } catch {
-      show('Error al eliminar', 'error')
+      show(t.profile.errorDelete, 'error')
     }
   }
 
@@ -84,9 +86,9 @@ export function Profile() {
       await api.put(`/users/${user!.id}`, { tema_equipo: tema })
       updateUser({ tema_equipo: tema })
       localStorage.setItem('tema_equipo', tema)
-      show(`Tema ${TEAM_THEMES[tema]?.name} activado ✓`, 'success')
+      show(t.profile.themeActivated(TEAM_THEMES[tema]?.name || tema), 'success')
     } catch {
-      show('Error al cambiar tema', 'error')
+      show(t.profile.errorUpdate, 'error')
     }
   }
 
@@ -94,7 +96,7 @@ export function Profile() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-      <h1 className="text-xl font-bold text-[#001A4B]">Mi Perfil</h1>
+      <h1 className="text-xl font-bold text-[#001A4B]">{t.profile.title}</h1>
 
       {/* Foto y nombre */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -116,7 +118,7 @@ export function Profile() {
               <div className="flex gap-2">
                 <input value={nombre} onChange={(e) => setNombre(e.target.value)}
                   className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
-                <button onClick={handleSaveName} className="bg-[#0042A5] text-white px-3 py-1.5 rounded-lg text-sm font-medium">Guardar</button>
+                <button onClick={handleSaveName} className="bg-[#0042A5] text-white px-3 py-1.5 rounded-lg text-sm font-medium">{t.profile.save}</button>
                 <button onClick={() => setEditName(false)} className="text-gray-400 text-sm px-2">×</button>
               </div>
             ) : (
@@ -135,12 +137,10 @@ export function Profile() {
 
       {/* Tema de equipo */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-        <h3 className="font-bold text-[#001A4B] mb-4">🎨 Tema Visual</h3>
-        {/* isolate crea stacking context propio → las cards escaladas no se escapan del container */}
+        <h3 className="font-bold text-[#001A4B] mb-4">{t.profile.visualTheme}</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 isolate">
           {Object.entries(TEAM_THEMES).map(([key, theme]) => {
             const isActive = user.tema_equipo === key
-            // Para colores claros (ej. Huracán blanco) usamos el secundario como fondo del preview
             const isLightPrimary = theme.primary === '#FFFFFF' || theme.primary === '#ffffff'
             const previewBg   = isLightPrimary ? theme.secondary : theme.primary
             const previewDot  = isLightPrimary ? theme.primary   : theme.secondary
@@ -159,13 +159,11 @@ export function Profile() {
                   position: 'relative',
                 }}
               >
-                {/* Preview del navbar */}
                 <div className="h-7 flex items-center gap-1.5 px-2" style={{ background: previewBg }}>
                   <span className="text-[10px]" style={{ color: previewIcon }}>⚽</span>
                   <span className="flex-1 h-1.5 rounded-full opacity-40" style={{ background: previewIcon }} />
                   <span className="w-3 h-3 rounded-full" style={{ background: previewDot }} />
                 </div>
-                {/* Nombre */}
                 <div
                   className="py-2 px-2 text-xs font-semibold text-center"
                   style={{
@@ -185,23 +183,23 @@ export function Profile() {
       {/* Planillas */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-[#001A4B]">📋 Mis Planillas</h3>
+          <h3 className="font-bold text-[#001A4B]">{t.profile.myPlanillas}</h3>
           <button onClick={() => setShowNewPlanilla(true)}
             className="bg-[#FFDF00] text-[#001A4B] text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-yellow-400 transition-colors">
-            + Nueva
+            {t.bets.new}
           </button>
         </div>
         {loading ? <Spinner size="sm" /> : (
           <div className="space-y-2">
-            {planillas.length === 0 && <p className="text-sm text-gray-400 text-center py-4">No tenés planillas todavía</p>}
+            {planillas.length === 0 && <p className="text-sm text-gray-400 text-center py-4">{t.profile.noPlanillas}</p>}
             {planillas.map((p) => (
               <div key={p.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                 <Link to={`/planilla/${p.id}`} className="flex-1 min-w-0 hover:opacity-80">
                   <p className="text-sm font-semibold text-[#001A4B]">{p.nombre_planilla}</p>
                   <div className="flex gap-2 mt-0.5">
-                    <span className="text-xs text-gray-400">{p.puntos_totales || 0} pts</span>
+                    <span className="text-xs text-gray-400">{p.puntos_totales || 0} {t.ranking.pts}</span>
                     <span className={`text-xs px-1.5 rounded font-medium ${p.precio_pagado ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600'}`}>
-                      {p.precio_pagado ? 'Pagada' : 'Sin pagar'}
+                      {p.precio_pagado ? t.profile.paid : t.profile.unpaid}
                     </span>
                   </div>
                 </Link>
@@ -213,22 +211,22 @@ export function Profile() {
       </div>
 
       {/* Modal nueva planilla */}
-      <Modal open={showNewPlanilla} onClose={() => setShowNewPlanilla(false)} title="Nueva Planilla">
+      <Modal open={showNewPlanilla} onClose={() => setShowNewPlanilla(false)} title={t.profile.newPlanilla}>
         <form onSubmit={handleCreatePlanilla} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de la planilla</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t.profile.editNamePlaceholder}</label>
             <input
               type="text"
               value={newPlanillaName}
               onChange={(e) => setNewPlanillaName(e.target.value)}
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
-              placeholder="Mi planilla 2026"
+              placeholder={t.profile.planillaPlaceholder}
               required
             />
           </div>
           <button type="submit"
             className="w-full bg-[#0042A5] text-white font-bold py-2.5 rounded-xl hover:bg-[#003080] transition-colors">
-            Crear planilla
+            {t.profile.createPlanilla}
           </button>
         </form>
       </Modal>

@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { api } from '@/api/client'
+import { useT } from '@/hooks/useT'
 import { Spinner } from '@/components/ui/Spinner'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
 import { teamFlag } from '@/utils/teamFlags'
@@ -8,7 +9,6 @@ import { useAuthStore } from '@/store/authStore'
 import type { Match, RankingEntry, Tournament } from '@/types'
 
 type BetMap = Record<string, Record<string, { home: number; away: number }>>
-
 
 interface ActiveCell {
   matchId: string
@@ -21,9 +21,9 @@ interface ActiveCell {
 
 /* ── Popover de detalle ──────────────────────────────────────────── */
 function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }) {
+  const t = useT()
   const popRef = useRef<HTMLDivElement>(null)
 
-  // Cerrar al click afuera
   useEffect(() => {
     const handle = (e: MouseEvent) => {
       if (popRef.current && !popRef.current.contains(e.target as Node)) onClose()
@@ -32,12 +32,10 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
     return () => document.removeEventListener('mousedown', handle)
   }, [onClose])
 
-  // Responsive: en móvil ocupa casi todo el ancho, en desktop ancho fijo
   const popW = Math.min(220, window.innerWidth - 24)
-  const popH = 200 // altura estimada del popover
+  const popH = 200
   const rawTop  = cell.rect.bottom + 8
   const rawLeft = cell.rect.left + cell.rect.width / 2 - popW / 2
-  // Flip: si no cabe abajo, va arriba
   const top  = rawTop + popH > window.innerHeight - 16
     ? Math.max(8, cell.rect.top - 8 - popH)
     : rawTop
@@ -46,19 +44,6 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
   const { match, bet, result } = cell
   const isExactoLocal = bet.home === match.resultado_local
   const isExactoVisitante = bet.away === match.resultado_visitante
-
-  const LABEL: Record<string, string> = {
-    celeste:  '¡Exacto + bonus! 🔥',
-    rojo:     'Exacto 🎯',
-    verde:    'Parcialmente exacto',
-    amarillo: 'Ganador correcto',
-    gris:     'Sin puntos',
-  }
-
-  const ICON: Record<string, string> = {
-    celeste: '🏆', rojo: '🎯', verde: '✅', amarillo: '👍', gris: '❌',
-  }
-
   const color = result.color as string
 
   return createPortal(
@@ -67,14 +52,12 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
       style={{ position: 'fixed', top, left, zIndex: 9999, width: popW }}
       className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-pop"
     >
-      {/* Header con equipos */}
       <div className="bg-gray-50 border-b border-gray-100 px-4 py-2.5">
         <div className="flex items-center justify-between gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
           <span className="truncate">{match.home_team}</span>
           <span className="text-gray-300">vs</span>
           <span className="truncate text-right">{match.away_team}</span>
         </div>
-        {/* Resultado real */}
         <div className="flex items-center justify-center gap-3 mt-1">
           <span className="text-2xl font-black text-gray-800">{match.resultado_local}</span>
           <span className="text-xs text-gray-300 font-bold">—</span>
@@ -82,11 +65,9 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
         </div>
       </div>
 
-      {/* Detalle apuesta */}
       <div className="px-4 py-3 space-y-2.5">
-        {/* Pronóstico del usuario */}
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-400">Tu pronóstico</span>
+          <span className="text-xs text-gray-400">{t.match.yourBet}</span>
           <div className="flex items-center gap-1.5">
             <span className={`text-sm font-black ${isExactoLocal ? 'text-green-600' : 'text-gray-700'}`}>
               {bet.home}
@@ -98,7 +79,6 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
           </div>
         </div>
 
-        {/* Puntos obtenidos */}
         <div className={`flex items-center justify-between rounded-xl px-3 py-2 ${
           color === 'celeste' ? 'bg-sky-50' :
           color === 'rojo'    ? 'bg-red-50' :
@@ -107,7 +87,7 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
                                 'bg-gray-50'
         }`}>
           <span className="text-xs font-semibold text-gray-600">
-            {ICON[color]} {LABEL[color]}
+            {t.match.popIcons[color as keyof typeof t.match.popIcons]} {t.match.popLabels[color as keyof typeof t.match.popLabels]}
           </span>
           <span className={`text-lg font-black ${
             color === 'celeste' ? 'text-sky-500' :
@@ -122,7 +102,7 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
 
         {result.bonus && (
           <p className="text-[11px] text-sky-500 font-medium text-center">
-            Incluye +1 bonus por exacto en partido de ≥4 goles
+            {t.match.bonusNote}
           </p>
         )}
       </div>
@@ -133,6 +113,7 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
 
 export function Matriz() {
   const { user } = useAuthStore()
+  const t = useT()
   const [matches, setMatches] = useState<Match[]>([])
   const [ranking, setRanking] = useState<RankingEntry[]>([])
   const [bets, setBets] = useState<BetMap>({})
@@ -149,6 +130,19 @@ export function Matriz() {
   const [unlockConfig, setUnlockConfig] = useState<{ price: number; currency: string; payment_link: string; free: boolean }>({ price: 0, currency: 'ARS', payment_link: '', free: true })
   const tableRef = useRef<HTMLDivElement>(null)
 
+  const parseUnlocks = (data: { target_user_id: string; match_id: string; status: string }[]) => {
+    const map = new Map<string, 'approved' | 'pending'>()
+    data.forEach(u => map.set(`${u.target_user_id}_${u.match_id}`, u.status as 'approved' | 'pending'))
+    return map
+  }
+
+  const refreshUnlocks = useCallback(async () => {
+    try {
+      const { data } = await api.get('/bets/my-unlocks')
+      setUnlocks(parseUnlocks(data.data || []))
+    } catch { /* silent */ }
+  }, [])
+
   useEffect(() => {
     Promise.all([
       api.get('/matches?limit=200'),
@@ -164,14 +158,17 @@ export function Matriz() {
       const tourList = tRes.data.data || []
       setTournaments(tourList)
       if (tourList.length > 0) setSelectedTournament(tourList[0].id)
-      const unlocksMap = new Map<string, 'approved' | 'pending'>()
-      ;(uRes.data.data || []).forEach((u: { target_user_id: string; match_id: string; status: string }) => {
-        unlocksMap.set(`${u.target_user_id}_${u.match_id}`, u.status as 'approved' | 'pending')
-      })
-      setUnlocks(unlocksMap)
+      setUnlocks(parseUnlocks(uRes.data.data || []))
       if (priceRes.data.data) setUnlockConfig(priceRes.data.data)
     }).finally(() => setLoading(false))
   }, [])
+
+  // Refresca el estado de unlocks cuando el usuario vuelve a esta pestaña
+  // (ej: el admin aprueba en Admin y luego vuelve a Matriz)
+  useEffect(() => {
+    window.addEventListener('focus', refreshUnlocks)
+    return () => window.removeEventListener('focus', refreshUnlocks)
+  }, [refreshUnlocks])
 
   const handleRequestUnlock = async () => {
     if (!pendingUnlock) return
@@ -216,7 +213,6 @@ export function Matriz() {
   ) => {
     e.stopPropagation()
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    // Toggle: cerrar si ya estaba abierto el mismo
     if (activeCell?.matchId === matchId && activeCell?.rowKey === rowKey) {
       setActiveCell(null)
       return
@@ -233,12 +229,10 @@ export function Matriz() {
   const pendingMatches  = filteredMatches.filter(m => m.estado !== 'finished')
   const allMatches = [...finishedMatches, ...pendingMatches]
 
-  // Jugadores con apuestas en el torneo
   const baseRows: RankingEntry[] = selectedTournament
     ? ranking.filter(r => allMatches.some(m => bets[r.planilla_id]?.[m.id]))
     : ranking
 
-  // Calcular puntos del torneo (solo partidos terminados del torneo)
   const tournamentPts = new Map<string, number>()
   baseRows.forEach(r => {
     const playerBets = bets[r.planilla_id] || {}
@@ -253,7 +247,6 @@ export function Matriz() {
     tournamentPts.set(r.planilla_id, pts)
   })
 
-  // Ordenar por puntos del torneo
   const rows = [...baseRows].sort(
     (a, b) => (tournamentPts.get(b.planilla_id) ?? 0) - (tournamentPts.get(a.planilla_id) ?? 0)
   )
@@ -298,36 +291,35 @@ export function Matriz() {
 
       <div className="max-w-7xl mx-auto px-2 flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-bold text-[#001A4B]">📊 Matriz de Pronósticos</h1>
+          <h1 className="text-xl font-bold text-[#001A4B]">{t.matrix.title}</h1>
           <p className="text-xs text-gray-400 mt-1">
-            {rows.length} jugadores · {allMatches.length} partidos
+            {t.matrix.players(rows.length)} · {t.matrix.matches(allMatches.length)}
           </p>
         </div>
 
         {tournaments.length > 0 && (
           <div className="flex gap-1 flex-wrap">
-            {tournaments.map(t => (
+            {tournaments.map(tour => (
               <button
-                key={t.id}
-                onClick={(e) => { e.stopPropagation(); setSelectedTournament(t.id) }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === t.id ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                key={tour.id}
+                onClick={(e) => { e.stopPropagation(); setSelectedTournament(tour.id) }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === tour.id ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
               >
-                {t.name}
+                {tour.name}
               </button>
             ))}
           </div>
         )}
       </div>
 
-      {/* Leyenda — solo si hay partidos terminados */}
       {finishedMatches.length > 0 && (
         <div className="max-w-7xl mx-auto px-2 flex gap-2 flex-wrap text-xs items-center">
           {(['celeste','rojo','verde','amarillo','gris'] as const).map((c) => (
             <span key={c} className={`px-2 py-0.5 rounded font-medium ${POINT_COLORS[c]}`}>
-              {c === 'celeste' ? '4pts' : c === 'rojo' ? '3pts' : c === 'verde' ? '2pts' : c === 'amarillo' ? '1pt' : 'sin acierto'}
+              {t.matrix.ptsLabel[c]}
             </span>
           ))}
-          <span className="text-gray-400 ml-1">· Click en un resultado para ver el detalle</span>
+          <span className="text-gray-400 ml-1">{t.matrix.legend}</span>
         </div>
       )}
 
@@ -339,7 +331,7 @@ export function Matriz() {
         <div className="flex justify-center py-10"><Spinner /></div>
       ) : allMatches.length === 0 ? (
         <div className="max-w-7xl mx-auto px-2 text-center py-10 text-gray-400 text-sm">
-          No hay partidos en este torneo todavía
+          {t.matrix.noMatches}
         </div>
       ) : (
         <div ref={tableRef} className="overflow-x-auto">
@@ -347,9 +339,9 @@ export function Matriz() {
             <thead>
               <tr className="bg-[#001A4B] text-white">
                 <th className="sticky left-0 bg-[#001A4B] px-3 py-2 text-left font-semibold z-10 min-w-[180px]">
-                  Jugador
+                  {t.ranking.player}
                 </th>
-                <th className="px-2 py-2 text-center font-semibold w-14">Pts</th>
+                <th className="px-2 py-2 text-center font-semibold w-14">{t.ranking.pts}</th>
                 {allMatches.map((m) => (
                   <th key={m.id} className="px-1 py-2 text-center font-medium min-w-[60px]">
                     {teamFlag(m.home_team)
@@ -404,7 +396,6 @@ export function Matriz() {
                       const b = playerBets[m.id]
                       const isCutoffPassed = new Date() > new Date(m.time_cutoff)
 
-                      // Partido terminado: mostrar resultado coloreado
                       if (m.estado === 'finished' && m.resultado_local !== undefined) {
                         if (!b) return <td key={m.id} className="px-1 py-1.5 text-center text-gray-300">—</td>
                         const res = calcularPuntaje(
@@ -427,10 +418,19 @@ export function Matriz() {
                         )
                       }
 
-                      // Partido pendiente — propia fila, cutoff pasado, o aprobado
                       const unlockStatus = unlocks.get(`${r.user_id}_${m.id}`)
                       if (isMe || isCutoffPassed || unlockStatus === 'approved') {
                         if (!b) return <td key={m.id} className="px-1 py-1.5 text-center text-gray-300">—</td>
+                        // Apuesta desbloqueada (aprobada por admin) — resaltada en teal
+                        if (!isMe && !isCutoffPassed && unlockStatus === 'approved') {
+                          return (
+                            <td key={m.id} className="px-1 py-1.5 text-center">
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded font-bold text-[11px] bg-teal-50 text-teal-700 border border-teal-200 ring-1 ring-teal-300">
+                                🔓 {b.home}-{b.away}
+                              </span>
+                            </td>
+                          )
+                        }
                         return (
                           <td key={m.id} className="px-1 py-1.5 text-center text-gray-500 font-medium">
                             {b.home}-{b.away}
@@ -438,35 +438,25 @@ export function Matriz() {
                         )
                       }
 
-                      // Solicitud pendiente — badge "golden ticket"
                       if (unlockStatus === 'pending') {
                         const isPaid = !unlockConfig.free
                         return (
                           <td key={m.id} className="px-1 py-1.5 text-center">
                             {isPaid
-                              ? <span
-                                  className="badge-paid"
-                                  title="Pago enviado · esperando aprobación del admin"
-                                >
-                                  🪙 $
-                                </span>
-                              : <span
-                                  className="inline-block text-[13px]"
-                                  title="Solicitud pendiente de aprobación"
-                                >⏳</span>
+                              ? <span className="badge-paid" title={t.matrix.paid}>🪙 $</span>
+                              : <span className="inline-block text-[13px]" title={t.matrix.pendingFree}>⏳</span>
                             }
                           </td>
                         )
                       }
 
-                      // Sin solicitud — mostrar candado o —
                       return (
                         <td key={m.id} className="px-1 py-1.5 text-center">
                           {b
                             ? <span
                                 onClick={(e) => { e.stopPropagation(); setPendingUnlock({ targetUserId: r.user_id, targetName: r.user_name, match: m }) }}
                                 className="inline-block px-1.5 py-0.5 rounded text-[13px] bg-gray-100 select-none cursor-pointer hover:bg-gray-200 transition-colors"
-                                title="Solicitar ver esta apuesta"
+                                title={t.matrix.lockTitle}
                               >🔒</span>
                             : <span className="text-gray-200">—</span>
                           }
@@ -480,21 +470,22 @@ export function Matriz() {
           </table>
         </div>
       )}
-      {/* Sheet de desbloqueo con flujo de pago */}
+
+      {/* Sheet de desbloqueo */}
       {pendingUnlock && (
         <>
           <div className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm" onClick={handleClosePendingUnlock} />
           <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl max-w-lg mx-auto p-6"
             style={{ animation: 'slideUp 0.2s ease-out both' }}>
+            <style>{`@keyframes slideUp { from { transform: translateY(100%); opacity:0; } to { transform: translateY(0); opacity:1; } }`}</style>
             <div className="flex justify-center mb-4">
               <div className="w-10 h-1 rounded-full bg-gray-200" />
             </div>
 
-            {/* Partido info siempre visible */}
             <div className="text-center mb-4">
               <div className="text-3xl mb-2">{unlockConfig.free ? '🔓' : '💳'}</div>
               <h3 className="font-bold t-text-nav text-base">
-                {unlockConfig.free ? 'Solicitar ver apuesta' : 'Desbloquear apuesta'}
+                {unlockConfig.free ? t.matrix.unlockTitle : t.matrix.payStep1Title}
               </h3>
               <p className="text-sm text-gray-600 mt-1 font-medium">{pendingUnlock.targetName}</p>
               <p className="text-xs text-gray-400 mt-0.5">
@@ -506,36 +497,36 @@ export function Matriz() {
             {unlockConfig.free && (
               <>
                 <p className="text-xs text-gray-400 text-center mb-5 leading-relaxed">
-                  Los administradores recibirán un email con tu solicitud. Una vez aprobada, podrás ver el pronóstico.
+                  {t.matrix.freeInstructions}
                 </p>
                 <div className="flex gap-3">
                   <button onClick={handleClosePendingUnlock}
                     className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
-                    Cancelar
+                    {t.matrix.cancel}
                   </button>
                   <button onClick={handleRequestUnlock} disabled={unlocking}
                     className="flex-1 t-btn-primary text-sm py-3">
-                    {unlocking ? '...' : 'Enviar solicitud'}
+                    {unlocking ? t.matrix.sending : t.matrix.sendRequest}
                   </button>
                 </div>
               </>
             )}
 
-            {/* FLUJO PAGO — paso 1: info y botón de pago */}
+            {/* FLUJO PAGO — paso 1 */}
             {!unlockConfig.free && payStep === 'info' && (
               <>
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 text-center">
-                  <p className="text-xs text-amber-700 font-semibold uppercase tracking-wide mb-1">Costo del desbloqueo</p>
+                  <p className="text-xs text-amber-700 font-semibold uppercase tracking-wide mb-1">{t.matrix.payStep1Cost}</p>
                   <p className="text-3xl font-black text-amber-600">${unlockConfig.price.toLocaleString('es-AR')}</p>
                   <p className="text-xs text-amber-600 mt-0.5">{unlockConfig.currency}</p>
                 </div>
                 <p className="text-xs text-gray-500 text-center mb-4 leading-relaxed">
-                  Pagá por MercadoPago y luego ingresá el número de comprobante para enviar tu solicitud al admin.
+                  {t.matrix.payInstructions}
                 </p>
                 <div className="flex gap-3">
                   <button onClick={handleClosePendingUnlock}
                     className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
-                    Cancelar
+                    {t.matrix.cancel}
                   </button>
                   {unlockConfig.payment_link ? (
                     <a
@@ -545,51 +536,51 @@ export function Matriz() {
                       onClick={() => setTimeout(() => setPayStep('reference'), 1500)}
                       className="flex-1 bg-[#009EE3] text-white text-sm font-bold py-3 rounded-xl text-center hover:bg-[#0086c3] transition-colors"
                     >
-                      Pagar en MercadoPago →
+                      {t.matrix.payBtn}
                     </a>
                   ) : (
                     <button onClick={() => setPayStep('reference')}
                       className="flex-1 t-btn-primary text-sm py-3">
-                      Ya pagué
+                      {t.matrix.paidBtn}
                     </button>
                   )}
                 </div>
                 {unlockConfig.payment_link && (
                   <button onClick={() => setPayStep('reference')}
                     className="w-full mt-2 text-xs text-gray-400 hover:text-gray-600 py-2">
-                    Ya pagué, ingresar comprobante →
+                    {t.matrix.alreadyPaid}
                   </button>
                 )}
               </>
             )}
 
-            {/* FLUJO PAGO — paso 2: ingresar referencia */}
+            {/* FLUJO PAGO — paso 2 */}
             {!unlockConfig.free && payStep === 'reference' && (
               <>
                 <div className="mb-4">
                   <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-                    Número de comprobante / referencia de pago
+                    {t.matrix.refTitle}
                   </label>
                   <input
                     type="text"
                     value={paymentRef}
                     onChange={(e) => setPaymentRef(e.target.value)}
-                    placeholder="Ej: 12345678 o ID de transacción"
+                    placeholder={t.matrix.refPlaceholder}
                     autoFocus
                     className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#009EE3]"
                   />
                   <p className="text-xs text-gray-400 mt-1.5">
-                    El admin verificará el pago antes de aprobar tu solicitud.
+                    {t.matrix.refHint}
                   </p>
                 </div>
                 <div className="flex gap-3">
                   <button onClick={() => setPayStep('info')}
                     className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
-                    ← Volver
+                    {t.matrix.back}
                   </button>
                   <button onClick={handleRequestUnlock} disabled={unlocking || !paymentRef.trim()}
                     className="flex-1 t-btn-primary text-sm py-3 disabled:opacity-40">
-                    {unlocking ? '...' : 'Enviar solicitud'}
+                    {unlocking ? t.matrix.sending : t.matrix.sendRequest}
                   </button>
                 </div>
               </>

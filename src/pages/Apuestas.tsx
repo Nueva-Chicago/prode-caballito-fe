@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/api/client'
+import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Spinner } from '@/components/ui/Spinner'
 import { useToastStore } from '@/store/toastStore'
@@ -7,6 +8,7 @@ import type { Match, Bet, Planilla, Tournament } from '@/types'
 
 export function Apuestas() {
   const { show } = useToastStore()
+  const t = useT()
   const [matches, setMatches] = useState<Match[]>([])
   const [bets, setBets] = useState<Record<string, Bet>>({})
   const [planillas, setPlanillas] = useState<Planilla[]>([])
@@ -44,7 +46,7 @@ export function Apuestas() {
         setSelectedPlanilla(pl[0].id)
       }
     } catch {
-      show('Error al cargar partidos', 'error')
+      show(t.bets.errorLoadMatches, 'error')
     } finally {
       setLoading(false)
     }
@@ -57,7 +59,7 @@ export function Apuestas() {
       for (const b of data.data) betMap[b.match_id] = b
       setBets(betMap)
     } catch {
-      show('Error al cargar pronósticos', 'error')
+      show(t.bets.errorLoad, 'error')
     }
   }
 
@@ -72,9 +74,9 @@ export function Apuestas() {
       setBets({})
       setNewPlanillaName('')
       setShowNewPlanilla(false)
-      show(`Planilla "${created.nombre_planilla}" creada ✓`, 'success')
+      show(t.bets.planillaCreated(created.nombre_planilla), 'success')
     } catch {
-      show('Error al crear planilla', 'error')
+      show(t.bets.errorCreate, 'error')
     } finally {
       setCreatingPlanilla(false)
     }
@@ -101,11 +103,10 @@ export function Apuestas() {
     total: pendingMatches.length,
   }
 
-  // Torneo seleccionado sin ninguna apuesta aún (hay partidos pero no aposté)
-  const selectedTournamentName = tournaments.find(t => t.id === selectedTournament)?.name
+  const selectedTournamentName = tournaments.find(tour => tour.id === selectedTournament)?.name
+  // Disabled si el torneo seleccionado no tiene ninguna apuesta propia (ni partidos ni pronósticos)
   const noBeetsInTournament = selectedTournament !== 'all'
-    && pendingMatches.length > 0
-    && !pendingMatches.some(m => bets[m.id])
+    && (tournamentMatches.length === 0 || !tournamentMatches.some(m => bets[m.id]))
 
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
@@ -113,8 +114,8 @@ export function Apuestas() {
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-[#001A4B]">Pronósticos</h1>
-        <span className="text-sm text-gray-400">{progress.done}/{progress.total} completados</span>
+        <h1 className="text-xl font-bold text-[#001A4B]">{t.bets.title}</h1>
+        <span className="text-sm text-gray-400">{progress.done}/{progress.total} {t.bets.completed}</span>
       </div>
 
       {/* Selector de planilla + crear nueva */}
@@ -139,7 +140,7 @@ export function Apuestas() {
           </div>
         ) : (
           <div className="flex-1 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 text-sm text-amber-800 font-medium">
-            No tenés planillas — creá una para apostar
+            {t.bets.noPlanillas}
           </div>
         )}
         <button
@@ -150,7 +151,7 @@ export function Apuestas() {
             setShowNewPlanilla(true)
           }}
           className="shrink-0 w-10 h-10 rounded-xl t-bg-primary text-white font-bold text-lg flex items-center justify-center hover:opacity-90 transition-opacity"
-          title="Nueva planilla"
+          title={t.bets.newPlanilla}
         >
           +
         </button>
@@ -162,10 +163,10 @@ export function Apuestas() {
           <span className="text-xl shrink-0">📋</span>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-blue-800">
-              No tenés pronósticos en {selectedTournamentName}
+              {t.bets.noBeetsTitle(selectedTournamentName || '')}
             </p>
             <p className="text-xs text-blue-600 mt-0.5">
-              Tu planilla actual no tiene apuestas en este torneo. Podés seguir usando la misma o crear una nueva.
+              {t.bets.noBeetsDesc}
             </p>
           </div>
           <button
@@ -175,7 +176,7 @@ export function Apuestas() {
             }}
             className="shrink-0 t-btn-primary text-xs px-3 py-2"
           >
-            + Nueva
+            {t.bets.new}
           </button>
         </div>
       )}
@@ -190,15 +191,15 @@ export function Apuestas() {
             <div className="flex justify-center mb-4">
               <div className="w-10 h-1 rounded-full bg-gray-200" />
             </div>
-            <h3 className="font-bold t-text-nav text-base mb-1">Nueva planilla</h3>
+            <h3 className="font-bold t-text-nav text-base mb-1">{t.bets.newPlanilla}</h3>
             <p className="text-xs text-gray-400 mb-4">
-              Cada planilla compite de forma independiente en el ranking y la matriz.
+              {t.bets.planillaIndependent}
             </p>
             <input
               type="text"
               value={newPlanillaName}
               onChange={(e) => setNewPlanillaName(e.target.value)}
-              placeholder="Nombre de tu planilla (ej: Mi equipo soñado)"
+              placeholder={t.bets.planillaPlaceholder}
               autoFocus
               maxLength={40}
               onKeyDown={(e) => e.key === 'Enter' && handleCreatePlanilla()}
@@ -209,14 +210,14 @@ export function Apuestas() {
                 onClick={() => { setShowNewPlanilla(false); setNewPlanillaName('') }}
                 className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl"
               >
-                Cancelar
+                {t.bets.cancel}
               </button>
               <button
                 onClick={handleCreatePlanilla}
                 disabled={!newPlanillaName.trim() || creatingPlanilla}
                 className="flex-1 t-btn-primary text-sm py-3 disabled:opacity-40"
               >
-                {creatingPlanilla ? '...' : 'Crear planilla'}
+                {creatingPlanilla ? '...' : t.bets.createPlanilla}
               </button>
             </div>
           </div>
@@ -230,15 +231,15 @@ export function Apuestas() {
             onClick={() => setSelectedTournament('all')}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === 'all' ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
           >
-            Todos
+            {t.bets.all}
           </button>
-          {tournaments.map(t => (
+          {tournaments.map(tour => (
             <button
-              key={t.id}
-              onClick={() => setSelectedTournament(t.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === t.id ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+              key={tour.id}
+              onClick={() => setSelectedTournament(tour.id)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === tour.id ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
             >
-              {t.name}
+              {tour.name}
             </button>
           ))}
         </div>
@@ -248,9 +249,9 @@ export function Apuestas() {
       <div className="flex gap-2 items-center flex-wrap">
         <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
           {([
-            { key: 'todos',       label: 'Todos' },
-            { key: 'pendientes',  label: 'Pendientes' },
-            { key: 'finalizados', label: 'Finalizados' },
+            { key: 'todos',       label: t.bets.all },
+            { key: 'pendientes',  label: t.bets.pending },
+            { key: 'finalizados', label: t.bets.finished },
           ] as const).map(({ key, label }) => (
             <button
               key={key}
@@ -267,7 +268,7 @@ export function Apuestas() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar equipo..."
+          placeholder={t.bets.searchTeam}
           className="flex-1 min-w-32 border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#0042A5] bg-white"
         />
       </div>
@@ -275,7 +276,7 @@ export function Apuestas() {
       {/* Lista de partidos */}
       <div className="space-y-3">
         {filtered.length === 0 && (
-          <p className="text-gray-400 text-sm text-center py-10">No hay partidos en esta categoría</p>
+          <p className="text-gray-400 text-sm text-center py-10">{t.bets.noMatches}</p>
         )}
         {filtered.map((m) => (
           <MatchCard

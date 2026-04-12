@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
+import { useT } from '@/hooks/useT'
 import { Spinner } from '@/components/ui/Spinner'
 import { calcularPuntaje } from '@/utils/scoring'
 import type { RankingEntry, Tournament, Match } from '@/types'
@@ -9,18 +10,18 @@ import type { RankingEntry, Tournament, Match } from '@/types'
 const MEDAL = ['🥇', '🥈', '🥉']
 
 type BetEntry = { home: number; away: number }
-type BetMap = Record<string, Record<string, BetEntry>> // planilla_id → match_id → bet
+type BetMap = Record<string, Record<string, BetEntry>>
 
 export function Ranking() {
   const { user } = useAuthStore()
+  const t = useT()
   const [ranking, setRanking] = useState<RankingEntry[]>([])
   const [tournaments, setTournaments] = useState<Tournament[]>([])
-  const [selectedTournamentId, setSelectedTournamentId] = useState<string>('')  // '' = global
+  const [selectedTournamentId, setSelectedTournamentId] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<RankingEntry | null>(null)
   const [shared, setShared] = useState(false)
 
-  // Datos para ranking por torneo (cargados lazy)
   const [bets, setBets] = useState<BetMap | null>(null)
   const [allMatches, setAllMatches] = useState<Match[] | null>(null)
   const [loadingTournament, setLoadingTournament] = useState(false)
@@ -35,7 +36,6 @@ export function Ranking() {
     }).finally(() => setLoading(false))
   }, [])
 
-  // Cargar bets+matches la primera vez que se selecciona un torneo
   useEffect(() => {
     if (!selectedTournamentId || bets !== null) return
     setLoadingTournament(true)
@@ -48,7 +48,6 @@ export function Ranking() {
     }).finally(() => setLoadingTournament(false))
   }, [selectedTournamentId, bets])
 
-  // Ranking por torneo calculado client-side
   const tournamentRanking = useMemo(() => {
     if (!selectedTournamentId || !bets || !allMatches) return null
 
@@ -78,7 +77,6 @@ export function Ranking() {
       exactos.set(r.planilla_id, totalExactos)
     })
 
-    // Filtrar solo jugadores que apostaron en este torneo
     const active = ranking.filter(r =>
       tournamentMatches.some(m => bets[r.planilla_id]?.[m.id])
     )
@@ -93,12 +91,12 @@ export function Ranking() {
       }))
   }, [selectedTournamentId, bets, allMatches, ranking])
 
-  const selectedTournament = tournaments.find(t => t.id === selectedTournamentId)
+  const selectedTournament = tournaments.find(tour => tour.id === selectedTournamentId)
   const displayRanking = selectedTournamentId ? (tournamentRanking ?? []) : ranking
   const isLoadingDisplay = loading || (selectedTournamentId && loadingTournament)
 
   const handleShare = async (r: RankingEntry) => {
-    const text = `${r.user_name} está #${r.position} en el PRODE Caballito con ${r.puntos_totales} puntos 🏆`
+    const text = t.ranking.shareText(r.user_name, r.position, r.puntos_totales)
     const url = window.location.origin + '/ranking'
     if (navigator.share) {
       await navigator.share({ title: 'PRODE Caballito', text, url }).catch(() => {})
@@ -117,7 +115,7 @@ export function Ranking() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
-      <h1 className="text-xl font-bold t-text-nav">🏆 Ranking</h1>
+      <h1 className="text-xl font-bold t-text-nav">{t.ranking.title}</h1>
 
       {/* Selector de torneo */}
       <div className="flex gap-2 flex-wrap">
@@ -129,35 +127,34 @@ export function Ranking() {
               : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
           }`}
         >
-          Global
+          {t.ranking.global}
         </button>
-        {tournaments.map(t => {
-          // Torneo sin arrancar: no tiene partidos terminados Y su fecha de inicio es futura
-          const futureStart = t.start_date ? new Date(t.start_date) > now : false
-          const hasFinished = (t.finished_count ?? 0) > 0
-          const firstMatch = t.first_match_time ? new Date(t.first_match_time) : null
+        {tournaments.map(tour => {
+          const futureStart = tour.start_date ? new Date(tour.start_date) > now : false
+          const hasFinished = (tour.finished_count ?? 0) > 0
+          const firstMatch = tour.first_match_time ? new Date(tour.first_match_time) : null
           const matchesStarted = firstMatch ? firstMatch <= now : false
           const notStarted = !hasFinished && futureStart && !matchesStarted
 
           return notStarted ? (
             <span
-              key={t.id}
-              title="El torneo aún no comenzó"
+              key={tour.id}
+              title={t.ranking.noStarted}
               className="px-4 py-2 rounded-full text-sm font-semibold border border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed select-none"
             >
-              {t.name}
+              {tour.name}
             </span>
           ) : (
             <button
-              key={t.id}
-              onClick={() => setSelectedTournamentId(t.id)}
+              key={tour.id}
+              onClick={() => setSelectedTournamentId(tour.id)}
               className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
-                selectedTournamentId === t.id
+                selectedTournamentId === tour.id
                   ? 't-pill-active'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
               }`}
             >
-              {t.name}
+              {tour.name}
             </button>
           )
         })}
@@ -183,25 +180,23 @@ export function Ranking() {
               <div className="flex-1">
                 <p className="font-semibold">{myEntry.user_name}</p>
                 <p className="text-white/60 text-xs">
-                  {selectedTournament ? selectedTournament.name : 'Ranking Global'}
+                  {selectedTournament ? selectedTournament.name : t.ranking.globalLabel}
                 </p>
               </div>
               <div className="text-right">
                 <p className="text-2xl font-black t-text-secondary">{myEntry.puntos_totales}</p>
-                <p className="text-white/60 text-xs">puntos</p>
+                <p className="text-white/60 text-xs">{t.ranking.points}</p>
               </div>
             </div>
           )}
 
-          {/* Info torneo cuando no hay partidos terminados aún */}
           {selectedTournamentId && tournamentRanking !== null && tournamentRanking.length === 0 && (
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
-              <p className="text-sm text-blue-700 font-medium">El torneo aún no tiene partidos terminados</p>
-              <p className="text-xs text-blue-500 mt-1">El ranking se mostrará cuando haya resultados</p>
+              <p className="text-sm text-blue-700 font-medium">{t.ranking.noResults}</p>
+              <p className="text-xs text-blue-500 mt-1">{t.ranking.noResultsDesc}</p>
             </div>
           )}
 
-          {/* Tabla */}
           {displayRanking.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
               {selectedTournament && (
@@ -211,9 +206,9 @@ export function Ranking() {
               )}
               <div className="grid grid-cols-[2rem_1fr_auto_auto] gap-2 px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 border-b">
                 <span>#</span>
-                <span>Jugador</span>
-                <span className="text-center">Exactos</span>
-                <span className="text-right">Pts</span>
+                <span>{t.ranking.player}</span>
+                <span className="text-center">{t.ranking.exact}</span>
+                <span className="text-right">{t.ranking.pts}</span>
               </div>
               {displayRanking.map((r, i) => {
                 const isMe = r.user_id === user?.id
@@ -235,10 +230,10 @@ export function Ranking() {
                       }
                       <div className="min-w-0">
                         <p className={`text-sm font-semibold truncate ${isMe ? 't-text-primary' : 't-text-nav'}`}>
-                          {r.user_name} {isMe && <span className="text-xs font-normal">(vos)</span>}
+                          {r.user_name} {isMe && <span className="text-xs font-normal">{t.ranking.you}</span>}
                         </p>
                         <p className="text-xs text-gray-400 truncate">{r.nombre_planilla}
-                          {!r.precio_pagado && <span className="ml-1 text-orange-400 font-medium">· no oficial</span>}
+                          {!r.precio_pagado && <span className="ml-1 text-orange-400 font-medium">· {t.ranking.noOfficial}</span>}
                         </p>
                       </div>
                     </div>
@@ -252,7 +247,7 @@ export function Ranking() {
         </>
       )}
 
-      {/* Drawer / modal de jugador */}
+      {/* Drawer de jugador */}
       {selected && (
         <>
           <div className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm" onClick={() => setSelected(null)} />
@@ -283,20 +278,20 @@ export function Ranking() {
                     <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium">{selectedTournament.name}</span>
                   )}
                   {!selected.precio_pagado && (
-                    <span className="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full font-medium ml-1">No oficial</span>
+                    <span className="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full font-medium ml-1">{t.ranking.noOfficial}</span>
                   )}
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-3xl font-black text-[#0042A5]">{selected.puntos_totales}</p>
-                  <p className="text-xs text-gray-400">puntos</p>
+                  <p className="text-xs text-gray-400">{t.ranking.points}</p>
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-2 mt-5">
                 {[
-                  { label: 'Exactos', value: selected.exactos_count, color: 'text-red-500' },
-                  { label: '+Bonus', value: selected.aciertos_celeste, color: 'text-sky-500' },
-                  { label: 'Parciales', value: selected.aciertos_verde, color: 'text-green-600' },
-                  { label: 'Tendencia', value: selected.aciertos_amarillo, color: 'text-yellow-500' },
+                  { label: t.ranking.exact,   value: selected.exactos_count,   color: 'text-red-500' },
+                  { label: t.ranking.extraBonus, value: selected.aciertos_celeste, color: 'text-sky-500' },
+                  { label: t.ranking.partial,  value: selected.aciertos_verde,  color: 'text-green-600' },
+                  { label: t.ranking.tendency, value: selected.aciertos_amarillo, color: 'text-yellow-500' },
                 ].map(({ label, value, color }) => (
                   <div key={label} className="bg-gray-50 rounded-xl p-3 text-center">
                     <p className={`text-xl font-black ${color}`}>{value || 0}</p>
@@ -310,13 +305,13 @@ export function Ranking() {
                   className="flex-1 bg-[#001A4B] text-white text-sm font-bold py-3 rounded-xl text-center hover:bg-[#002870] transition-colors"
                   onClick={() => setSelected(null)}
                 >
-                  Ver planilla completa
+                  {t.ranking.fullPlanilla}
                 </Link>
                 <button
                   onClick={() => handleShare(selected)}
                   className="flex-1 border-2 border-[#001A4B] text-[#001A4B] text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors"
                 >
-                  {shared ? '✓ Copiado' : '↗ Compartir'}
+                  {shared ? t.ranking.copied : t.ranking.share}
                 </button>
               </div>
             </div>

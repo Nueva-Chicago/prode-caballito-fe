@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { es as esLocale } from 'date-fns/locale'
+import { ptBR } from 'date-fns/locale'
 import { api } from '@/api/client'
 import { useToastStore } from '@/store/toastStore'
+import { useAuthStore } from '@/store/authStore'
+import { useT } from '@/hooks/useT'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
 import { teamFlag } from '@/utils/teamFlags'
 import { useTeamBadgesStore, getTeamBadge } from '@/store/teamBadgesStore'
@@ -38,15 +41,22 @@ function TeamDisplay({ team }: { team: string }) {
 
 export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, readonly }: Props) {
   const { show } = useToastStore()
+  const t = useT()
+  const lang = useAuthStore(s => s.user?.idioma_pref || 'es')
   const [score, setScore] = useState(
     bet ? `${bet.goles_local}-${bet.goles_visitante}` : ''
   )
   const [saving, setSaving] = useState(false)
   const [editing, setEditing] = useState(false)
 
+  // Team names in user's language
+  const homeTeam = (lang === 'pt' && match.home_team_pt) ? match.home_team_pt : match.home_team
+  const awayTeam = (lang === 'pt' && match.away_team_pt) ? match.away_team_pt : match.away_team
+
   const isClosed = new Date() > new Date(match.time_cutoff)
   const isFinished = match.estado === 'finished'
   const isLive = match.estado === 'live'
+  const dateLocale = lang === 'pt' ? ptBR : esLocale
 
   const pointResult = isFinished && bet
     ? calcularPuntaje(
@@ -59,7 +69,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
     if (!planillaId) return
     const parts = score.split(/[-:]/).map(Number)
     if (parts.length !== 2 || parts.some(isNaN)) {
-      show('Formato inválido. Usá: 2-1', 'error'); return
+      show(t.match.invalidFormat, 'error'); return
     }
     setSaving(true)
     try {
@@ -68,11 +78,11 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
         match_id: match.id,
         score,
       })
-      show('Pronóstico guardado ✓', 'success')
+      show(t.match.saved, 'success')
       onBetSaved?.(data.data)
       setEditing(false)
     } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al guardar'
+      const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || t.match.errorSave
       show(msg, 'error')
     } finally {
       setSaving(false)
@@ -83,12 +93,12 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
     if (!planillaId || !bet) return
     try {
       await api.delete(`/bets/planillas/${planillaId}/matches/${match.id}`)
-      show('Pronóstico eliminado', 'info')
+      show(t.match.deleted, 'info')
       onBetDeleted?.(match.id)
       setScore('')
       setEditing(false)
     } catch {
-      show('Error al eliminar', 'error')
+      show(t.match.errorDelete, 'error')
     }
   }
 
@@ -113,7 +123,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
           </span>
           <TeamDisplay team={match.home_team} />
           <span className="text-xs font-semibold text-[#001A4B] text-center leading-tight">
-            {match.home_team}
+            {homeTeam}
           </span>
         </div>
 
@@ -123,7 +133,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
             <>
               <span className="flex items-center gap-1 text-[11px] font-bold text-green-600">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block" />
-                EN VIVO
+                {t.match.live}
               </span>
               {match.halftime_minutes != null && (
                 <span className="text-[11px] text-green-600 font-semibold">{match.halftime_minutes}'</span>
@@ -131,10 +141,10 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
             </>
           ) : (
             <>
-              <span className="text-xs text-gray-400 font-medium">VS</span>
+              <span className="text-xs text-gray-400 font-medium">{t.match.vs}</span>
               {!isFinished && (
                 <span className="text-[11px] text-gray-400 text-center leading-snug whitespace-nowrap">
-                  {format(new Date(match.start_time), "d MMM HH:mm", { locale: es })}
+                  {format(new Date(match.start_time), "d MMM HH:mm", { locale: dateLocale })}
                 </span>
               )}
             </>
@@ -148,7 +158,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
           </span>
           <TeamDisplay team={match.away_team} />
           <span className="text-xs font-semibold text-[#001A4B] text-center leading-tight">
-            {match.away_team}
+            {awayTeam}
           </span>
         </div>
       </div>
@@ -164,7 +174,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
               {pointResult && <span className="ml-1 opacity-80">· {pointResult.puntos}pts</span>}
             </span>
           ) : (
-            <span className="text-xs text-gray-400 italic">Sin pronóstico</span>
+            <span className="text-xs text-gray-400 italic">{t.match.noBet}</span>
           )}
           {editing && (
             <input
@@ -189,10 +199,10 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
                   disabled={saving}
                   className="t-btn-cta text-xs px-4 py-2 disabled:opacity-50"
                 >
-                  {saving ? '...' : '🎯 Apostar'}
+                  {saving ? '...' : t.match.bet}
                 </button>
                 <button onClick={() => setEditing(false)} className="text-xs text-gray-400 hover:text-gray-600">
-                  Cancelar
+                  {t.match.cancel}
                 </button>
               </>
             ) : bet ? (
@@ -201,7 +211,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
                   onClick={() => { setEditing(true); setScore(`${bet.goles_local}-${bet.goles_visitante}`) }}
                   className="text-xs text-blue-600 hover:underline"
                 >
-                  Editar
+                  {t.match.edit}
                 </button>
                 <button onClick={handleDelete} className="text-xs text-red-400 hover:text-red-600">×</button>
               </>
@@ -210,15 +220,15 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
                 onClick={() => setEditing(true)}
                 className="t-btn-cta text-xs px-4 py-2"
               >
-                🎯 Apostar
+                {t.match.bet}
               </button>
             )
           ) : isClosed && !isFinished ? (
             <span className="text-xs bg-red-100 text-red-500 px-2.5 py-1 rounded-full font-medium">
-              Cerrado
+              {t.match.closed}
             </span>
           ) : pointResult?.bonus ? (
-            <span className="text-xs bg-sky-100 text-sky-600 px-2.5 py-1 rounded-full font-bold">BONUS +1</span>
+            <span className="text-xs bg-sky-100 text-sky-600 px-2.5 py-1 rounded-full font-bold">{t.match.bonus}</span>
           ) : null}
         </div>
       </div>

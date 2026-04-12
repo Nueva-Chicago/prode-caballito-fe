@@ -20,6 +20,8 @@ export interface Match {
   id: string
   home_team: string
   away_team: string
+  home_team_pt?: string
+  away_team_pt?: string
   start_time: string
   time_cutoff: string
   halftime_minutes: number

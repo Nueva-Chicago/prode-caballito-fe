@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
+import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Spinner } from '@/components/ui/Spinner'
 import type { Match, Bet, Planilla, RankingEntry, Tournament } from '@/types'
@@ -12,7 +13,7 @@ const PODIUM_ORDER = [1, 0, 2]
 
 function formatCountdown(cutoffMs: number, nowMs: number): string {
   const diff = cutoffMs - nowMs
-  if (diff <= 0) return 'cerrado'
+  if (diff <= 0) return '—'
   const h = Math.floor(diff / 3600000)
   const m = Math.floor((diff % 3600000) / 60000)
   if (h > 0) return `${h}h ${m}m`
@@ -21,6 +22,7 @@ function formatCountdown(cutoffMs: number, nowMs: number): string {
 
 export function Home() {
   const { user } = useAuthStore()
+  const t = useT()
   const [matches, setMatches] = useState<Match[]>([])
   const [bets, setBets] = useState<Record<string, Bet>>({})
   const [planilla, setPlanilla] = useState<Planilla | null>(null)
@@ -74,18 +76,15 @@ export function Home() {
   const pendingMatches = tournamentMatches.filter(m => m.estado !== 'finished')
   const finishedMatches = tournamentMatches.filter(m => m.estado === 'finished')
 
-  // Progreso del torneo seleccionado
   const progress = planilla ? {
     done: pendingMatches.filter(m => bets[m.id]).length,
     total: pendingMatches.length,
   } : null
 
-  // Total de partidos SIN pronóstico (todos los torneos) → badge en tarjeta Apostar
   const totalUnbet = matches
     .filter(m => m.estado !== 'finished' && !bets[m.id])
     .length
 
-  // Partidos que cierran pronto (< 6h)
   const closingSoon = matches
     .filter(m => {
       if (m.estado !== 'pending') return false
@@ -98,7 +97,6 @@ export function Home() {
   const upcoming = pendingMatches.slice(0, 5)
   const recentFinished = finishedMatches.slice(0, 3)
 
-  // Datos del usuario en el ranking
   const myEntry = ranking.find(r => r.user_id === user?.id)
   const leader = ranking[0]
   const ptsDiff = leader && myEntry ? leader.puntos_totales - myEntry.puntos_totales : null
@@ -111,10 +109,10 @@ export function Home() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
 
-      {/* ── 1. HERO — bienvenida, torneo y urgencia ─────────────── */}
+      {/* ── 1. HERO ─────────────────────────────────────────────── */}
       <div className="t-gradient-hero rounded-2xl p-5 text-white">
-        <h1 className="text-xl font-bold">¡Hola, {user?.nombre}! 👋</h1>
-        <p className="text-white/70 text-sm mt-0.5">PRODE Caballito</p>
+        <h1 className="text-xl font-bold">{t.home.greeting(user?.nombre || '')}</h1>
+        <p className="text-white/70 text-sm mt-0.5">{t.home.subtitle}</p>
 
         {tournaments.length > 0 && (
           <div className="flex gap-1.5 flex-wrap mt-3">
@@ -126,19 +124,19 @@ export function Home() {
                   : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'
               }`}
             >
-              Todos
+              {t.home.all}
             </button>
-            {tournaments.map(t => (
+            {tournaments.map(tour => (
               <button
-                key={t.id}
-                onClick={() => setSelectedTournament(t.id)}
+                key={tour.id}
+                onClick={() => setSelectedTournament(tour.id)}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all ${
-                  selectedTournament === t.id
+                  selectedTournament === tour.id
                     ? 'bg-white t-text-nav border-white'
                     : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'
                 }`}
               >
-                {t.name}
+                {tour.name}
               </button>
             ))}
           </div>
@@ -147,7 +145,7 @@ export function Home() {
         {progress && (
           <div className="mt-3">
             <div className="flex justify-between text-xs mb-1 text-white/80">
-              <span>Pronósticos completados</span>
+              <span>{t.home.completedBets}</span>
               <span className="font-bold">{progress.done}/{progress.total}</span>
             </div>
             <div className="bg-white/20 rounded-full h-2">
@@ -159,10 +157,10 @@ export function Home() {
           </div>
         )}
 
-        {/* ⏰ Cierran pronto */}
+        {/* ⏰ Cierra pronto */}
         {closingSoon.length > 0 && (
           <div className="mt-3 space-y-1.5">
-            <p className="text-[11px] text-white/60 font-semibold uppercase tracking-wide">⏰ Cierra pronto</p>
+            <p className="text-[11px] text-white/60 font-semibold uppercase tracking-wide">⏰ {t.home.closingSoon}</p>
             {closingSoon.map(m => (
               <div key={m.id} className="flex items-center justify-between bg-black/20 rounded-xl px-3 py-2 border border-white/10">
                 <div className="flex items-center gap-2 min-w-0">
@@ -172,7 +170,7 @@ export function Home() {
                   </span>
                   {!bets[m.id] && (
                     <span className="shrink-0 text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded-full font-semibold">
-                      sin pronóstico
+                      {t.home.noBet}
                     </span>
                   )}
                 </div>
@@ -185,77 +183,73 @@ export function Home() {
         )}
       </div>
 
-      {/* ── 2. ACCESOS RÁPIDOS con contexto personalizado ───────── */}
+      {/* ── 2. ACCESOS RÁPIDOS ──────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-3">
 
-        {/* Apostar */}
         <Link
           to="/apuestas"
           className="bg-white rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col items-center gap-1"
         >
           <div className="text-2xl">⚽</div>
-          <div className="text-xs font-semibold t-text-nav">Apostar</div>
+          <div className="text-xs font-semibold t-text-nav">{t.home.bet}</div>
           {totalUnbet > 0 ? (
             <span className="text-[10px] font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
-              {totalUnbet} falt{totalUnbet === 1 ? 'a' : 'an'}
+              {t.home.pending(totalUnbet)}
             </span>
           ) : (
             <span className="text-[10px] font-bold bg-green-100 text-green-600 px-2 py-0.5 rounded-full">
-              Al día ✓
+              {t.home.upToDate}
             </span>
           )}
         </Link>
 
-        {/* Ranking */}
         <Link
           to="/ranking"
           className="bg-white rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col items-center gap-1"
         >
           <div className="text-2xl">🏆</div>
-          <div className="text-xs font-semibold t-text-nav">Ranking</div>
+          <div className="text-xs font-semibold t-text-nav">{t.home.ranking}</div>
           {myEntry ? (
             <span className="text-[10px] font-bold t-bg-secondary t-text-accent px-2 py-0.5 rounded-full">
-              #{myEntry.position} lugar
+              #{myEntry.position}
             </span>
           ) : (
-            <span className="text-[10px] text-gray-400 px-2 py-0.5">Sin posición</span>
+            <span className="text-[10px] text-gray-400 px-2 py-0.5">{t.home.noPosition}</span>
           )}
         </Link>
 
-        {/* Matriz */}
         <Link
           to="/matriz"
           className="bg-white rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col items-center gap-1"
         >
           <div className="text-2xl">📊</div>
-          <div className="text-xs font-semibold t-text-nav">Matriz</div>
+          <div className="text-xs font-semibold t-text-nav">{t.home.matrix}</div>
           {ptsDiff !== null ? (
             ptsDiff === 0 ? (
               <span className="text-[10px] font-bold bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
-                ¡Líder! 🔥
+                {t.home.leader}
               </span>
             ) : (
               <span className="text-[10px] font-bold bg-sky-100 text-sky-600 px-2 py-0.5 rounded-full">
-                {ptsDiff}pts del 1°
+                {t.home.fromFirst(ptsDiff)}
               </span>
             )
           ) : (
-            <span className="text-[10px] text-gray-400 px-2 py-0.5">Ver tabla</span>
+            <span className="text-[10px] text-gray-400 px-2 py-0.5">{t.home.seeTable}</span>
           )}
         </Link>
       </div>
 
-      {/* ── 3. PODIO — siempre visible, rivalidad inmediata ─────── */}
+      {/* ── 3. PODIO ────────────────────────────────────────────── */}
       {top3.length > 0 && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="t-bg-nav px-4 py-2.5 flex items-center justify-between">
-            <p className="text-xs font-bold text-white/90 uppercase tracking-wide">🏆 Ranking actual</p>
+            <p className="text-xs font-bold text-white/90 uppercase tracking-wide">{t.home.currentRanking}</p>
             <Link to="/ranking" className="text-xs text-white/60 hover:text-white transition-colors">
-              Ver completo →
+              {t.home.seeComplete}
             </Link>
           </div>
 
-          {/* Podio visual */}
           <div className="flex items-end justify-center gap-1 px-6 pt-6 pb-2">
             {PODIUM_ORDER.map((idx) => {
               const r = top3[idx]
@@ -269,7 +263,6 @@ export function Home() {
 
               return (
                 <div key={r.planilla_id} className="flex flex-col items-center gap-1 flex-1">
-                  {/* Avatar + medalla */}
                   <div className="relative">
                     {r.user_avatar
                       ? <img src={r.user_avatar} alt="" className={`${avatarSize} rounded-full object-cover ${avatarBorder}`} />
@@ -280,37 +273,33 @@ export function Home() {
                     <span className="absolute -top-1 -right-1 text-base leading-none">{MEDAL[idx]}</span>
                   </div>
 
-                  {/* Nombre */}
                   <p className={`text-center font-semibold truncate w-full px-0.5 leading-tight ${isFirst ? 'text-xs t-text-nav' : 'text-[10px] text-gray-500'}`}>
                     {r.user_name.split(' ')[0]}
-                    {isMe && <span className="t-text-primary"> (vos)</span>}
+                    {isMe && <span className="t-text-primary"> {t.home.you}</span>}
                   </p>
 
-                  {/* Puntos */}
                   <p className={`font-black ${isFirst ? 'text-sm t-text-primary' : 'text-xs text-gray-500'}`}>
                     {r.puntos_totales}
-                    <span className="font-normal text-[9px] ml-0.5">pts</span>
+                    <span className="font-normal text-[9px] ml-0.5">{t.ranking.pts}</span>
                   </p>
 
-                  {/* Base del podio */}
                   <div className={`w-full rounded-t-lg ${podiumH} ${podiumBg}`} />
                 </div>
               )
             })}
           </div>
 
-          {/* Tu posición si no estás en el podio */}
           {myEntry && myEntry.position > 3 && (
             <div className="mx-4 mb-4 mt-1 rounded-xl px-4 py-2.5 flex items-center justify-between border"
               style={{ background: 'color-mix(in srgb, var(--theme-primary) 8%, white)', borderColor: 'color-mix(in srgb, var(--theme-primary) 20%, white)' }}>
               <div className="flex items-center gap-2">
                 <span className="text-base font-black t-text-primary">#{myEntry.position}</span>
-                <span className="text-sm font-semibold t-text-nav">Vos — {myEntry.user_name.split(' ')[0]}</span>
+                <span className="text-sm font-semibold t-text-nav">{myEntry.user_name.split(' ')[0]}</span>
               </div>
               <div className="text-right">
-                <span className="font-black t-text-primary">{myEntry.puntos_totales}pts</span>
+                <span className="font-black t-text-primary">{myEntry.puntos_totales}{t.ranking.pts}</span>
                 {ptsDiff !== null && ptsDiff > 0 && (
-                  <p className="text-[10px] text-gray-400">{ptsDiff}pts del líder</p>
+                  <p className="text-[10px] text-gray-400">{t.home.fromFirst(ptsDiff)}</p>
                 )}
               </div>
             </div>
@@ -318,12 +307,12 @@ export function Home() {
         </div>
       )}
 
-      {/* ── 4. PRÓXIMOS PARTIDOS ─────────────────────────────────── */}
+      {/* ── 4. PRÓXIMOS PARTIDOS ────────────────────────────────── */}
       <div className="space-y-3">
-        <h2 className="text-sm font-bold t-text-nav">Próximos partidos</h2>
+        <h2 className="text-sm font-bold t-text-nav">{t.home.nextMatches}</h2>
 
         {upcoming.length === 0 ? (
-          <p className="text-gray-400 text-sm text-center py-8">No hay partidos próximos</p>
+          <p className="text-gray-400 text-sm text-center py-8">{t.home.noUpcoming}</p>
         ) : (
           upcoming.map((m) => (
             <MatchCard
@@ -339,7 +328,7 @@ export function Home() {
 
         {recentFinished.length > 0 && (
           <>
-            <h3 className="text-sm font-semibold text-gray-500 mt-4">Últimos resultados</h3>
+            <h3 className="text-sm font-semibold text-gray-500 mt-4">{t.home.lastResults}</h3>
             {recentFinished.map((m) => (
               <MatchCard key={m.id} match={m} bet={bets[m.id]} readonly />
             ))}
@@ -347,7 +336,7 @@ export function Home() {
         )}
 
         <Link to="/apuestas" className="block text-center text-sm t-text-primary hover:underline py-2">
-          Ver todos los partidos →
+          {t.home.seeAll}
         </Link>
       </div>
 

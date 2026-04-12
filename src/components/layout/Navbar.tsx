@@ -1,22 +1,25 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { useT } from '@/hooks/useT'
 import { api } from '@/api/client'
 
-const navLinks = [
-  { to: '/',            label: 'Inicio',      icon: '🏠' },
-  { to: '/apuestas',    label: 'Pronósticos', icon: '⚽' },
-  { to: '/matriz',      label: 'Matriz',      icon: '📊' },
-  { to: '/ranking',     label: 'Ranking',     icon: '🏆' },
-  { to: '/tournaments', label: 'Torneos',     icon: '🎯' },
-  { to: '/messages',    label: 'Mensajes',    icon: '💬' },
-]
-
 export function Navbar() {
-  const { user, logout, isAdmin } = useAuthStore()
+  const { user, logout, updateUser, isAdmin } = useAuthStore()
+  const t = useT()
   const navigate = useNavigate()
   const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [switchingLang, setSwitchingLang] = useState(false)
+
+  const navLinks = [
+    { to: '/',            label: t.nav.home,        icon: '🏠' },
+    { to: '/apuestas',    label: t.nav.bets,         icon: '⚽' },
+    { to: '/matriz',      label: t.nav.matrix,       icon: '📊' },
+    { to: '/ranking',     label: t.nav.ranking,      icon: '🏆' },
+    { to: '/tournaments', label: t.nav.tournaments,  icon: '🎯' },
+    { to: '/messages',    label: t.nav.messages,     icon: '💬' },
+  ]
 
   const handleLogout = async () => {
     try { await api.post('/auth/logout', { refreshToken: localStorage.getItem('refreshToken') }) } catch { /* ignore */ }
@@ -24,7 +27,21 @@ export function Navbar() {
     navigate('/login')
   }
 
+  const handleToggleLang = async () => {
+    if (!user || switchingLang) return
+    const newLang = user.idioma_pref === 'pt' ? 'es' : 'pt'
+    setSwitchingLang(true)
+    try {
+      await api.put(`/users/${user.id}`, { idioma_pref: newLang })
+      updateUser({ idioma_pref: newLang })
+    } catch { /* silent */ } finally {
+      setSwitchingLang(false)
+    }
+  }
+
   if (!user) return null
+
+  const langFlag = user.idioma_pref === 'pt' ? '🇧🇷' : '🇦🇷'
 
   return (
     <nav
@@ -60,13 +77,23 @@ export function Navbar() {
                 ? { background: 'rgba(255,255,255,0.18)', color: 'var(--theme-secondary)' }
                 : undefined}
             >
-              Admin
+              {t.nav.admin}
             </Link>
           )}
         </div>
 
-        {/* Right: avatar + menu */}
+        {/* Right: lang toggle + avatar */}
         <div className="flex items-center gap-2">
+          {/* Language toggle */}
+          <button
+            onClick={handleToggleLang}
+            disabled={switchingLang}
+            title={user.idioma_pref === 'pt' ? 'Mudar para Español' : 'Mudar para Português'}
+            className="text-lg leading-none px-1 py-0.5 rounded hover:bg-white/10 transition-colors disabled:opacity-50"
+          >
+            {langFlag}
+          </button>
+
           <Link to="/profile" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             {user.foto_url
               ? <img src={user.foto_url} alt="" className="w-8 h-8 rounded-full object-cover border-2 border-white/30" />
@@ -80,7 +107,7 @@ export function Navbar() {
             <span className="hidden sm:block text-sm max-w-[120px] truncate">{user.nombre}</span>
           </Link>
           <button onClick={handleLogout} className="hidden md:block text-xs text-white/60 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition-colors">
-            Salir
+            {t.nav.logout}
           </button>
 
           {/* Mobile hamburger */}
@@ -106,11 +133,16 @@ export function Navbar() {
           ))}
           {isAdmin() && (
             <Link to="/admin" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-sm">
-              <span>⚙️</span>Admin
+              <span>⚙️</span>{t.nav.admin}
             </Link>
           )}
+          <button onClick={handleToggleLang} disabled={switchingLang}
+            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-sm text-white/80">
+            <span className="text-base">{langFlag}</span>
+            {user.idioma_pref === 'pt' ? 'Cambiar a Español' : 'Mudar para Português'}
+          </button>
           <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-sm text-red-300 mt-2 border-t border-white/10 pt-3">
-            <span>🚪</span>Cerrar sesión
+            <span>🚪</span>{t.nav.logoutMobile}
           </button>
         </div>
       )}
