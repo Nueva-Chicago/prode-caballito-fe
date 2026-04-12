@@ -262,15 +262,17 @@ export function Matriz() {
         )}
       </div>
 
-      {/* Leyenda */}
-      <div className="max-w-7xl mx-auto px-2 flex gap-2 flex-wrap text-xs items-center">
-        {(['celeste','rojo','verde','amarillo','gris'] as const).map((c) => (
-          <span key={c} className={`px-2 py-0.5 rounded font-medium ${POINT_COLORS[c]}`}>
-            {c === 'celeste' ? '4pts' : c === 'rojo' ? '3pts' : c === 'verde' ? '2pts' : c === 'amarillo' ? '1pt' : 'sin acierto'}
-          </span>
-        ))}
-        <span className="text-gray-400 ml-1">· Click en un resultado para ver el detalle</span>
-      </div>
+      {/* Leyenda — solo si hay partidos terminados */}
+      {finishedMatches.length > 0 && (
+        <div className="max-w-7xl mx-auto px-2 flex gap-2 flex-wrap text-xs items-center">
+          {(['celeste','rojo','verde','amarillo','gris'] as const).map((c) => (
+            <span key={c} className={`px-2 py-0.5 rounded font-medium ${POINT_COLORS[c]}`}>
+              {c === 'celeste' ? '4pts' : c === 'rojo' ? '3pts' : c === 'verde' ? '2pts' : c === 'amarillo' ? '1pt' : 'sin acierto'}
+            </span>
+          ))}
+          <span className="text-gray-400 ml-1">· Click en un resultado para ver el detalle</span>
+        </div>
+      )}
 
       {activeCell && (
         <BetPopover cell={activeCell} onClose={() => setActiveCell(null)} />
