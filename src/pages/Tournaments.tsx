@@ -24,11 +24,14 @@ export function Tournaments() {
   const [loadingRanking, setLoadingRanking] = useState(false)
 
   useEffect(() => {
-    api.get('/tournaments').then(({ data }) => {
-      const list: Tournament[] = data.data
-      setTournaments(list)
-      if (list.length > 0) setSelected(list[0].id)
-    }).finally(() => setLoadingTournaments(false))
+    api.get('/tournaments')
+      .then(({ data }) => {
+        const list: Tournament[] = data.data || []
+        setTournaments(list)
+        if (list.length > 0) setSelected(list[0].id)
+      })
+      .catch(() => setTournaments([]))
+      .finally(() => setLoadingTournaments(false))
   }, [])
 
   useEffect(() => {
@@ -144,7 +147,7 @@ export function Tournaments() {
                   {r.user_avatar
                     ? <img src={r.user_avatar} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" />
                     : <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${isMe ? 'bg-[#0042A5] text-white' : 'bg-gray-200 text-gray-600'}`}>
-                        {r.user_name[0].toUpperCase()}
+                        {(r.user_name || '?')[0].toUpperCase()}
                       </div>
                   }
                   <p className={`text-sm font-semibold truncate ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
