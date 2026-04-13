@@ -82,12 +82,15 @@ export function Profile() {
   }
 
   const handleThemeChange = async (tema: string) => {
+    const prev = user!.tema_equipo
+    // Optimista: aplica el tema visualmente de inmediato
+    updateUser({ tema_equipo: tema })
+    show(t.profile.themeActivated(TEAM_THEMES[tema]?.name || tema), 'success')
     try {
       await api.put(`/users/${user!.id}`, { tema_equipo: tema })
-      updateUser({ tema_equipo: tema })
-      localStorage.setItem('tema_equipo', tema)
-      show(t.profile.themeActivated(TEAM_THEMES[tema]?.name || tema), 'success')
     } catch {
+      // Revertir si falla
+      updateUser({ tema_equipo: prev })
       show(t.profile.errorUpdate, 'error')
     }
   }

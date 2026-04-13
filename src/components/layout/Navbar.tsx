@@ -30,11 +30,15 @@ export function Navbar() {
   const handleToggleLang = async () => {
     if (!user || switchingLang) return
     const newLang = user.idioma_pref === 'pt' ? 'es' : 'pt'
+    // Actualización optimista: el UI cambia de inmediato
+    updateUser({ idioma_pref: newLang })
     setSwitchingLang(true)
     try {
       await api.put(`/users/${user.id}`, { idioma_pref: newLang })
-      updateUser({ idioma_pref: newLang })
-    } catch { /* silent */ } finally {
+    } catch {
+      // Si la API falla, revertimos
+      updateUser({ idioma_pref: user.idioma_pref ?? 'es' })
+    } finally {
       setSwitchingLang(false)
     }
   }
