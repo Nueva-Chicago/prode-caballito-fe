@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
+import { useT } from '@/hooks/useT'
 import { Spinner } from '@/components/ui/Spinner'
 import type { Message } from '@/types'
 
@@ -12,6 +13,7 @@ export function Messages() {
   const { userId } = useParams()
   const { user } = useAuthStore()
   const { show } = useToastStore()
+  const t = useT()
   const [users, setUsers] = useState<UserPreview[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
@@ -22,7 +24,7 @@ export function Messages() {
 
   useEffect(() => {
     api.get('/messages/users').then(({ data }) => setUsers(data.data || []))
-      .catch(() => show('Error al cargar usuarios', 'error'))
+      .catch(() => show(t.messages.errorLoad, 'error'))
       .finally(() => setLoading(false))
   }, [])
 
@@ -44,7 +46,7 @@ export function Messages() {
       setText('')
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
     } catch {
-      show('Error al enviar mensaje', 'error')
+      show(t.messages.errorSend, 'error')
     } finally {
       setSending(false)
     }
@@ -57,11 +59,11 @@ export function Messages() {
       {/* Sidebar */}
       <div className={`${userId ? 'hidden md:flex' : 'flex'} flex-col w-full md:w-72 border-r border-gray-100 bg-white`}>
         <div className="p-4 border-b">
-          <h2 className="font-bold text-[#001A4B]">💬 Mensajes</h2>
+          <h2 className="font-bold text-[#001A4B]">{t.messages.title}</h2>
         </div>
         <div className="flex-1 overflow-y-auto">
           {users.length === 0 && (
-            <p className="text-sm text-gray-400 text-center py-8">No hay conversaciones</p>
+            <p className="text-sm text-gray-400 text-center py-8">{t.messages.noConversations}</p>
           )}
           {users.map((u) => (
             <Link
@@ -120,7 +122,7 @@ export function Messages() {
             <input
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Escribí un mensaje..."
+              placeholder={t.messages.placeholder}
               className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
             />
             <button type="submit" disabled={sending || !text.trim()}
@@ -133,7 +135,7 @@ export function Messages() {
         <div className="hidden md:flex flex-1 items-center justify-center bg-gray-50">
           <div className="text-center text-gray-400">
             <div className="text-4xl mb-2">💬</div>
-            <p className="text-sm">Seleccioná una conversación</p>
+            <p className="text-sm">{t.messages.selectConversation}</p>
           </div>
         </div>
       )}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
+import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Spinner } from '@/components/ui/Spinner'
 import { POINT_COLORS } from '@/utils/scoring'
@@ -10,6 +11,7 @@ import type { Match, Bet, Planilla as PlanillaType } from '@/types'
 export function Planilla() {
   const { planillaId } = useParams<{ planillaId: string }>()
   const { user } = useAuthStore()
+  const t = useT()
   const [planilla, setPlanilla] = useState<PlanillaType | null>(null)
   const [matches, setMatches] = useState<Match[]>([])
   const [bets, setBets] = useState<Record<string, Bet>>({})
@@ -70,8 +72,8 @@ export function Planilla() {
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
   if (!planilla) return (
     <div className="max-w-2xl mx-auto px-4 py-10 text-center">
-      <p className="text-gray-400">Planilla no encontrada</p>
-      <Link to="/profile" className="text-[#0042A5] text-sm hover:underline mt-2 block">← Volver al perfil</Link>
+      <p className="text-gray-400">{t.planilla.notFound}</p>
+      <Link to="/profile" className="text-[#0042A5] text-sm hover:underline mt-2 block">{t.planilla.back}</Link>
     </div>
   )
 
@@ -84,10 +86,10 @@ export function Planilla() {
           <h1 className="text-xl font-bold text-[#001A4B]">{planilla.nombre_planilla}</h1>
           <div className="flex gap-2 mt-0.5">
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${planilla.precio_pagado ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600'}`}>
-              {planilla.precio_pagado ? '✓ Pagada' : 'Sin pagar'}
+              {planilla.precio_pagado ? t.planilla.paid : t.planilla.unpaid}
             </span>
             {!planilla.precio_pagado && (
-              <span className="text-xs text-orange-500">· No aparece en el ranking oficial</span>
+              <span className="text-xs text-orange-500">{t.planilla.notInRanking}</span>
             )}
           </div>
         </div>
@@ -97,26 +99,26 @@ export function Planilla() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
           <p className="text-3xl font-black text-[#0042A5]">{pts}</p>
-          <p className="text-xs text-gray-400 mt-1">Puntos totales</p>
+          <p className="text-xs text-gray-400 mt-1">{t.planilla.totalPoints}</p>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
           <p className="text-3xl font-black text-[#001A4B]">{exactos}</p>
-          <p className="text-xs text-gray-400 mt-1">Exactos (≥3pts)</p>
+          <p className="text-xs text-gray-400 mt-1">{t.planilla.exacts}</p>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
           <p className="text-3xl font-black text-gray-700">{totalBets}</p>
-          <p className="text-xs text-gray-400 mt-1">Total pronósticos</p>
+          <p className="text-xs text-gray-400 mt-1">{t.planilla.totalBets}</p>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
           <p className="text-3xl font-black text-gray-700">{betsDone}/{pending}</p>
-          <p className="text-xs text-gray-400 mt-1">Pendientes</p>
+          <p className="text-xs text-gray-400 mt-1">{t.planilla.pendingCount}</p>
         </div>
       </div>
 
       {/* Distribución de puntajes */}
       {totalBets > 0 && (
         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-          <p className="text-xs font-semibold text-gray-500 mb-3">Distribución de puntajes</p>
+          <p className="text-xs font-semibold text-gray-500 mb-3">{t.planilla.distribution}</p>
           <div className="flex gap-2 flex-wrap">
             {(Object.entries(dist) as [keyof typeof dist, number][]).map(([color, count]) =>
               count > 0 ? (
@@ -130,7 +132,7 @@ export function Planilla() {
           {pending > 0 && (
             <div className="mt-3">
               <div className="flex justify-between text-xs text-gray-400 mb-1">
-                <span>Partidos pendientes completados</span>
+                <span>{t.planilla.pendingProgress}</span>
                 <span>{betsDone}/{pending}</span>
               </div>
               <div className="bg-gray-100 rounded-full h-1.5">
@@ -146,10 +148,14 @@ export function Planilla() {
 
       {/* Filtros */}
       <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
-        {(['todos', 'pendientes', 'finalizados'] as const).map((f) => (
+        {([
+          ['todos',       t.planilla.all],
+          ['pendientes',  t.planilla.pendingFilter],
+          ['finalizados', t.planilla.finishedFilter],
+        ] as const).map(([f, label]) => (
           <button key={f} onClick={() => setFilter(f)}
-            className={`px-3 py-1 rounded-md text-xs font-medium transition-all capitalize ${filter === f ? 'bg-white shadow text-[#0042A5]' : 'text-gray-500'}`}>
-            {f}
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${filter === f ? 'bg-white shadow text-[#0042A5]' : 'text-gray-500'}`}>
+            {label}
           </button>
         ))}
       </div>
@@ -157,7 +163,7 @@ export function Planilla() {
       {/* Partidos */}
       <div className="space-y-3">
         {filtered.length === 0 && (
-          <p className="text-gray-400 text-sm text-center py-10">No hay partidos en esta categoría</p>
+          <p className="text-gray-400 text-sm text-center py-10">{t.planilla.noMatches}</p>
         )}
         {filtered.map((m) => (
           <MatchCard

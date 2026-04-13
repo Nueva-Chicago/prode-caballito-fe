@@ -90,7 +90,7 @@ export function Navbar() {
           <button
             onClick={handleToggleLang}
             disabled={switchingLang}
-            title={user.idioma_pref === 'pt' ? 'Mudar para Español' : 'Mudar para Português'}
+            title={t.nav.switchLang}
             className="text-lg leading-none px-1 py-0.5 rounded hover:bg-white/10 transition-colors disabled:opacity-50"
           >
             {langFlag}
@@ -141,7 +141,7 @@ export function Navbar() {
           <button onClick={handleToggleLang} disabled={switchingLang}
             className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-sm text-white/80">
             <span className="text-base">{langFlag}</span>
-            {user.idioma_pref === 'pt' ? 'Cambiar a Español' : 'Mudar para Português'}
+            {t.nav.switchLang}
           </button>
           <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-sm text-red-300 mt-2 border-t border-white/10 pt-3">
             <span>🚪</span>{t.nav.logoutMobile}
