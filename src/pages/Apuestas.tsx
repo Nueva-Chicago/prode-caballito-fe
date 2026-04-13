@@ -120,12 +120,14 @@ export function Apuestas() {
 
   const selectedTournamentName = tournaments.find(tour => tour.id === selectedTournament)?.name
 
-  // Planillas que participan en el torneo seleccionado (via relación N:N)
+  // Planillas del torneo seleccionado:
+  // - Sin asociaciones aún (planilla nueva) → disponible en cualquier torneo
+  // - Con asociaciones → solo si incluye este torneo
   const planillasForTournament = selectedTournament === 'all'
     ? planillas
-    : planillas.filter(p => p.tournament_ids?.includes(selectedTournament))
+    : planillas.filter(p => !p.tournament_ids?.length || p.tournament_ids.includes(selectedTournament))
 
-  // Disabled cuando el torneo seleccionado no tiene planillas asociadas
+  // Solo muestra "sin planillas" si la planilla ya tiene torneos pero ninguno es el seleccionado
   const noBeetsInTournament = selectedTournament !== 'all' && planillasForTournament.length === 0
 
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
