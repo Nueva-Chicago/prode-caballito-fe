@@ -7,6 +7,8 @@ export interface User {
   tema_equipo: string
   email_verified: boolean
   foto_url?: string
+  whatsapp_number?: string
+  whatsapp_consent?: boolean
   created_at?: string
 }
 
@@ -69,6 +71,7 @@ export interface RankingEntry {
   user_id: string
   user_name: string
   user_avatar?: string
+  whatsapp_number?: string
   puntos_totales: number
   exactos_count: number
   aciertos_celeste: number

@@ -21,6 +21,9 @@ export function Profile() {
   const [showNewPlanilla, setShowNewPlanilla] = useState(false)
   const [newPlanillaName, setNewPlanillaName] = useState('')
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [waNumber, setWaNumber] = useState(user?.whatsapp_number || '')
+  const [waConsent, setWaConsent] = useState(user?.whatsapp_consent || false)
+  const [savingWa, setSavingWa] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -35,6 +38,22 @@ export function Profile() {
       show(t.profile.nameUpdated, 'success')
     } catch {
       show(t.profile.errorUpdate, 'error')
+    }
+  }
+
+  const handleSaveWhatsapp = async () => {
+    setSavingWa(true)
+    try {
+      const { data } = await api.put(`/users/${user!.id}`, {
+        whatsapp_number: waConsent ? waNumber : '',
+        whatsapp_consent: waConsent,
+      })
+      updateUser({ whatsapp_number: data.data.whatsapp_number, whatsapp_consent: data.data.whatsapp_consent })
+      show(waConsent && waNumber ? t.profile.whatsappSaved : t.profile.whatsappRemoved, 'success')
+    } catch {
+      show(t.profile.errorUpdate, 'error')
+    } finally {
+      setSavingWa(false)
     }
   }
 
@@ -178,6 +197,35 @@ export function Profile() {
             )
           })}
         </div>
+      </div>
+
+      {/* WhatsApp */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
+        <h3 className="font-bold text-[#001A4B]">{t.profile.whatsappTitle}</h3>
+        <input
+          type="tel"
+          value={waNumber}
+          onChange={e => setWaNumber(e.target.value.replace(/\D/g, ''))}
+          placeholder={t.profile.whatsappPlaceholder}
+          maxLength={15}
+          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+        />
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={waConsent}
+            onChange={e => setWaConsent(e.target.checked)}
+            className="mt-0.5 w-4 h-4 accent-[#0042A5] shrink-0"
+          />
+          <span className="text-xs text-gray-500 leading-relaxed">{t.profile.whatsappConsent}</span>
+        </label>
+        <button
+          onClick={handleSaveWhatsapp}
+          disabled={savingWa || (waConsent && !waNumber)}
+          className="w-full bg-[#001A4B] text-white text-sm font-bold py-2.5 rounded-xl hover:bg-[#002870] transition-colors disabled:opacity-40"
+        >
+          {savingWa ? '...' : t.profile.save}
+        </button>
       </div>
 
       {/* Planillas */}
