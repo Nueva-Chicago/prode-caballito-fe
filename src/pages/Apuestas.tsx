@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Spinner } from '@/components/ui/Spinner'
 import { useToastStore } from '@/store/toastStore'
+import { useCountdown, formatCountdown } from '@/hooks/useCountdown'
 import type { Match, Bet, Planilla, Tournament } from '@/types'
 
 export function Apuestas() {
@@ -21,6 +22,8 @@ export function Apuestas() {
   const [showNewPlanilla, setShowNewPlanilla] = useState(false)
   const [newPlanillaName, setNewPlanillaName] = useState('')
   const [creatingPlanilla, setCreatingPlanilla] = useState(false)
+  const [now, setNow] = useState(Date.now())
+  const livePollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
     loadInitial()
@@ -29,6 +32,27 @@ export function Apuestas() {
   useEffect(() => {
     if (selectedPlanilla) loadBets(selectedPlanilla)
   }, [selectedPlanilla])
+
+  // Tick now every 30s (for countdown chips)
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000)
+    return () => clearInterval(id)
+  }, [])
+
+  // Live polling: refresh matches every 30s when any match is live
+  useEffect(() => {
+    const hasLive = matches.some(m => m.estado === 'live')
+    if (livePollingRef.current) { clearInterval(livePollingRef.current); livePollingRef.current = null }
+    if (!hasLive) return
+    livePollingRef.current = setInterval(async () => {
+      try {
+        const res = await api.get('/matches?limit=200')
+        setMatches(res.data.data.matches)
+        setNow(Date.now())
+      } catch { /* silent */ }
+    }, 30_000)
+    return () => { if (livePollingRef.current) clearInterval(livePollingRef.current) }
+  }, [matches])
 
   // Cuando cambia el torneo, selecciona la primera planilla válida para ese torneo
   useEffect(() => {
@@ -100,6 +124,22 @@ export function Apuestas() {
   const tournamentMatches = selectedTournament === 'all'
     ? matches
     : matches.filter(m => m.tournament_id === selectedTournament)
+
+  // Live matches (pinned at top)
+  const liveMatches = useMemo(
+    () => tournamentMatches.filter(m => m.estado === 'live'),
+    [tournamentMatches]
+  )
+
+  // Next match to close (for countdown banner)
+  const nextClosingMatch = useMemo(() => {
+    return tournamentMatches
+      .filter(m => m.estado !== 'finished' && new Date(m.time_cutoff).getTime() > now)
+      .sort((a, b) => new Date(a.time_cutoff).getTime() - new Date(b.time_cutoff).getTime())[0] ?? null
+  }, [tournamentMatches, now])
+
+  const nextCloseDate = nextClosingMatch ? new Date(nextClosingMatch.time_cutoff) : null
+  const nextCloseCountdown = useCountdown(nextCloseDate)
 
   const pendingMatches = tournamentMatches.filter(m => m.estado !== 'finished')
 
@@ -295,6 +335,44 @@ export function Apuestas() {
         />
       </div>
 
+      {/* Banner: próximo cierre */}
+      {nextCloseCountdown && nextClosingMatch && (
+        <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+          <span className="text-lg shrink-0">⏳</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-amber-800">{t.bets.nextClose}</p>
+            <p className="text-xs text-amber-600 truncate">
+              {nextClosingMatch.home_team} vs {nextClosingMatch.away_team}
+            </p>
+          </div>
+          <span className="font-mono font-black text-amber-700 text-sm shrink-0">
+            {formatCountdown(nextCloseCountdown.h, nextCloseCountdown.m, nextCloseCountdown.s)}
+          </span>
+        </div>
+      )}
+
+      {/* Sección EN VIVO */}
+      {liveMatches.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0" />
+            <p className="text-xs font-bold text-green-700 uppercase tracking-wide">{t.bets.liveNow}</p>
+          </div>
+          {liveMatches.map(m => (
+            <MatchCard
+              key={m.id}
+              match={m}
+              bet={bets[m.id]}
+              planillaId={selectedPlanilla || undefined}
+              onBetSaved={(b) => setBets({ ...bets, [m.id]: b })}
+              onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
+              now={now}
+            />
+          ))}
+          <div className="border-t border-gray-100 pt-1" />
+        </div>
+      )}
+
       {/* Lista de partidos */}
       <div className="space-y-3">
         {filtered.length === 0 && (
@@ -308,6 +386,7 @@ export function Apuestas() {
             planillaId={selectedPlanilla || undefined}
             onBetSaved={(b) => setBets({ ...bets, [m.id]: b })}
             onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
+            now={now}
           />
         ))}
       </div>

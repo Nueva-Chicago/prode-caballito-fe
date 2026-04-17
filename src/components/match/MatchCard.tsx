@@ -9,7 +9,10 @@ import { useT } from '@/hooks/useT'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
 import { teamFlag } from '@/utils/teamFlags'
 import { useTeamBadgesStore, getTeamBadge } from '@/store/teamBadgesStore'
+import { formatCountdown } from '@/hooks/useCountdown'
 import type { Match, Bet } from '@/types'
+
+const TWO_HOURS_MS = 2 * 60 * 60 * 1000
 
 interface Props {
   match: Match
@@ -18,6 +21,7 @@ interface Props {
   onBetSaved?: (bet: Bet) => void
   onBetDeleted?: (matchId: string) => void
   readonly?: boolean
+  now?: number
 }
 
 function TeamDisplay({ team }: { team: string }) {
@@ -39,7 +43,7 @@ function TeamDisplay({ team }: { team: string }) {
   )
 }
 
-export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, readonly }: Props) {
+export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, readonly, now: nowProp }: Props) {
   const { show } = useToastStore()
   const t = useT()
   const lang = useAuthStore(s => s.user?.idioma_pref || 'es')
@@ -53,10 +57,19 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
   const homeTeam = (lang === 'pt' && match.home_team_pt) ? match.home_team_pt : match.home_team
   const awayTeam = (lang === 'pt' && match.away_team_pt) ? match.away_team_pt : match.away_team
 
-  const isClosed = new Date() > new Date(match.time_cutoff)
+  const nowMs = nowProp ?? Date.now()
+  const cutoffMs = new Date(match.time_cutoff).getTime()
+  const isClosed = nowMs > cutoffMs
   const isFinished = match.estado === 'finished'
   const isLive = match.estado === 'live'
   const dateLocale = lang === 'pt' ? ptBR : esLocale
+
+  // Countdown chip: show when within 2 hours of closing and not yet closed
+  const msUntilClose = cutoffMs - nowMs
+  const showCountdown = !isClosed && !isFinished && msUntilClose > 0 && msUntilClose < TWO_HOURS_MS
+  const countdownH = Math.floor(msUntilClose / 3600000)
+  const countdownM = Math.floor((msUntilClose % 3600000) / 60000)
+  const countdownS = Math.floor((msUntilClose % 60000) / 1000)
 
   const pointResult = isFinished && bet
     ? calcularPuntaje(
@@ -105,11 +118,36 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
   const canEdit = !isClosed && !isFinished && !readonly && planillaId
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all ${
+      isLive
+        ? 'border-2 border-green-400 shadow-green-100 shadow-md'
+        : showCountdown
+          ? 'border-2 border-orange-300'
+          : 'border border-gray-100'
+    }`}>
       {/* Tournament header */}
       {match.tournament_name && (
         <div className="bg-[#001A4B] text-white text-xs px-4 py-2 text-center font-medium tracking-wide">
           {match.tournament_name} · {match.tournament_fase}
+        </div>
+      )}
+
+      {/* Countdown chip */}
+      {showCountdown && !bet && (
+        <div className="bg-orange-50 border-b border-orange-200 px-4 py-1.5 flex items-center justify-between">
+          <span className="text-xs font-bold text-orange-600">
+            ⚠️ {t.bets.noBetWarning}
+          </span>
+          <span className="text-xs font-mono font-bold text-orange-500">
+            {t.match.closesIn} {formatCountdown(countdownH, countdownM, countdownS)}
+          </span>
+        </div>
+      )}
+      {showCountdown && bet && (
+        <div className="bg-amber-50 border-b border-amber-100 px-4 py-1 flex items-center justify-end">
+          <span className="text-xs font-mono text-amber-500">
+            {t.match.closesIn} {formatCountdown(countdownH, countdownM, countdownS)}
+          </span>
         </div>
       )}
 
