@@ -127,6 +127,24 @@ export const es = {
     you: '(vos)', live: 'EN VIVO', final: 'Final',
     player: 'Jugador', exactHeader: 'Exactos', hitsHeader: 'Aciertos',
   },
+  viral: {
+    title: '⚡ Momentos del torneo',
+    exact: (n: number, total: number) => n === 0
+      ? `Nadie acertó el resultado exacto`
+      : n === 1
+        ? `Solo 1 de ${total} acertó el resultado exacto 🎯`
+        : `${n} de ${total} acertaron el resultado exacto 🎯`,
+    topPred: (score: string, n: number) => `Pronóstico más popular: ${score} (${n} jugadores)`,
+    noBets: 'Sin pronósticos cargados',
+    share: '↗ Compartir',
+    shareText: (home: string, away: string, rL: number, rV: number, exact: number, total: number) =>
+      `⚽ ${home} ${rL}-${rV} ${away}\n🎯 ${exact === 0 ? 'Nadie acertó' : exact === 1 ? 'Solo 1 de ' + total + ' acertó' : exact + ' de ' + total + ' acertaron'} el resultado exacto en PRODE Caballito 2026\n\n¿Estabas entre los que la vieron venir? 👉 prodecaballito.com/ranking`,
+    copied: '✓ Copiado',
+    seeAll: 'Ver todos',
+    seeLess: 'Ver menos',
+    hardest: '🔥 El más difícil',
+    easiest: '✅ El más acertado',
+  },
   messages: {
     title: '💬 Mensajes',
     noConversations: 'No hay conversaciones',
