@@ -538,7 +538,7 @@ export function Matriz() {
           <table className="text-xs border-collapse min-w-max">
             <thead className="sticky top-0 z-20">
               <tr className="bg-[#001A4B] text-white">
-                <th className="sticky left-0 bg-[#001A4B] px-3 py-2 text-left font-semibold z-30 min-w-[180px]">
+                <th className="sticky left-0 bg-[#001A4B] px-2 py-2 text-left font-semibold z-30 min-w-[140px] sm:min-w-[180px]">
                   {t.ranking.player}
                 </th>
                 <th className="px-2 py-2 text-center font-semibold w-14 bg-[#001A4B]">{t.ranking.pts}</th>
@@ -570,7 +570,7 @@ export function Matriz() {
                 const pos = ri + 1
                 return (
                   <tr key={rowKey} className={`${rowBg} hover:bg-yellow-50/50 transition-colors`}>
-                    <td className={`sticky left-0 px-2 py-1.5 font-medium z-10 border-r border-gray-100 ${rowBg}`}>
+                    <td className={`sticky left-0 px-1.5 sm:px-2 py-1.5 font-medium z-10 border-r border-gray-100 ${rowBg} min-w-[140px] sm:min-w-auto`}>
                       <div className="flex items-center gap-2">
                         <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isMe ? 'bg-[#0042A5] text-white' : 'bg-gray-200 text-gray-600'}`}>
                           {pos}
@@ -581,7 +581,7 @@ export function Matriz() {
                               {r.user_name[0].toUpperCase()}
                             </div>
                         }
-                        <div className="min-w-0 flex-1">
+                        <div className="min-w-0 flex-1 hidden sm:block">
                           <div className={`truncate max-w-[105px] font-semibold ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
                             {r.user_name}
                           </div>
