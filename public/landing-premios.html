@@ -318,7 +318,7 @@
         'f.home':'Home','f.mundial':'World Cup 2026','f.amigos':'Invite friends','f.register':'Register','f.copy':'© 2026 Prode Caballito · Made with ⚽ in Buenos Aires',
       }
     };
-    function detectLang(){const s=localStorage.getItem('pc_lang');if(s&&translations[s])return s;const n=(navigator.language||'es').toLowerCase();if(n.startsWith('pt'))return 'pt';if(n.startsWith('es'))return 'es';return 'en';}
+    function detectLang(){const s=localStorage.getItem('pc_lang');if(s&&translations[s])return s;const n=(navigator.language||'es').toLowerCase();if(n.startsWith('pt'))return 'pt';if(n.startsWith('es'))return 'es';return 'es';}
     function applyLang(lang){const t=translations[lang];if(!t)return;document.documentElement.lang=lang==='pt'?'pt-BR':lang;if(t['meta.title'])document.title=t['meta.title'];const md=document.querySelector('meta[name="description"]');if(md&&t['meta.desc'])md.setAttribute('content',t['meta.desc']);document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t[k]!==undefined)el.textContent=t[k];});document.querySelectorAll('[data-i18n-html]').forEach(el=>{const k=el.getAttribute('data-i18n-html');if(t[k]!==undefined)el.innerHTML=t[k];});document.querySelectorAll('[data-lang-btn]').forEach(btn=>{btn.classList.toggle('active',btn.getAttribute('data-lang-btn')===lang);});}
     function setLang(lang){localStorage.setItem('pc_lang',lang);applyLang(lang);}
     applyLang(detectLang());
