@@ -246,7 +246,7 @@ export function Matriz() {
   const [loading, setLoading] = useState(true)
   const [loadingTournament, setLoadingTournament] = useState(false)
   const [activeCell, setActiveCell] = useState<ActiveCell | null>(null)
-  const [filterColor, setFilterColor] = useState<string | null>(null)
+  const [filterColors, setFilterColors] = useState<Set<string>>(new Set())
   const [unlocks, setUnlocks] = useState<Map<string, 'approved' | 'pending'>>(new Map())
   const [pendingUnlock, setPendingUnlock] = useState<{ targetUserId: string; targetName: string; match: Match } | null>(null)
   const [unlocking, setUnlocking] = useState(false)
@@ -489,11 +489,18 @@ export function Matriz() {
           {(['celeste','rojo','verde','amarillo','gris'] as const).map((c) => (
             <button
               key={c}
-              onClick={(e) => { e.stopPropagation(); setFilterColor(filterColor === c ? null : c) }}
+              onClick={(e) => {
+                e.stopPropagation()
+                setFilterColors(prev => {
+                  const next = new Set(prev)
+                  next.has(c) ? next.delete(c) : next.add(c)
+                  return next
+                })
+              }}
               className={`px-2 py-0.5 rounded font-medium transition-all ${POINT_COLORS[c]} ${
-                filterColor === c
+                filterColors.has(c)
                   ? 'ring-2 ring-offset-1 ring-gray-500 scale-105 shadow'
-                  : filterColor !== null
+                  : filterColors.size > 0
                     ? 'opacity-40'
                     : ''
               }`}
@@ -501,15 +508,15 @@ export function Matriz() {
               {t.matrix.ptsLabel[c]}
             </button>
           ))}
-          {filterColor && (
+          {filterColors.size > 0 && (
             <button
-              onClick={() => setFilterColor(null)}
+              onClick={() => setFilterColors(new Set())}
               className="text-gray-400 hover:text-gray-600 font-medium ml-1"
             >
               ✕ limpiar
             </button>
           )}
-          {!filterColor && <span className="text-gray-400 ml-1">{t.matrix.legend}</span>}
+          {filterColors.size === 0 && <span className="text-gray-400 ml-1">{t.matrix.legend}</span>}
         </div>
       )}
 
@@ -626,7 +633,7 @@ export function Matriz() {
                               className={`inline-block px-1.5 py-0.5 rounded font-bold text-[11px] cursor-pointer select-none transition-all
                                 ${POINT_COLORS[res.color]}
                                 ${isActive ? 'ring-2 ring-offset-1 ring-gray-400 scale-110' : 'hover:scale-105 hover:shadow-md'}
-                                ${filterColor !== null && res.color !== filterColor ? 'opacity-10 pointer-events-none' : ''}
+                                ${filterColors.size > 0 && !filterColors.has(res.color) ? 'opacity-10 pointer-events-none' : ''}
                               `}
                             >
                               {b.home}-{b.away}
