@@ -71,8 +71,8 @@ function ViralHighlights({ stats, lang }: { stats: MatchStat[]; lang: string }) 
         {displayed.map(s => {
           const m = s.match
           const exactPct = s.total > 0 ? Math.round((s.exact / s.total) * 100) : 0
-          const isHard = s.exact === 0 || exactPct <= 10
-          const isEasy = exactPct >= 50
+          const isHard = s.total > 0 && (s.exact === 0 || exactPct <= 10)
+          const isEasy = s.total > 0 && exactPct >= 50
           return (
             <div key={m.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-3 space-y-2">
               {/* Header */}
