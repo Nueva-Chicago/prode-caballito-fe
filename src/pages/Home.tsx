@@ -104,6 +104,26 @@ export function Home() {
   const ptsDiff = leader && myEntry ? leader.puntos_totales - myEntry.puntos_totales : null
   const top3 = ranking.slice(0, 3)
 
+  // ── Saludo personalizado ──────────────────────────────────────────
+  const hour = now.getHours()
+  const timeGreeting = hour >= 6 && hour < 13
+    ? t.home.goodMorning
+    : hour >= 13 && hour < 20
+      ? t.home.goodAfternoon
+      : t.home.goodEvening
+
+  const contextMessage = (() => {
+    const isLeading = myEntry?.position === 1
+    const allDone = totalUnbet === 0 && matches.filter(m => m.estado !== 'finished').length > 0
+    if (isLeading && allDone) return t.home.contextLeadingAllDone
+    if (isLeading) return t.home.contextLeading
+    if (myEntry && myEntry.position <= 3) return t.home.contextPodium(myEntry.position)
+    if (allDone) return t.home.contextAllDone
+    if (totalUnbet > 0) return t.home.contextPending(totalUnbet)
+    if (myEntry) return t.home.contextDefault(myEntry.position)
+    return t.home.contextNoRanking
+  })()
+
   if (loading) return (
     <div className="flex justify-center py-20"><Spinner size="lg" /></div>
   )
@@ -113,8 +133,21 @@ export function Home() {
 
       {/* ── 1. HERO ─────────────────────────────────────────────── */}
       <div className="t-gradient-hero rounded-2xl p-5 text-white">
-        <h1 className="text-xl font-bold">{t.home.greeting(user?.nombre || '')}</h1>
-        <p className="text-white/70 text-sm mt-0.5">{t.home.subtitle}</p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-white/60 uppercase tracking-widest mb-0.5">{timeGreeting}</p>
+            <h1 className="text-xl font-bold leading-tight">{t.home.greeting(user?.nombre || '')} 👋</h1>
+            <p className="text-white/75 text-sm mt-1 leading-snug">{contextMessage}</p>
+          </div>
+          <div className="shrink-0">
+            {user?.foto_url
+              ? <img src={user.foto_url} alt={user.nombre} className="w-14 h-14 rounded-full object-cover border-2 border-white/30 shadow-lg" />
+              : <div className="w-14 h-14 rounded-full border-2 border-white/30 shadow-lg flex items-center justify-center t-bg-secondary font-black text-xl t-text-accent">
+                  {(user?.nombre || '?')[0].toUpperCase()}
+                </div>
+            }
+          </div>
+        </div>
 
         {tournaments.length > 0 && (
           <div className="flex gap-1.5 flex-wrap mt-3">
