@@ -23,6 +23,9 @@ export const pt: T = {
     you: '(você)', nextMatches: 'Próximos jogos',
     noUpcoming: 'Não há jogos próximos', lastResults: 'Últimos resultados',
     seeAll: 'Ver todos os jogos →',
+    ctaTitle: (n: number) => n === 1 ? 'Tens 1 prognóstico pendente' : `Tens ${n} prognósticos pendentes`,
+    ctaUrgent: (n: number) => n === 1 ? '⚠️ 1 jogo fecha em breve sem teu prognóstico' : `⚠️ ${n} jogos fecham em breve sem teu prognóstico`,
+    ctaBtn: 'Completar agora →',
   },
   match: {
     vs: 'VS', live: 'AO VIVO', closed: 'Fechado', bonus: 'BÔNUS +1', closesIn: 'Fecha em',

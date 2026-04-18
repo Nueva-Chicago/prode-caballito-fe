@@ -97,6 +97,8 @@ export function Home() {
   const upcoming = pendingMatches.slice(0, 5)
   const recentFinished = finishedMatches.slice(0, 3)
 
+  const urgentUnbet = closingSoon.filter(m => !bets[m.id]).length
+
   const myEntry = ranking.find(r => r.user_id === user?.id)
   const leader = ranking[0]
   const ptsDiff = leader && myEntry ? leader.puntos_totales - myEntry.puntos_totales : null
@@ -183,7 +185,42 @@ export function Home() {
         )}
       </div>
 
-      {/* ── 2. ACCESOS RÁPIDOS ──────────────────────────────────── */}
+      {/* ── 2. CTA PRONÓSTICOS PENDIENTES ───────────────────────── */}
+      {totalUnbet > 0 && (
+        <Link
+          to="/apuestas"
+          className={`flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5 border transition-all hover:scale-[1.01] active:scale-[0.99] ${
+            urgentUnbet > 0
+              ? 'bg-red-50 border-red-200 hover:bg-red-100'
+              : 'bg-amber-50 border-amber-200 hover:bg-amber-100'
+          }`}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <span className={`text-2xl shrink-0 ${urgentUnbet > 0 ? 'animate-bounce' : ''}`}>
+              ⚽
+            </span>
+            <div className="min-w-0">
+              <p className={`font-bold text-sm leading-tight ${urgentUnbet > 0 ? 'text-red-700' : 'text-amber-800'}`}>
+                {t.home.ctaTitle(totalUnbet)}
+              </p>
+              {urgentUnbet > 0 && (
+                <p className="text-xs text-red-500 mt-0.5 font-medium">
+                  {t.home.ctaUrgent(urgentUnbet)}
+                </p>
+              )}
+            </div>
+          </div>
+          <span className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap ${
+            urgentUnbet > 0
+              ? 'bg-red-500 text-white'
+              : 'bg-amber-500 text-white'
+          }`}>
+            {t.home.ctaBtn}
+          </span>
+        </Link>
+      )}
+
+      {/* ── 3. ACCESOS RÁPIDOS ─────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-3">
 
         <Link

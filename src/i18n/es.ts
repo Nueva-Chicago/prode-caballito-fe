@@ -21,6 +21,9 @@ export const es = {
     you: '(vos)', nextMatches: 'Próximos partidos',
     noUpcoming: 'No hay partidos próximos', lastResults: 'Últimos resultados',
     seeAll: 'Ver todos los partidos →',
+    ctaTitle: (n: number) => n === 1 ? 'Tenés 1 pronóstico pendiente' : `Tenés ${n} pronósticos pendientes`,
+    ctaUrgent: (n: number) => n === 1 ? '⚠️ 1 partido cierra pronto sin tu apuesta' : `⚠️ ${n} partidos cierran pronto sin tu apuesta`,
+    ctaBtn: 'Completar ahora →',
   },
   match: {
     vs: 'VS', live: 'EN VIVO', closed: 'Cerrado', bonus: 'BONUS +1', closesIn: 'Cierra en',
