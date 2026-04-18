@@ -11,21 +11,21 @@ function HomeSkeleton() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
       {/* Hero */}
-      <div className="bg-gray-100 rounded-2xl p-5">
+      <div className="t-gradient-hero rounded-2xl p-5 text-white">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-2 flex-1">
-            <Sk className="h-3 w-20" />
-            <Sk className="h-6 w-44" />
-            <Sk className="h-4 w-56" />
+            <div className="animate-pulse bg-white/30 h-3 w-20 rounded" />
+            <div className="animate-pulse bg-white/40 h-6 w-44 rounded" />
+            <div className="animate-pulse bg-white/30 h-4 w-56 rounded" />
           </div>
-          <SkAvatar size="lg" />
+          <div className="animate-pulse bg-white/20 rounded-full shrink-0 w-14 h-14" />
         </div>
         <div className="mt-4 space-y-2">
           <div className="flex justify-between">
-            <Sk className="h-3 w-28" />
-            <Sk className="h-3 w-8" />
+            <div className="animate-pulse bg-white/30 h-3 w-28 rounded" />
+            <div className="animate-pulse bg-white/30 h-3 w-8 rounded" />
           </div>
-          <Sk className="h-2 w-full rounded-full" />
+          <div className="animate-pulse bg-white/20 h-2 w-full rounded-full" />
         </div>
       </div>
       {/* Quick access */}
