@@ -13,16 +13,16 @@ function RankingSkeleton() {
       <div className="flex gap-2 flex-wrap">
         {[0, 1, 2, 3].map(i => <Sk key={i} className="h-9 w-20 rounded-full" />)}
       </div>
-      <div className="bg-gray-100 rounded-xl p-4 flex items-center gap-4">
-        <Sk className="h-8 w-8" />
-        <SkAvatar size="md" />
+      <div className="t-gradient-hero rounded-xl p-4 flex items-center gap-4">
+        <div className="animate-pulse bg-white/20 h-8 w-8 rounded" />
+        <div className="animate-pulse bg-white/20 rounded-full w-10 h-10 shrink-0" />
         <div className="flex-1 space-y-1.5">
-          <Sk className="h-4 w-28" />
-          <Sk className="h-3 w-16" />
+          <div className="animate-pulse bg-white/30 h-4 w-28 rounded" />
+          <div className="animate-pulse bg-white/20 h-3 w-16 rounded" />
         </div>
         <div className="space-y-1">
-          <Sk className="h-7 w-10" />
-          <Sk className="h-3 w-12" />
+          <div className="animate-pulse bg-white/30 h-7 w-10 rounded" />
+          <div className="animate-pulse bg-white/20 h-3 w-12 rounded" />
         </div>
       </div>
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -36,16 +36,16 @@ function RankingSkeleton() {
 function RankingContentSkeleton() {
   return (
     <>
-      <div className="bg-gray-100 rounded-xl p-4 flex items-center gap-4">
-        <Sk className="h-8 w-8" />
-        <SkAvatar size="md" />
+      <div className="t-gradient-hero rounded-xl p-4 flex items-center gap-4">
+        <div className="animate-pulse bg-white/20 h-8 w-8 rounded" />
+        <div className="animate-pulse bg-white/20 rounded-full w-10 h-10 shrink-0" />
         <div className="flex-1 space-y-1.5">
-          <Sk className="h-4 w-28" />
-          <Sk className="h-3 w-16" />
+          <div className="animate-pulse bg-white/30 h-4 w-28 rounded" />
+          <div className="animate-pulse bg-white/20 h-3 w-16 rounded" />
         </div>
         <div className="space-y-1">
-          <Sk className="h-7 w-10" />
-          <Sk className="h-3 w-12" />
+          <div className="animate-pulse bg-white/30 h-7 w-10 rounded" />
+          <div className="animate-pulse bg-white/20 h-3 w-12 rounded" />
         </div>
       </div>
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
