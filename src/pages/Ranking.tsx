@@ -3,8 +3,58 @@ import { Link } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
-import { Spinner } from '@/components/ui/Spinner'
+import { Sk, SkAvatar, SkRankRow } from '@/components/ui/Skeleton'
 import { calcularPuntaje } from '@/utils/scoring'
+
+function RankingSkeleton() {
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+      <Sk className="h-7 w-32" />
+      <div className="flex gap-2 flex-wrap">
+        {[0, 1, 2, 3].map(i => <Sk key={i} className="h-9 w-20 rounded-full" />)}
+      </div>
+      <div className="bg-gray-100 rounded-xl p-4 flex items-center gap-4">
+        <Sk className="h-8 w-8" />
+        <SkAvatar size="md" />
+        <div className="flex-1 space-y-1.5">
+          <Sk className="h-4 w-28" />
+          <Sk className="h-3 w-16" />
+        </div>
+        <div className="space-y-1">
+          <Sk className="h-7 w-10" />
+          <Sk className="h-3 w-12" />
+        </div>
+      </div>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-gray-50 h-9 border-b border-gray-100" />
+        {[0, 1, 2, 3, 4, 5, 6, 7].map(i => <SkRankRow key={i} />)}
+      </div>
+    </div>
+  )
+}
+
+function RankingContentSkeleton() {
+  return (
+    <>
+      <div className="bg-gray-100 rounded-xl p-4 flex items-center gap-4">
+        <Sk className="h-8 w-8" />
+        <SkAvatar size="md" />
+        <div className="flex-1 space-y-1.5">
+          <Sk className="h-4 w-28" />
+          <Sk className="h-3 w-16" />
+        </div>
+        <div className="space-y-1">
+          <Sk className="h-7 w-10" />
+          <Sk className="h-3 w-12" />
+        </div>
+      </div>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-gray-50 h-9 border-b border-gray-100" />
+        {[0, 1, 2, 3, 4, 5].map(i => <SkRankRow key={i} />)}
+      </div>
+    </>
+  )
+}
 import type { RankingEntry, Tournament, Match } from '@/types'
 
 const MEDAL = ['🥇', '🥈', '🥉']
@@ -142,7 +192,7 @@ export function Ranking() {
 
   const myEntry = baseRanking.find((r) => r.user_id === user?.id)
 
-  if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
+  if (loading) return <RankingSkeleton />
 
   const now = new Date()
 
@@ -212,7 +262,7 @@ export function Ranking() {
       </div>
 
       {isLoadingDisplay ? (
-        <div className="flex justify-center py-16"><Spinner size="lg" /></div>
+        <RankingContentSkeleton />
       ) : (
         <>
           {/* Mi posición */}

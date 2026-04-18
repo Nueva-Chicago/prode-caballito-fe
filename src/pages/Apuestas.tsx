@@ -2,8 +2,33 @@ import { useEffect, useState, useMemo, useRef } from 'react'
 import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
-import { Spinner } from '@/components/ui/Spinner'
+import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { useToastStore } from '@/store/toastStore'
+
+function ApuestasSkeleton() {
+  return (
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <Sk className="h-7 w-32" />
+        <Sk className="h-4 w-20" />
+      </div>
+      <div className="flex gap-2 items-center">
+        <Sk className="h-11 flex-1 rounded-xl" />
+        <Sk className="h-10 w-10 rounded-xl shrink-0" />
+      </div>
+      <div className="flex gap-1">
+        {[0, 1, 2].map(i => <Sk key={i} className="h-8 w-20 rounded-lg" />)}
+      </div>
+      <div className="flex gap-2 items-center">
+        <Sk className="h-9 w-48 rounded-lg" />
+        <Sk className="h-9 flex-1 rounded-lg" />
+      </div>
+      <div className="space-y-3">
+        {[0, 1, 2, 3].map(i => <SkMatchCard key={i} />)}
+      </div>
+    </div>
+  )
+}
 import { useCountdown, formatCountdown } from '@/hooks/useCountdown'
 import type { Match, Bet, Planilla, Tournament } from '@/types'
 
@@ -170,7 +195,7 @@ export function Apuestas() {
   // Solo muestra "sin planillas" si la planilla ya tiene torneos pero ninguno es el seleccionado
   const noBeetsInTournament = selectedTournament !== 'all' && planillasForTournament.length === 0
 
-  if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
+  if (loading) return <ApuestasSkeleton />
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">

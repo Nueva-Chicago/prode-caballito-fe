@@ -4,8 +4,40 @@ import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
-import { Spinner } from '@/components/ui/Spinner'
+import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { POINT_COLORS } from '@/utils/scoring'
+
+function PlanillaSkeleton() {
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+      <div className="flex items-center gap-3">
+        <Sk className="h-6 w-6 rounded" />
+        <div className="flex-1 space-y-1.5">
+          <Sk className="h-6 w-40" />
+          <Sk className="h-5 w-16 rounded-full" />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[0, 1, 2, 3].map(i => (
+          <div key={i} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col items-center gap-2">
+            <Sk className="h-8 w-14" />
+            <Sk className="h-3 w-20" />
+          </div>
+        ))}
+      </div>
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 space-y-3">
+        <Sk className="h-3 w-28" />
+        <div className="flex gap-2 flex-wrap">
+          {[0, 1, 2, 3].map(i => <Sk key={i} className="h-6 w-16 rounded-full" />)}
+        </div>
+      </div>
+      <Sk className="h-9 w-48 rounded-lg" />
+      <div className="space-y-3">
+        {[0, 1, 2, 3].map(i => <SkMatchCard key={i} />)}
+      </div>
+    </div>
+  )
+}
 import type { Match, Bet, Planilla as PlanillaType } from '@/types'
 
 export function Planilla() {
@@ -69,7 +101,7 @@ export function Planilla() {
     else if (b.puntos_obtenidos === 0) dist.gris++
   }
 
-  if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
+  if (loading) return <PlanillaSkeleton />
   if (!planilla) return (
     <div className="max-w-2xl mx-auto px-4 py-10 text-center">
       <p className="text-gray-400">{t.planilla.notFound}</p>

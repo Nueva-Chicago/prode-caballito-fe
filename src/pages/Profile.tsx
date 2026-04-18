@@ -5,7 +5,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { Modal } from '@/components/ui/Modal'
-import { Spinner } from '@/components/ui/Spinner'
+import { Sk } from '@/components/ui/Skeleton'
 import type { Planilla } from '@/types'
 import { TEAM_THEMES } from '@/types'
 
@@ -237,7 +237,22 @@ export function Profile() {
             {t.bets.new}
           </button>
         </div>
-        {loading ? <Spinner size="sm" /> : (
+        {loading ? (
+          <div className="space-y-2">
+            {[0, 1, 2].map(i => (
+              <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                <div className="flex-1 space-y-1.5">
+                  <Sk className="h-4 w-36" />
+                  <div className="flex gap-2">
+                    <Sk className="h-3 w-10" />
+                    <Sk className="h-4 w-14 rounded" />
+                  </div>
+                </div>
+                <Sk className="h-5 w-5 rounded ml-2" />
+              </div>
+            ))}
+          </div>
+        ) : (
           <div className="space-y-2">
             {planillas.length === 0 && <p className="text-sm text-gray-400 text-center py-4">{t.profile.noPlanillas}</p>}
             {planillas.map((p) => (

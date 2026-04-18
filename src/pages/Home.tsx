@@ -4,8 +4,62 @@ import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
-import { Spinner } from '@/components/ui/Spinner'
+import { Sk, SkAvatar, SkMatchCard } from '@/components/ui/Skeleton'
 import type { Match, Bet, Planilla, RankingEntry, Tournament } from '@/types'
+
+function HomeSkeleton() {
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
+      {/* Hero */}
+      <div className="bg-gray-100 rounded-2xl p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-2 flex-1">
+            <Sk className="h-3 w-20" />
+            <Sk className="h-6 w-44" />
+            <Sk className="h-4 w-56" />
+          </div>
+          <SkAvatar size="lg" />
+        </div>
+        <div className="mt-4 space-y-2">
+          <div className="flex justify-between">
+            <Sk className="h-3 w-28" />
+            <Sk className="h-3 w-8" />
+          </div>
+          <Sk className="h-2 w-full rounded-full" />
+        </div>
+      </div>
+      {/* Quick access */}
+      <div className="grid grid-cols-3 gap-3">
+        {[0, 1, 2].map(i => (
+          <div key={i} className="bg-white rounded-xl p-3 shadow-sm border border-gray-100 flex flex-col items-center gap-2">
+            <Sk className="w-8 h-8 rounded-full" />
+            <Sk className="h-3 w-14" />
+            <Sk className="h-4 w-16 rounded-full" />
+          </div>
+        ))}
+      </div>
+      {/* Podio */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <Sk className="h-9 rounded-none" />
+        <div className="flex items-end justify-center gap-1 px-6 pt-6 pb-4">
+          {[{ h: 'h-6', sz: 'w-10 h-10' }, { h: 'h-10', sz: 'w-14 h-14' }, { h: 'h-4', sz: 'w-10 h-10' }].map((p, i) => (
+            <div key={i} className="flex flex-col items-center gap-1.5 flex-1">
+              <div className={`animate-pulse bg-gray-200 rounded-full ${p.sz}`} />
+              <Sk className="h-3 w-14" />
+              <Sk className="h-3 w-10" />
+              <Sk className={`w-full rounded-t-lg ${p.h}`} />
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Partidos */}
+      <div className="space-y-3">
+        <Sk className="h-4 w-28" />
+        {[0, 1, 2].map(i => <SkMatchCard key={i} />)}
+      </div>
+    </div>
+  )
+}
 
 const MEDAL = ['🥇', '🥈', '🥉']
 // Orden visual del podio: 2do (izq), 1ro (centro), 3ro (der)
@@ -124,9 +178,7 @@ export function Home() {
     return t.home.contextNoRanking
   })()
 
-  if (loading) return (
-    <div className="flex justify-center py-20"><Spinner size="lg" /></div>
-  )
+  if (loading) return <HomeSkeleton />
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
