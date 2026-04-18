@@ -24,6 +24,11 @@ export function useCountdown(targetDate: Date | null) {
 }
 
 export function formatCountdown(h: number, m: number, s: number) {
+  if (h >= 48) {
+    const d = Math.floor(h / 24)
+    const remH = h % 24
+    return remH > 0 ? `${d}d ${remH}h` : `${d}d`
+  }
   if (h > 0) return `${h}h ${String(m).padStart(2, '0')}m`
   if (m > 0) return `${m}m ${String(s).padStart(2, '0')}s`
   return `${s}s`
