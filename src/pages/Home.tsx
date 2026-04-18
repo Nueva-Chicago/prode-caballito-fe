@@ -4,7 +4,7 @@ import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
-import { Sk, SkAvatar, SkMatchCard } from '@/components/ui/Skeleton'
+import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import type { Match, Bet, Planilla, RankingEntry, Tournament } from '@/types'
 
 function HomeSkeleton() {

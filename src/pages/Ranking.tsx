@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
-import { Sk, SkAvatar, SkRankRow } from '@/components/ui/Skeleton'
+import { Sk, SkRankRow } from '@/components/ui/Skeleton'
 import { calcularPuntaje } from '@/utils/scoring'
 
 function RankingSkeleton() {
