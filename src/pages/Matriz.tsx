@@ -536,14 +536,14 @@ export function Matriz() {
       ) : (
         <div ref={tableRef} className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-280px)] [scrollbar-width:thin] [scrollbar-color:rgba(100,116,139,0.6)_rgba(203,213,225,0.4)] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-500/60 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-200/40">
           <table className="text-xs border-collapse min-w-max">
-            <thead className="sticky top-0 z-20">
+            <thead>
               <tr className="bg-[#001A4B] text-white">
-                <th className="sticky left-0 bg-[#001A4B] px-2 py-2 text-left font-semibold z-30 min-w-[140px] sm:min-w-[180px]">
+                <th className="sticky top-0 left-0 bg-[#001A4B] px-2 py-2 text-left font-semibold z-30 min-w-[140px] sm:min-w-[180px]">
                   {t.ranking.player}
                 </th>
-                <th className="px-2 py-2 text-center font-semibold w-14 bg-[#001A4B]">{t.ranking.pts}</th>
+                <th className="sticky top-0 px-2 py-2 text-center font-semibold w-14 bg-[#001A4B] z-20">{t.ranking.pts}</th>
                 {allMatches.map((m) => (
-                  <th key={m.id} className="px-1 py-2 text-center font-medium min-w-[60px] bg-[#001A4B]">
+                  <th key={m.id} className="sticky top-0 px-1 py-2 text-center font-medium min-w-[60px] bg-[#001A4B] z-20">
                     {teamFlag(m.home_team)
                       ? <div className="text-base leading-none">{teamFlag(m.home_team)}</div>
                       : <div className="truncate max-w-[55px]">{m.home_team.substring(0,3).toUpperCase()}</div>
