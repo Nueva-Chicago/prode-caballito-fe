@@ -534,7 +534,7 @@ export function Matriz() {
           {t.matrix.noMatches}
         </div>
       ) : (
-        <div ref={tableRef} className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-280px)]">
+        <div ref={tableRef} className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-280px)] [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.35)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/35 [&::-webkit-scrollbar-track]:bg-transparent">
           <table className="text-xs border-collapse min-w-max">
             <thead className="sticky top-0 z-20">
               <tr className="bg-[#001A4B] text-white">
