@@ -534,16 +534,16 @@ export function Matriz() {
           {t.matrix.noMatches}
         </div>
       ) : (
-        <div ref={tableRef} className="overflow-x-auto">
+        <div ref={tableRef} className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-280px)]">
           <table className="text-xs border-collapse min-w-max">
-            <thead>
+            <thead className="sticky top-0 z-20">
               <tr className="bg-[#001A4B] text-white">
-                <th className="sticky left-0 bg-[#001A4B] px-3 py-2 text-left font-semibold z-10 min-w-[180px]">
+                <th className="sticky left-0 bg-[#001A4B] px-3 py-2 text-left font-semibold z-30 min-w-[180px]">
                   {t.ranking.player}
                 </th>
-                <th className="px-2 py-2 text-center font-semibold w-14">{t.ranking.pts}</th>
+                <th className="px-2 py-2 text-center font-semibold w-14 bg-[#001A4B]">{t.ranking.pts}</th>
                 {allMatches.map((m) => (
-                  <th key={m.id} className="px-1 py-2 text-center font-medium min-w-[60px]">
+                  <th key={m.id} className="px-1 py-2 text-center font-medium min-w-[60px] bg-[#001A4B]">
                     {teamFlag(m.home_team)
                       ? <div className="text-base leading-none">{teamFlag(m.home_team)}</div>
                       : <div className="truncate max-w-[55px]">{m.home_team.substring(0,3).toUpperCase()}</div>
