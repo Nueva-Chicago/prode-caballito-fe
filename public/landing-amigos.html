@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n-meta="title">Prode Caballito | Invitá a tus amigos – Jugá en grupo</title>
+  <meta name="description" data-i18n-meta="desc" content="El prode del Mundial 2026 es mejor con amigos. Invitalos gratis, competí en el mismo ranking y que gane el que más sabe de fútbol." />
+  <link rel="canonical" href="https://prodecaballito.com/landing/amigos.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://prodecaballito.com/landing/amigos.html" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: #f8fafc; color: #1f2937; }
+    a { text-decoration: none; color: inherit; }
+    .nav { position: sticky; top: 0; z-index: 100; background: #001A4B; box-shadow: 0 2px 12px rgba(0,0,0,0.25); }
+    .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 1.25rem; height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .nav-logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1rem; color: #fff; }
+    .nav-logo span { color: #FFDF00; font-size: 1.3rem; }
+    .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+    .nav-links a { color: rgba(255,255,255,0.75); font-size: 0.85rem; font-weight: 600; padding: 0.4rem 0.75rem; border-radius: 8px; transition: background 0.15s, color 0.15s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-cta { background: #FFDF00; color: #001A4B; font-size: 0.82rem; font-weight: 800; padding: 0.45rem 1.1rem; border-radius: 10px; border: none; cursor: pointer; transition: filter 0.15s; white-space: nowrap; }
+    .nav-cta:hover { filter: brightness(0.92); }
+    .lang-switcher { display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.08); border-radius: 8px; padding: 2px; }
+    .lang-btn { background: none; border: none; cursor: pointer; font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.5); padding: 4px 7px; border-radius: 6px; transition: background 0.15s, color 0.15s; }
+    .lang-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+    .lang-btn.active { background: #FFDF00; color: #001A4B; }
+    @media (max-width: 600px) { .nav-links { display: none; } }
+    .btn-primary { display: inline-block; background: #FFDF00; color: #001A4B; font-weight: 900; font-size: 1.05rem; padding: 0.9rem 2.2rem; border-radius: 14px; border: none; cursor: pointer; box-shadow: 0 4px 20px rgba(255,223,0,0.35); transition: transform 0.15s, filter 0.15s; }
+    .btn-primary:hover { transform: translateY(-2px); filter: brightness(0.95); }
+    .btn-share { display: inline-flex; align-items: center; gap: 0.5rem; background: #fff; color: #001A4B; font-weight: 800; font-size: 0.95rem; padding: 0.75rem 1.5rem; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+    .btn-share:hover { border-color: #001A4B; box-shadow: 0 4px 12px rgba(0,26,75,0.12); }
+    .btn-share.wa { background: #25d366; color: #fff; border-color: #25d366; }
+    .btn-share.wa:hover { background: #1db954; border-color: #1db954; }
+
+    /* HERO */
+    .hero { background: #001A4B; padding: 5rem 1.5rem 4rem; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content: '👥'; position: absolute; font-size: 20rem; opacity: 0.04; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+    .hero-inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,223,0,0.12); border: 1px solid rgba(255,223,0,0.35); color: #FFDF00; font-size: 0.78rem; font-weight: 700; padding: 0.35rem 0.9rem; border-radius: 99px; margin-bottom: 1.5rem; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900; color: #fff; line-height: 1.12; margin-bottom: 1rem; }
+    .hero h1 em { color: #FFDF00; font-style: normal; }
+    .hero p { color: rgba(255,255,255,0.65); font-size: 1.1rem; max-width: 520px; margin: 0 auto 2rem; line-height: 1.6; }
+    .hero-share-bar { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem; }
+
+    /* SECTION */
+    .section-label { text-align: center; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #001A4B; margin-bottom: 0.75rem; }
+    .section-title { text-align: center; font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 900; color: #0f172a; line-height: 1.2; margin-bottom: 0.75rem; }
+    .section-sub { text-align: center; font-size: 1rem; color: #64748b; max-width: 520px; margin: 0 auto 3.5rem; line-height: 1.6; }
+
+    /* WHY SECTION */
+    .why-section { background: #fff; padding: 5rem 1.5rem; }
+    .why-grid { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem; }
+    .why-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 18px; padding: 1.75rem 1.5rem; }
+    .why-icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; }
+    .why-card h3 { font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 0.4rem; }
+    .why-card p { font-size: 0.875rem; color: #64748b; line-height: 1.6; }
+
+    /* HOW TO INVITE */
+    .how-section { background: #f1f5f9; padding: 5rem 1.5rem; }
+    .how-steps { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
+    .how-step { display: flex; align-items: flex-start; gap: 1.25rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; transition: box-shadow 0.2s; }
+    .how-step:hover { box-shadow: 0 8px 24px rgba(0,26,75,0.08); }
+    .how-step-num { flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; background: #001A4B; color: #FFDF00; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.1rem; }
+    .how-step-body h3 { font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 0.35rem; }
+    .how-step-body p { font-size: 0.875rem; color: #64748b; line-height: 1.6; }
+    .how-step-body .share-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+
+    /* MOCK RANKING */
+    .ranking-section { background: #001A4B; padding: 5rem 1.5rem; }
+    .ranking-section .section-label { color: #FFDF00; }
+    .ranking-section .section-title { color: #fff; }
+    .ranking-section .section-sub { color: rgba(255,255,255,0.6); }
+    .ranking-mock { max-width: 560px; margin: 0 auto; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; }
+    .rank-header { background: rgba(255,255,255,0.08); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .rank-header span { color: rgba(255,255,255,0.5); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+    .rank-header strong { color: #FFDF00; font-size: 0.82rem; }
+    .rank-row { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.07); transition: background 0.15s; }
+    .rank-row:last-child { border-bottom: none; }
+    .rank-row.highlight { background: rgba(255,223,0,0.08); }
+    .rank-pos { font-size: 0.85rem; font-weight: 900; color: rgba(255,255,255,0.3); width: 24px; text-align: center; flex-shrink: 0; }
+    .rank-pos.gold { color: #FFDF00; }
+    .rank-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.9rem; flex-shrink: 0; }
+    .rank-name { flex: 1; font-size: 0.9rem; font-weight: 700; color: rgba(255,255,255,0.85); }
+    .rank-name small { display: block; font-size: 0.72rem; color: rgba(255,255,255,0.4); font-weight: 500; }
+    .rank-pts { font-size: 1rem; font-weight: 900; color: #FFDF00; }
+    .rank-you { background: rgba(255,223,0,0.15); border: 1px solid rgba(255,223,0,0.3); border-radius: 99px; padding: 0.15rem 0.5rem; font-size: 0.68rem; color: #FFDF00; font-weight: 800; }
+
+    /* CTA */
+    .cta-section { background: linear-gradient(135deg, #001A4B, #002B7F); padding: 6rem 1.5rem; text-align: center; }
+    .cta-inner { max-width: 580px; margin: 0 auto; }
+    .cta-inner h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; color: #fff; margin-bottom: 1rem; line-height: 1.15; }
+    .cta-inner h2 em { color: #FFDF00; font-style: normal; }
+    .cta-inner p { color: rgba(255,255,255,0.65); font-size: 1.05rem; margin-bottom: 2rem; line-height: 1.6; }
+    .cta-share-btns { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem; }
+    .cta-sub { margin-top: 1.5rem; font-size: 0.82rem; color: rgba(255,255,255,0.4); }
+
+    /* FOOTER */
+    .footer { background: #000d26; padding: 2.5rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    .footer-inner { max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; }
+    .footer-logo { color: rgba(255,255,255,0.7); font-size: 0.9rem; font-weight: 700; }
+    .footer-logo span { color: #FFDF00; }
+    .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .footer-links a { color: rgba(255,255,255,0.4); font-size: 0.8rem; transition: color 0.15s; }
+    .footer-links a:hover { color: rgba(255,255,255,0.8); }
+    .footer-copy { color: rgba(255,255,255,0.25); font-size: 0.78rem; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="https://prodecaballito.com" class="nav-logo"><span>⚽</span> PRODE Caballito</a>
+      <div class="nav-links">
+        <a href="/landing/mundial.html" data-i18n="nav.mundial">Mundial 2026</a>
+        <a href="/landing/premios.html" data-i18n="nav.premios">Premios</a>
+        <a href="https://prodecaballito.com/login" data-i18n="nav.login">Iniciar sesión</a>
+      </div>
+      <div class="nav-right">
+        <div class="lang-switcher">
+          <button class="lang-btn" onclick="setLang('es')" data-lang-btn="es">🇦🇷 ES</button>
+          <button class="lang-btn" onclick="setLang('pt')" data-lang-btn="pt">🇧🇷 PT</button>
+          <button class="lang-btn" onclick="setLang('en')" data-lang-btn="en">🇬🇧 EN</button>
+        </div>
+        <a href="https://prodecaballito.com/register" class="nav-cta" data-i18n="nav.cta">Jugá gratis →</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge" data-i18n="hero.badge">👥 Invitá a tus amigos · Es gratis</div>
+      <h1 data-i18n-html="hero.h1">El prode es mejor<br>con <em>tus amigos</em>.</h1>
+      <p data-i18n="hero.sub">Invitalos en segundos. Compitan en el mismo ranking. Que gane el que más sabe de fútbol.</p>
+      <div class="hero-share-bar">
+        <a href="#" onclick="shareWA(event)" class="btn-share wa">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.057 23.57a.5.5 0 00.613.613l5.708-1.475A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.374l-.36-.214-3.733.965.99-3.619-.235-.373A9.818 9.818 0 112 12c0-5.42 4.398-9.818 9.818-9.818z"/></svg>
+          <span data-i18n="share.wa">Invitar por WhatsApp</span>
+        </a>
+        <button onclick="copyLink()" class="btn-share" style="background:rgba(255,255,255,0.08);color:#fff;border-color:rgba(255,255,255,0.2)">
+          <span id="copy-icon">🔗</span> <span data-i18n="share.copy" id="copy-label">Copiar link</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY WITH FRIENDS -->
+  <section class="why-section">
+    <p class="section-label" data-i18n="why.label">🤝 Por qué en grupo</p>
+    <h2 class="section-title" data-i18n="why.title">El prode solo está bueno.<br>Con amigos está en otro nivel.</h2>
+    <p class="section-sub" data-i18n="why.sub">Cada partido se convierte en un evento. Cada resultado en debate. Cada punto en tensión compartida.</p>
+    <div class="why-grid">
+      <div class="why-card">
+        <span class="why-icon">🏆</span>
+        <h3 data-i18n="why1.title">Competís entre conocidos</h3>
+        <p data-i18n="why1.desc">Más divertido ganarle a tu amigo que al desconocido. Podés seguirlos, ver sus pronósticos y reírte de los errores.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">📲</span>
+        <h3 data-i18n="why2.title">Un tema de conversación</h3>
+        <p data-i18n="why2.desc">Antes de cada partido, durante y después. El prode se convierte en el hilo conductor de cada jornada del Mundial.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">👀</span>
+        <h3 data-i18n="why3.title">Ves lo que apostó cada uno</h3>
+        <p data-i18n="why3.desc">La matriz de pronósticos muestra todos los resultados en una sola pantalla. ¿Quién fue el más valiente? ¿Quién el más conservador?</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🔥</span>
+        <h3 data-i18n="why4.title">El ranking se vuelve personal</h3>
+        <p data-i18n="why4.desc">Saber que tu compañero de trabajo va uno arriba que vos cambia todo. El próximo partido importa el doble.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">😂</span>
+        <h3 data-i18n="why5.title">Los errores son lo mejor</h3>
+        <p data-i18n="why5.desc">¿Alguien apostó que ganaba Arabia Saudita? Eso no se olvida. El prode crea recuerdos.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🎨</span>
+        <h3 data-i18n="why6.title">Armá grupos temáticos</h3>
+        <p data-i18n="why6.desc">El grupo del trabajo, la familia, los del barrio. Cada contexto tiene su propio ranking paralelo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW TO INVITE -->
+  <section class="how-section">
+    <p class="section-label" data-i18n="how.label">⚡ Cómo invitar</p>
+    <h2 class="section-title" data-i18n="how.title">En 3 pasos, tus amigos adentro</h2>
+    <p class="section-sub" data-i18n="how.sub">Sin complicaciones. Sin formularios. Un link y listo.</p>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step-num">1</div>
+        <div class="how-step-body">
+          <h3 data-i18n="step1.title">Registrate vos primero</h3>
+          <p data-i18n="step1.desc">Creá tu cuenta gratis. 30 segundos. Sin tarjeta de crédito. Cuando estés adentro, podés invitar a todos los que quieras.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">2</div>
+        <div class="how-step-body">
+          <h3 data-i18n="step2.title">Compartí el link del prode</h3>
+          <p data-i18n="step2.desc">Mandá el link de la plataforma por WhatsApp, Instagram, el grupo del trabajo o donde quieras. Tus amigos se registran gratis y ya quedan en el mismo ranking.</p>
+          <div class="share-btns">
+            <a href="#" onclick="shareWA(event)" class="btn-share wa" style="font-size:0.85rem;padding:0.6rem 1.2rem">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.057 23.57a.5.5 0 00.613.613l5.708-1.475A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.374l-.36-.214-3.733.965.99-3.619-.235-.373A9.818 9.818 0 112 12c0-5.42 4.398-9.818 9.818-9.818z"/></svg>
+              <span data-i18n="share.wa">Invitar por WhatsApp</span>
+            </a>
+            <button onclick="copyLink()" class="btn-share" style="font-size:0.85rem;padding:0.6rem 1.2rem">
+              🔗 <span data-i18n="share.copy">Copiar link</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">3</div>
+        <div class="how-step-body">
+          <h3 data-i18n="step3.title">Seguí a tus amigos en el ranking</h3>
+          <p data-i18n="step3.desc">Desde el ranking podés marcar a tus amigos como favoritos para ver su posición de cerca. Comparar apuestas, ver quién va ganando y disfrutar cada partido juntos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RANKING MOCK -->
+  <section class="ranking-section">
+    <p class="section-label" data-i18n="rank.label">📊 El ranking</p>
+    <h2 class="section-title" data-i18n="rank.title">Así se ve cuando competís con amigos</h2>
+    <p class="section-sub" style="margin-bottom:2.5rem" data-i18n="rank.sub">Podés ver a todos en tiempo real. Después de cada partido, el ranking se actualiza solo.</p>
+    <div class="ranking-mock">
+      <div class="rank-header">
+        <span data-i18n="rank.header">🏆 Ranking Global · Mundial 2026</span>
+        <strong data-i18n="rank.live">● En vivo</strong>
+      </div>
+      <div class="rank-row">
+        <div class="rank-pos gold">1</div>
+        <div class="rank-avatar" style="background:#FFDF00">J</div>
+        <div class="rank-name">Juani<small data-i18n="rank.friend">tu amigo</small></div>
+        <div class="rank-pts">98 pts</div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-pos">2</div>
+        <div class="rank-avatar" style="background:#86efac">L</div>
+        <div class="rank-name">Laura<small data-i18n="rank.friend">tu amiga</small></div>
+        <div class="rank-pts">91 pts</div>
+      </div>
+      <div class="rank-row highlight">
+        <div class="rank-pos" style="color:#FFDF00">3</div>
+        <div class="rank-avatar" style="background:#93c5fd">V</div>
+        <div class="rank-name">
+          <span data-i18n="rank.you">Vos</span> <span class="rank-you" data-i18n="rank.you.tag">← Vos</span>
+          <small data-i18n="rank.close">a solo 7 puntos del primero</small>
+        </div>
+        <div class="rank-pts">87 pts</div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-pos">4</div>
+        <div class="rank-avatar" style="background:#fca5a5">P</div>
+        <div class="rank-name">Pablo<small data-i18n="rank.coworker">compañero de trabajo</small></div>
+        <div class="rank-pts">82 pts</div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-pos">5</div>
+        <div class="rank-avatar" style="background:#d8b4fe">M</div>
+        <div class="rank-name">Mariana<small data-i18n="rank.friend">tu amiga</small></div>
+        <div class="rank-pts">79 pts</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-inner">
+      <h2 data-i18n-html="cta.title">¿A quién le vas a mandar<br>el link <em>primero</em>?</h2>
+      <p data-i18n="cta.sub">Registrate gratis y empezá a invitar. Cuantos más amigos, más divertido. Gratis para todos.</p>
+      <div class="cta-share-btns">
+        <a href="#" onclick="shareWA(event)" class="btn-share wa" style="font-size:1rem;padding:0.9rem 2rem">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.057 23.57a.5.5 0 00.613.613l5.708-1.475A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.374l-.36-.214-3.733.965.99-3.619-.235-.373A9.818 9.818 0 112 12c0-5.42 4.398-9.818 9.818-9.818z"/></svg>
+          <span data-i18n="share.wa">Invitar por WhatsApp</span>
+        </a>
+        <a href="https://prodecaballito.com/register" class="btn-primary" data-i18n="cta.btn">Registrarme gratis →</a>
+      </div>
+      <p class="cta-sub" data-i18n="cta.sub2">Es gratis para vos y para cada amigo que invites.</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo"><span>⚽</span> PRODE Caballito</div>
+      <nav class="footer-links">
+        <a href="https://prodecaballito.com" data-i18n="f.home">Inicio</a>
+        <a href="/landing/mundial.html" data-i18n="f.mundial">Mundial 2026</a>
+        <a href="/landing/premios.html" data-i18n="f.premios">Premios</a>
+        <a href="https://prodecaballito.com/register" data-i18n="f.register">Registrarse</a>
+      </nav>
+      <p class="footer-copy" data-i18n="f.copy">© 2026 Prode Caballito · Hecho con ⚽ en Buenos Aires</p>
+    </div>
+  </footer>
+
+  <script>
+    const SHARE_URL = 'https://prodecaballito.com/register';
+    const SHARE_MSGS = {
+      es: '⚽ ¿Jugamos el prode del Mundial 2026? Es gratis y el ranking se actualiza solo. Entrá acá: ' + SHARE_URL,
+      pt: '⚽ Vamos jogar o bolão da Copa 2026? É grátis e o ranking se atualiza sozinho. Entra aqui: ' + SHARE_URL,
+      en: '⚽ Want to join my World Cup 2026 predictor? It\'s free and rankings update automatically. Join here: ' + SHARE_URL,
+    };
+    function getCurrentLang(){ return localStorage.getItem('pc_lang') || 'es'; }
+    function shareWA(e){ e.preventDefault(); const msg = SHARE_MSGS[getCurrentLang()] || SHARE_MSGS.es; window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank'); }
+    function copyLink(){ navigator.clipboard.writeText(SHARE_URL).then(()=>{ const lbl = document.getElementById('copy-label'); if(lbl){ const orig = lbl.textContent; lbl.textContent = '¡Copiado!'; setTimeout(()=>{ lbl.textContent = orig; }, 2000); }}); }
+
+    const translations = {
+      es: {
+        'meta.title':'Prode Caballito | Invitá a tus amigos – Jugá en grupo','meta.desc':'El prode del Mundial 2026 es mejor con amigos. Invitalos gratis y competí en el mismo ranking.',
+        'nav.mundial':'Mundial 2026','nav.premios':'Premios','nav.login':'Iniciar sesión','nav.cta':'Jugá gratis →',
+        'hero.badge':'👥 Invitá a tus amigos · Es gratis','hero.h1':'El prode es mejor<br>con <em>tus amigos</em>.','hero.sub':'Invitalos en segundos. Compitan en el mismo ranking. Que gane el que más sabe de fútbol.',
+        'share.wa':'Invitar por WhatsApp','share.copy':'Copiar link',
+        'why.label':'🤝 Por qué en grupo','why.title':'El prode solo está bueno. Con amigos está en otro nivel.','why.sub':'Cada partido se convierte en un evento. Cada resultado en debate. Cada punto en tensión compartida.',
+        'why1.title':'Competís entre conocidos','why1.desc':'Más divertido ganarle a tu amigo que al desconocido. Podés seguirlos, ver sus pronósticos y reírte de los errores.',
+        'why2.title':'Un tema de conversación','why2.desc':'Antes de cada partido, durante y después. El prode se convierte en el hilo conductor de cada jornada del Mundial.',
+        'why3.title':'Ves lo que apostó cada uno','why3.desc':'La matriz de pronósticos muestra todos los resultados en una sola pantalla. ¿Quién fue el más valiente?',
+        'why4.title':'El ranking se vuelve personal','why4.desc':'Saber que tu compañero de trabajo va uno arriba que vos cambia todo. El próximo partido importa el doble.',
+        'why5.title':'Los errores son lo mejor','why5.desc':'¿Alguien apostó que ganaba Arabia Saudita? Eso no se olvida. El prode crea recuerdos.',
+        'why6.title':'Armá grupos temáticos','why6.desc':'El grupo del trabajo, la familia, los del barrio. Cada contexto tiene su propio ranking paralelo.',
+        'how.label':'⚡ Cómo invitar','how.title':'En 3 pasos, tus amigos adentro','how.sub':'Sin complicaciones. Sin formularios. Un link y listo.',
+        'step1.title':'Registrate vos primero','step1.desc':'Creá tu cuenta gratis. 30 segundos. Sin tarjeta de crédito. Cuando estés adentro, podés invitar a todos los que quieras.',
+        'step2.title':'Compartí el link del prode','step2.desc':'Mandá el link de la plataforma por WhatsApp, Instagram, el grupo del trabajo o donde quieras. Tus amigos se registran gratis y ya quedan en el mismo ranking.',
+        'step3.title':'Seguí a tus amigos en el ranking','step3.desc':'Desde el ranking podés marcar a tus amigos como favoritos para ver su posición de cerca. Comparar apuestas, ver quién va ganando y disfrutar cada partido juntos.',
+        'rank.label':'📊 El ranking','rank.title':'Así se ve cuando competís con amigos','rank.sub':'Podés ver a todos en tiempo real. Después de cada partido, el ranking se actualiza solo.',
+        'rank.header':'🏆 Ranking Global · Mundial 2026','rank.live':'● En vivo','rank.friend':'tu amigo/a','rank.you':'Vos','rank.you.tag':'← Vos','rank.close':'a solo 7 puntos del primero','rank.coworker':'compañero de trabajo',
+        'cta.title':'¿A quién le vas a mandar<br>el link <em>primero</em>?','cta.sub':'Registrate gratis y empezá a invitar. Cuantos más amigos, más divertido. Gratis para todos.','cta.btn':'Registrarme gratis →','cta.sub2':'Es gratis para vos y para cada amigo que invites.',
+        'f.home':'Inicio','f.mundial':'Mundial 2026','f.premios':'Premios','f.register':'Registrarse','f.copy':'© 2026 Prode Caballito · Hecho con ⚽ en Buenos Aires',
+      },
+      pt: {
+        'meta.title':'Prode Caballito | Convide seus amigos – Jogue em grupo','meta.desc':'O bolão da Copa 2026 é melhor com amigos. Convide de graça e compita no mesmo ranking.',
+        'nav.mundial':'Copa 2026','nav.premios':'Prêmios','nav.login':'Entrar','nav.cta':'Jogar grátis →',
+        'hero.badge':'👥 Convide seus amigos · É grátis','hero.h1':'O bolão é melhor<br>com <em>seus amigos</em>.','hero.sub':'Convide em segundos. Compitam no mesmo ranking. Que vença quem mais entende de futebol.',
+        'share.wa':'Convidar pelo WhatsApp','share.copy':'Copiar link',
+        'why.label':'🤝 Por que em grupo','why.title':'O bolão sozinho é bom. Com amigos é outro nível.','why.sub':'Cada jogo vira um evento. Cada resultado vira debate. Cada ponto vira tensão compartilhada.',
+        'why1.title':'Você compete com conhecidos','why1.desc':'É mais divertido ganhar do seu amigo do que de um desconhecido. Pode seguir eles, ver os palpites e rir dos erros.',
+        'why2.title':'Um assunto de conversa','why2.desc':'Antes de cada jogo, durante e depois. O bolão vira o fio condutor de cada rodada da Copa.',
+        'why3.title':'Vê o que cada um apostou','why3.desc':'A matriz de palpites mostra todos os resultados em uma só tela. Quem foi o mais corajoso?',
+        'why4.title':'O ranking fica pessoal','why4.desc':'Saber que seu colega de trabalho está um ponto acima de você muda tudo. O próximo jogo importa o dobro.',
+        'why5.title':'Os erros são o melhor','why5.desc':'Alguém apostou que a Arábia Saudita ia ganhar? Isso não se esquece. O bolão cria memórias.',
+        'why6.title':'Monte grupos temáticos','why6.desc':'O grupo do trabalho, a família, os amigos do bairro. Cada contexto tem seu próprio ranking paralelo.',
+        'how.label':'⚡ Como convidar','how.title':'Em 3 passos, seus amigos dentro','how.sub':'Sem complicação. Sem formulários. Um link e pronto.',
+        'step1.title':'Cadastre-se você primeiro','step1.desc':'Crie sua conta grátis. 30 segundos. Sem cartão de crédito. Quando estiver dentro, pode convidar quantos quiser.',
+        'step2.title':'Compartilhe o link do bolão','step2.desc':'Mande o link pelo WhatsApp, Instagram, grupo do trabalho ou onde quiser. Seus amigos se cadastram grátis e já ficam no mesmo ranking.',
+        'step3.title':'Acompanhe seus amigos no ranking','step3.desc':'No ranking você pode marcar seus amigos como favoritos para ver a posição deles de perto. Comparar palpites, ver quem está ganhando e curtir cada jogo juntos.',
+        'rank.label':'📊 O ranking','rank.title':'É assim que fica quando você compete com amigos','rank.sub':'Você vê todos em tempo real. Após cada jogo, o ranking se atualiza sozinho.',
+        'rank.header':'🏆 Ranking Global · Copa 2026','rank.live':'● Ao vivo','rank.friend':'seu amigo/a','rank.you':'Você','rank.you.tag':'← Você','rank.close':'a só 7 pontos do primeiro','rank.coworker':'colega de trabalho',
+        'cta.title':'Para quem você vai mandar<br>o link <em>primeiro</em>?','cta.sub':'Cadastre-se grátis e comece a convidar. Quanto mais amigos, mais divertido. Grátis para todos.','cta.btn':'Cadastrar-me grátis →','cta.sub2':'É grátis para você e para cada amigo que convidar.',
+        'f.home':'Início','f.mundial':'Copa 2026','f.premios':'Prêmios','f.register':'Cadastrar-se','f.copy':'© 2026 Prode Caballito · Feito com ⚽ em Buenos Aires',
+      },
+      en: {
+        'meta.title':'Prode Caballito | Invite your friends – Play together','meta.desc':'World Cup 2026 predictions are better with friends. Invite them free and compete on the same leaderboard.',
+        'nav.mundial':'World Cup 2026','nav.premios':'Prizes','nav.login':'Log in','nav.cta':'Play free →',
+        'hero.badge':'👥 Invite your friends · It\'s free','hero.h1':'Predictions are better<br>with <em>your friends</em>.','hero.sub':'Invite them in seconds. Compete on the same leaderboard. May the best football fan win.',
+        'share.wa':'Invite via WhatsApp','share.copy':'Copy link',
+        'why.label':'🤝 Why play in groups','why.title':'Predictions alone are good. With friends it\'s another level.','why.sub':'Every match becomes an event. Every result becomes a debate. Every point becomes shared tension.',
+        'why1.title':'Compete with people you know','why1.desc':'It\'s way more fun to beat your friend than a stranger. Follow them, see their predictions and laugh at the mistakes.',
+        'why2.title':'A conversation topic','why2.desc':'Before each match, during and after. The predictor becomes the thread connecting every World Cup matchday.',
+        'why3.title':'See what everyone bet','why3.desc':'The predictions matrix shows all results on one screen. Who was the bravest? Who was the most conservative?',
+        'why4.title':'The standings get personal','why4.desc':'Knowing your coworker is one point ahead changes everything. The next match matters twice as much.',
+        'why5.title':'The mistakes are the best part','why5.desc':'Someone bet Saudi Arabia would win? That doesn\'t get forgotten. The predictor creates memories.',
+        'why6.title':'Create themed groups','why6.desc':'Work colleagues, family, the neighbourhood crew. Every context has its own parallel standings.',
+        'how.label':'⚡ How to invite','how.title':'3 steps to get your friends in','how.sub':'No hassle. No forms. A link and you\'re done.',
+        'step1.title':'Sign up first','step1.desc':'Create your free account. 30 seconds. No credit card. Once you\'re in, invite as many friends as you want.',
+        'step2.title':'Share the predictor link','step2.desc':'Send the link via WhatsApp, Instagram, the work group or wherever. Your friends sign up free and automatically join the same standings.',
+        'step3.title':'Follow your friends in the standings','step3.desc':'In the standings you can mark friends as favourites to track their position closely. Compare predictions, see who\'s winning and enjoy every match together.',
+        'rank.label':'📊 The standings','rank.title':'This is what it looks like when you compete with friends','rank.sub':'You can see everyone in real time. After each match, the standings update automatically.',
+        'rank.header':'🏆 Global Standings · World Cup 2026','rank.live':'● Live','rank.friend':'your friend','rank.you':'You','rank.you.tag':'← You','rank.close':'only 7 points from the top','rank.coworker':'work colleague',
+        'cta.title':'Who are you sending<br>the link to <em>first</em>?','cta.sub':'Sign up free and start inviting. The more friends, the more fun. Free for everyone.','cta.btn':'Sign up for free →','cta.sub2':'It\'s free for you and for every friend you invite.',
+        'f.home':'Home','f.mundial':'World Cup 2026','f.premios':'Prizes','f.register':'Register','f.copy':'© 2026 Prode Caballito · Made with ⚽ in Buenos Aires',
+      }
+    };
+    function detectLang(){const s=localStorage.getItem('pc_lang');if(s&&translations[s])return s;const n=(navigator.language||'es').toLowerCase();if(n.startsWith('pt'))return 'pt';if(n.startsWith('es'))return 'es';return 'en';}
+    function applyLang(lang){const t=translations[lang];if(!t)return;document.documentElement.lang=lang==='pt'?'pt-BR':lang;if(t['meta.title'])document.title=t['meta.title'];const md=document.querySelector('meta[name="description"]');if(md&&t['meta.desc'])md.setAttribute('content',t['meta.desc']);document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t[k]!==undefined)el.textContent=t[k];});document.querySelectorAll('[data-i18n-html]').forEach(el=>{const k=el.getAttribute('data-i18n-html');if(t[k]!==undefined)el.innerHTML=t[k];});document.querySelectorAll('[data-lang-btn]').forEach(btn=>{btn.classList.toggle('active',btn.getAttribute('data-lang-btn')===lang);});}
+    function setLang(lang){localStorage.setItem('pc_lang',lang);applyLang(lang);}
+    applyLang(detectLang());
+  </script>
+</body>
+</html>

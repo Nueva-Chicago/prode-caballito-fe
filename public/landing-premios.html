@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n-meta="title">Prode Caballito | Premios – ¿Qué gana el que gana?</title>
+  <meta name="description" data-i18n-meta="desc" content="Conocé qué premios tiene el Prode Caballito del Mundial 2026. Ranking, gloria, reputación y algo más. Gratis, sin apuestas de dinero." />
+  <link rel="canonical" href="https://prodecaballito.com/landing/premios.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://prodecaballito.com/landing/premios.html" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: #f8fafc; color: #1f2937; }
+    a { text-decoration: none; color: inherit; }
+    .nav { position: sticky; top: 0; z-index: 100; background: #001A4B; box-shadow: 0 2px 12px rgba(0,0,0,0.25); }
+    .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 1.25rem; height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .nav-logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1rem; color: #fff; }
+    .nav-logo span { color: #FFDF00; font-size: 1.3rem; }
+    .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+    .nav-links a { color: rgba(255,255,255,0.75); font-size: 0.85rem; font-weight: 600; padding: 0.4rem 0.75rem; border-radius: 8px; transition: background 0.15s, color 0.15s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-cta { background: #FFDF00; color: #001A4B; font-size: 0.82rem; font-weight: 800; padding: 0.45rem 1.1rem; border-radius: 10px; border: none; cursor: pointer; transition: filter 0.15s; white-space: nowrap; }
+    .nav-cta:hover { filter: brightness(0.92); }
+    .lang-switcher { display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.08); border-radius: 8px; padding: 2px; }
+    .lang-btn { background: none; border: none; cursor: pointer; font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.5); padding: 4px 7px; border-radius: 6px; transition: background 0.15s, color 0.15s; }
+    .lang-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+    .lang-btn.active { background: #FFDF00; color: #001A4B; }
+    @media (max-width: 600px) { .nav-links { display: none; } }
+    .btn-primary { display: inline-block; background: #FFDF00; color: #001A4B; font-weight: 900; font-size: 1.05rem; padding: 0.9rem 2.2rem; border-radius: 14px; border: none; cursor: pointer; box-shadow: 0 4px 20px rgba(255,223,0,0.35); transition: transform 0.15s, filter 0.15s; }
+    .btn-primary:hover { transform: translateY(-2px); filter: brightness(0.95); }
+
+    /* HERO */
+    .hero { background: #001A4B; padding: 5rem 1.5rem 4rem; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content: '🏆'; position: absolute; font-size: 20rem; opacity: 0.04; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+    .hero-inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,223,0,0.12); border: 1px solid rgba(255,223,0,0.35); color: #FFDF00; font-size: 0.78rem; font-weight: 700; padding: 0.35rem 0.9rem; border-radius: 99px; margin-bottom: 1.5rem; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900; color: #fff; line-height: 1.12; margin-bottom: 1rem; }
+    .hero h1 em { color: #FFDF00; font-style: normal; }
+    .hero p { color: rgba(255,255,255,0.65); font-size: 1.1rem; max-width: 520px; margin: 0 auto 2rem; line-height: 1.6; }
+
+    /* PODIO */
+    .podio-section { background: #fff; padding: 5rem 1.5rem; }
+    .section-label { text-align: center; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #001A4B; margin-bottom: 0.75rem; }
+    .section-title { text-align: center; font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 900; color: #0f172a; line-height: 1.2; margin-bottom: 0.75rem; }
+    .section-sub { text-align: center; font-size: 1rem; color: #64748b; max-width: 520px; margin: 0 auto 3.5rem; line-height: 1.6; }
+    .podio { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 1rem; align-items: end; }
+    @media (max-width: 640px) { .podio { grid-template-columns: 1fr; align-items: stretch; } }
+    .podio-card { border-radius: 20px; padding: 2rem 1.5rem; text-align: center; border: 2px solid transparent; transition: transform 0.2s; }
+    .podio-card:hover { transform: translateY(-4px); }
+    .podio-3 { background: #f8fafc; border-color: #e2e8f0; }
+    .podio-1 { background: linear-gradient(135deg, #fffbeb, #fff8d6); border-color: #FFDF00; box-shadow: 0 16px 40px rgba(255,223,0,0.2); }
+    .podio-2 { background: linear-gradient(135deg, #f0f9ff, #fff); border-color: #bae6fd; }
+    .podio-medal { font-size: 3rem; margin-bottom: 0.75rem; }
+    .podio-pos { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #94a3b8; margin-bottom: 0.5rem; }
+    .podio-1 .podio-pos { color: #a16207; }
+    .podio-2 .podio-pos { color: #0369a1; }
+    .podio-title { font-size: 1.15rem; font-weight: 900; color: #0f172a; margin-bottom: 0.5rem; }
+    .podio-prize { font-size: 0.88rem; color: #64748b; line-height: 1.5; }
+    .podio-tag { display: inline-block; margin-top: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 99px; font-size: 0.75rem; font-weight: 800; }
+    .podio-1 .podio-tag { background: #FFDF00; color: #001A4B; }
+    .podio-2 .podio-tag { background: #e0f2fe; color: #0369a1; }
+    .podio-3 .podio-tag { background: #f1f5f9; color: #475569; }
+
+    /* EXTRA PRIZES */
+    .extra-section { background: #f1f5f9; padding: 5rem 1.5rem; }
+    .extras-grid { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem; }
+    .extra-card { background: #fff; border-radius: 18px; padding: 1.75rem 1.5rem; border: 1px solid #e2e8f0; }
+    .extra-icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; }
+    .extra-card h3 { font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 0.4rem; }
+    .extra-card p { font-size: 0.875rem; color: #64748b; line-height: 1.6; }
+
+    /* SCORING */
+    .scoring-section { background: #001A4B; padding: 5rem 1.5rem; }
+    .scoring-section .section-label { color: #FFDF00; }
+    .scoring-section .section-title { color: #fff; }
+    .scoring-section .section-sub { color: rgba(255,255,255,0.6); }
+    .scoring-grid { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.75rem; }
+    .score-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 1rem 1.5rem; gap: 1rem; }
+    .score-desc { font-size: 0.95rem; color: rgba(255,255,255,0.85); font-weight: 600; }
+    .score-pts { display: flex; align-items: center; gap: 0.5rem; }
+    .score-num { font-size: 1.5rem; font-weight: 900; color: #FFDF00; }
+    .score-label { font-size: 0.78rem; color: rgba(255,255,255,0.45); }
+    .score-bonus { background: rgba(255,223,0,0.15); border: 1px solid rgba(255,223,0,0.3); }
+
+    /* CTA */
+    .cta-section { background: linear-gradient(135deg, #001A4B, #002B7F); padding: 6rem 1.5rem; text-align: center; }
+    .cta-inner { max-width: 580px; margin: 0 auto; }
+    .cta-inner h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; color: #fff; margin-bottom: 1rem; line-height: 1.15; }
+    .cta-inner h2 em { color: #FFDF00; font-style: normal; }
+    .cta-inner p { color: rgba(255,255,255,0.65); font-size: 1.05rem; margin-bottom: 2rem; line-height: 1.6; }
+    .cta-sub { margin-top: 1.25rem; font-size: 0.82rem; color: rgba(255,255,255,0.4); display: flex; justify-content: center; flex-wrap: wrap; gap: 1.25rem; }
+    .cta-sub span::before { content: '✓ '; color: #FFDF00; }
+
+    /* FOOTER */
+    .footer { background: #000d26; padding: 2.5rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    .footer-inner { max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; }
+    .footer-logo { color: rgba(255,255,255,0.7); font-size: 0.9rem; font-weight: 700; }
+    .footer-logo span { color: #FFDF00; }
+    .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .footer-links a { color: rgba(255,255,255,0.4); font-size: 0.8rem; transition: color 0.15s; }
+    .footer-links a:hover { color: rgba(255,255,255,0.8); }
+    .footer-copy { color: rgba(255,255,255,0.25); font-size: 0.78rem; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="https://prodecaballito.com" class="nav-logo"><span>⚽</span> PRODE Caballito</a>
+      <div class="nav-links">
+        <a href="/landing/mundial.html" data-i18n="nav.mundial">Mundial 2026</a>
+        <a href="/landing/amigos.html" data-i18n="nav.amigos">Invitá amigos</a>
+        <a href="https://prodecaballito.com/login" data-i18n="nav.login">Iniciar sesión</a>
+      </div>
+      <div class="nav-right">
+        <div class="lang-switcher">
+          <button class="lang-btn" onclick="setLang('es')" data-lang-btn="es">🇦🇷 ES</button>
+          <button class="lang-btn" onclick="setLang('pt')" data-lang-btn="pt">🇧🇷 PT</button>
+          <button class="lang-btn" onclick="setLang('en')" data-lang-btn="en">🇬🇧 EN</button>
+        </div>
+        <a href="https://prodecaballito.com/register" class="nav-cta" data-i18n="nav.cta">Jugá gratis →</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge" data-i18n="hero.badge">🏆 Premios · Mundial 2026</div>
+      <h1 data-i18n-html="hero.h1">¿Qué gana<br>el que <em>gana</em>?</h1>
+      <p data-i18n="hero.sub">Gloria, reconocimiento y el derecho a chantar con tus amigos durante los próximos 4 años. Y algo más.</p>
+      <a href="https://prodecaballito.com/register" class="btn-primary" data-i18n="hero.cta">🏆 Quiero competir gratis</a>
+    </div>
+  </section>
+
+  <section class="podio-section">
+    <p class="section-label" data-i18n="podio.label">🥇 El podio</p>
+    <h2 class="section-title" data-i18n="podio.title">Los tres primeros del ranking</h2>
+    <p class="section-sub" data-i18n="podio.sub">Al final del torneo, el ranking global determina quién ganó. Hay premios para los tres primeros.</p>
+    <div class="podio">
+      <div class="podio-card podio-2">
+        <div class="podio-medal">🥈</div>
+        <div class="podio-pos" data-i18n="p2.pos">2° lugar</div>
+        <div class="podio-title" data-i18n="p2.title">Sub-campeón</div>
+        <div class="podio-prize" data-i18n="p2.prize">Reconocimiento permanente en el hall of fame del prode. Placa digital y mención especial.</div>
+        <span class="podio-tag" data-i18n="p2.tag">🏅 Plata</span>
+      </div>
+      <div class="podio-card podio-1">
+        <div class="podio-medal">🥇</div>
+        <div class="podio-pos" data-i18n="p1.pos">1° lugar</div>
+        <div class="podio-title" data-i18n="p1.title">Campeón del Prode</div>
+        <div class="podio-prize" data-i18n="p1.prize">Trofeo digital exclusivo, perfil destacado en la plataforma y el derecho eterno a decir que ganaste el Mundial 2026.</div>
+        <span class="podio-tag" data-i18n="p1.tag">👑 Campeón</span>
+      </div>
+      <div class="podio-card podio-3">
+        <div class="podio-medal">🥉</div>
+        <div class="podio-pos" data-i18n="p3.pos">3° lugar</div>
+        <div class="podio-title" data-i18n="p3.title">Tercer puesto</div>
+        <div class="podio-prize" data-i18n="p3.prize">Mención en el ranking final y badge especial en el perfil por toda la temporada.</div>
+        <span class="podio-tag" data-i18n="p3.tag">🥉 Bronce</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="extra-section">
+    <p class="section-label" data-i18n="extra.label">✨ Más premios</p>
+    <h2 class="section-title" data-i18n="extra.title">Premios para todos</h2>
+    <p class="section-sub" data-i18n="extra.sub">No solo gana el primero. Hay reconocimientos durante todo el torneo.</p>
+    <div class="extras-grid">
+      <div class="extra-card">
+        <span class="extra-icon">🎯</span>
+        <h3 data-i18n="ex1.title">Resultado exacto</h3>
+        <p data-i18n="ex1.desc">Cada vez que acertás el marcador exacto ganás 3 puntos. Acertá muchos y todos lo van a saber.</p>
+      </div>
+      <div class="extra-card">
+        <span class="extra-icon">📈</span>
+        <h3 data-i18n="ex2.title">Mejor racha</h3>
+        <p data-i18n="ex2.desc">El jugador con más partidos consecutivos acertando se gana un badge especial de racha.</p>
+      </div>
+      <div class="extra-card">
+        <span class="extra-icon">⚡</span>
+        <h3 data-i18n="ex3.title">Remontada del torneo</h3>
+        <p data-i18n="ex3.desc">El jugador que más posiciones sube en la segunda mitad del torneo. Nunca abandones.</p>
+      </div>
+      <div class="extra-card">
+        <span class="extra-icon">🔮</span>
+        <h3 data-i18n="ex4.title">Mejor fase de grupos</h3>
+        <p data-i18n="ex4.desc">El que más puntos acumula en los 72 partidos de la fase inicial. Hay un badge especial.</p>
+      </div>
+      <div class="extra-card">
+        <span class="extra-icon">😎</span>
+        <h3 data-i18n="ex5.title">El que nadie esperaba</h3>
+        <p data-i18n="ex5.desc">Si acertás la sorpresa del torneo (el outsider que llegó lejos), hay un reconocimiento exclusivo.</p>
+      </div>
+      <div class="extra-card">
+        <span class="extra-icon">🤝</span>
+        <h3 data-i18n="ex6.title">Mejor reclutador</h3>
+        <p data-i18n="ex6.desc">El jugador que más amigos invitó a la plataforma. <a href="/landing/amigos.html" style="color:#001A4B;font-weight:700">Ver cómo funciona →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scoring-section">
+    <p class="section-label" data-i18n="score.label">📊 Sistema de puntos</p>
+    <h2 class="section-title" data-i18n="score.title">Cómo se suman los puntos</h2>
+    <p class="section-sub" data-i18n="score.sub">Simple, transparente, automático. El sistema lo calcula solo al terminar cada partido.</p>
+    <div class="scoring-grid">
+      <div class="score-row" style="border-color:rgba(255,223,0,0.4);background:rgba(255,223,0,0.08)">
+        <div class="score-desc" data-i18n="s1.desc">Marcador exacto (ej: 2-1 apostás, 2-1 termina)</div>
+        <div class="score-pts"><span class="score-num">3</span><span class="score-label" data-i18n="s1.label">pts</span></div>
+      </div>
+      <div class="score-row score-bonus">
+        <div class="score-desc" data-i18n="s2.desc">Bonus partido con 4+ goles</div>
+        <div class="score-pts"><span class="score-num">+1</span><span class="score-label" data-i18n="s2.label">bonus</span></div>
+      </div>
+      <div class="score-row">
+        <div class="score-desc" data-i18n="s3.desc">Ganador correcto + diferencia exacta (ej: apostás 2-0, termina 3-1)</div>
+        <div class="score-pts"><span class="score-num">2</span><span class="score-label" data-i18n="s3.label">pts</span></div>
+      </div>
+      <div class="score-row">
+        <div class="score-desc" data-i18n="s4.desc">Solo el ganador correcto (ej: apostás 2-0, termina 1-0)</div>
+        <div class="score-pts"><span class="score-num">1</span><span class="score-label" data-i18n="s4.label">pt</span></div>
+      </div>
+      <div class="score-row">
+        <div class="score-desc" data-i18n="s5.desc">Resultado incorrecto</div>
+        <div class="score-pts"><span class="score-num">0</span><span class="score-label" data-i18n="s5.label">pts</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-inner">
+      <h2 data-i18n-html="cta.title">¿Querés estar<br>en el <em>podio</em>?</h2>
+      <p data-i18n="cta.sub">Registrate gratis, cargá tus pronósticos y competí por ser el campeón del prode del Mundial 2026.</p>
+      <a href="https://prodecaballito.com/register" class="btn-primary" style="font-size:1.1rem;padding:1rem 2.8rem" data-i18n="cta.btn">🏆 Quiero competir gratis ahora</a>
+      <div class="cta-sub">
+        <span data-i18n="cta.i1">Sin tarjeta</span>
+        <span data-i18n="cta.i2">Sin app</span>
+        <span data-i18n="cta.i3">100% gratis</span>
+        <span data-i18n="cta.i4">Listo en 30 segundos</span>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo"><span>⚽</span> PRODE Caballito</div>
+      <nav class="footer-links">
+        <a href="https://prodecaballito.com" data-i18n="f.home">Inicio</a>
+        <a href="/landing/mundial.html" data-i18n="f.mundial">Mundial 2026</a>
+        <a href="/landing/amigos.html" data-i18n="f.amigos">Invitá amigos</a>
+        <a href="https://prodecaballito.com/register" data-i18n="f.register">Registrarse</a>
+      </nav>
+      <p class="footer-copy" data-i18n="f.copy">© 2026 Prode Caballito · Hecho con ⚽ en Buenos Aires</p>
+    </div>
+  </footer>
+
+  <script>
+    const translations = {
+      es: {
+        'meta.title':'Prode Caballito | Premios – ¿Qué gana el que gana?','meta.desc':'Conocé qué premios tiene el Prode Caballito del Mundial 2026. Ranking, gloria y reconocimiento. Gratis, sin apuestas de dinero.',
+        'nav.mundial':'Mundial 2026','nav.amigos':'Invitá amigos','nav.login':'Iniciar sesión','nav.cta':'Jugá gratis →',
+        'hero.badge':'🏆 Premios · Mundial 2026','hero.h1':'¿Qué gana<br>el que <em>gana</em>?','hero.sub':'Gloria, reconocimiento y el derecho a chantar con tus amigos durante los próximos 4 años. Y algo más.','hero.cta':'🏆 Quiero competir gratis',
+        'podio.label':'🥇 El podio','podio.title':'Los tres primeros del ranking','podio.sub':'Al final del torneo, el ranking global determina quién ganó. Hay premios para los tres primeros.',
+        'p1.pos':'1° lugar','p1.title':'Campeón del Prode','p1.prize':'Trofeo digital exclusivo, perfil destacado en la plataforma y el derecho eterno a decir que ganaste el Mundial 2026.','p1.tag':'👑 Campeón',
+        'p2.pos':'2° lugar','p2.title':'Sub-campeón','p2.prize':'Reconocimiento permanente en el hall of fame del prode. Placa digital y mención especial.','p2.tag':'🏅 Plata',
+        'p3.pos':'3° lugar','p3.title':'Tercer puesto','p3.prize':'Mención en el ranking final y badge especial en el perfil por toda la temporada.','p3.tag':'🥉 Bronce',
+        'extra.label':'✨ Más premios','extra.title':'Premios para todos','extra.sub':'No solo gana el primero. Hay reconocimientos durante todo el torneo.',
+        'ex1.title':'Resultado exacto','ex1.desc':'Cada vez que acertás el marcador exacto ganás 3 puntos. Acertá muchos y todos lo van a saber.',
+        'ex2.title':'Mejor racha','ex2.desc':'El jugador con más partidos consecutivos acertando se gana un badge especial de racha.',
+        'ex3.title':'Remontada del torneo','ex3.desc':'El jugador que más posiciones sube en la segunda mitad del torneo. Nunca abandones.',
+        'ex4.title':'Mejor fase de grupos','ex4.desc':'El que más puntos acumula en los 72 partidos de la fase inicial. Hay un badge especial.',
+        'ex5.title':'El que nadie esperaba','ex5.desc':'Si acertás la sorpresa del torneo (el outsider que llegó lejos), hay un reconocimiento exclusivo.',
+        'ex6.title':'Mejor reclutador','ex6.desc':'El jugador que más amigos invitó a la plataforma.',
+        'score.label':'📊 Sistema de puntos','score.title':'Cómo se suman los puntos','score.sub':'Simple, transparente, automático. El sistema lo calcula solo al terminar cada partido.',
+        's1.desc':'Marcador exacto (ej: 2-1 apostás, 2-1 termina)','s1.label':'pts','s2.desc':'Bonus partido con 4+ goles','s2.label':'bonus','s3.desc':'Ganador correcto + diferencia exacta','s3.label':'pts','s4.desc':'Solo el ganador correcto','s4.label':'pt','s5.desc':'Resultado incorrecto','s5.label':'pts',
+        'cta.title':'¿Querés estar<br>en el <em>podio</em>?','cta.sub':'Registrate gratis, cargá tus pronósticos y competí por ser el campeón del prode del Mundial 2026.','cta.btn':'🏆 Quiero competir gratis ahora','cta.i1':'Sin tarjeta','cta.i2':'Sin app','cta.i3':'100% gratis','cta.i4':'Listo en 30 segundos',
+        'f.home':'Inicio','f.mundial':'Mundial 2026','f.amigos':'Invitá amigos','f.register':'Registrarse','f.copy':'© 2026 Prode Caballito · Hecho con ⚽ en Buenos Aires',
+      },
+      pt: {
+        'meta.title':'Prode Caballito | Prêmios – O que ganha quem ganha?','meta.desc':'Veja os prêmios do Bolão Caballito da Copa 2026. Ranking, glória e reconhecimento. Grátis, sem apostas em dinheiro.',
+        'nav.mundial':'Copa 2026','nav.amigos':'Convide amigos','nav.login':'Entrar','nav.cta':'Jogar grátis →',
+        'hero.badge':'🏆 Prêmios · Copa 2026','hero.h1':'O que ganha<br>quem <em>ganha</em>?','hero.sub':'Glória, reconhecimento e o direito de zoar seus amigos pelos próximos 4 anos. E mais algumas coisas.','hero.cta':'🏆 Quero competir grátis',
+        'podio.label':'🥇 O pódio','podio.title':'Os três primeiros do ranking','podio.sub':'Ao final do torneio, o ranking global determina quem ganhou. Há prêmios para os três primeiros.',
+        'p1.pos':'1° lugar','p1.title':'Campeão do Bolão','p1.prize':'Troféu digital exclusivo, perfil em destaque na plataforma e o direito eterno de dizer que ganhou a Copa 2026.','p1.tag':'👑 Campeão',
+        'p2.pos':'2° lugar','p2.title':'Vice-campeão','p2.prize':'Reconhecimento permanente no hall of fame do bolão. Placa digital e menção especial.','p2.tag':'🏅 Prata',
+        'p3.pos':'3° lugar','p3.title':'Terceiro lugar','p3.prize':'Menção no ranking final e badge especial no perfil por toda a temporada.','p3.tag':'🥉 Bronze',
+        'extra.label':'✨ Mais prêmios','extra.title':'Prêmios para todos','extra.sub':'Não ganha só o primeiro. Há reconhecimentos ao longo de todo o torneio.',
+        'ex1.title':'Placar exato','ex1.desc':'Toda vez que você acerta o placar exato ganha 3 pontos. Acerte muitos e todo mundo vai saber.',
+        'ex2.title':'Melhor sequência','ex2.desc':'O jogador com mais jogos consecutivos acertados ganha um badge especial de sequência.',
+        'ex3.title':'Virada do torneio','ex3.desc':'O jogador que mais posições sobe na segunda metade do torneio. Nunca desista.',
+        'ex4.title':'Melhor fase de grupos','ex4.desc':'Quem acumula mais pontos nos 72 jogos da fase inicial ganha um badge especial.',
+        'ex5.title':'O azarão certeiro','ex5.desc':'Se você acerta a surpresa do torneio (o azarão que foi longe), há um reconhecimento exclusivo.',
+        'ex6.title':'Melhor recrutador','ex6.desc':'O jogador que convidou mais amigos para a plataforma.',
+        'score.label':'📊 Sistema de pontos','score.title':'Como os pontos são somados','score.sub':'Simples, transparente, automático. O sistema calcula sozinho ao final de cada jogo.',
+        's1.desc':'Placar exato (ex: aposta 2-1, termina 2-1)','s1.label':'pts','s2.desc':'Bônus jogo com 4+ gols','s2.label':'bônus','s3.desc':'Vencedor correto + diferença exata','s3.label':'pts','s4.desc':'Só o vencedor correto','s4.label':'pt','s5.desc':'Resultado incorreto','s5.label':'pts',
+        'cta.title':'Quer estar<br>no <em>pódio</em>?','cta.sub':'Cadastre-se grátis, carregue seus palpites e compita para ser o campeão do bolão da Copa 2026.','cta.btn':'🏆 Quero competir grátis agora','cta.i1':'Sem cartão','cta.i2':'Sem app','cta.i3':'100% grátis','cta.i4':'Pronto em 30 segundos',
+        'f.home':'Início','f.mundial':'Copa 2026','f.amigos':'Convide amigos','f.register':'Cadastrar-se','f.copy':'© 2026 Prode Caballito · Feito com ⚽ em Buenos Aires',
+      },
+      en: {
+        'meta.title':'Prode Caballito | Prizes – What does the winner get?','meta.desc':'See what prizes Prode Caballito offers for World Cup 2026. Rankings, glory and recognition. Free, no money betting.',
+        'nav.mundial':'World Cup 2026','nav.amigos':'Invite friends','nav.login':'Log in','nav.cta':'Play free →',
+        'hero.badge':'🏆 Prizes · World Cup 2026','hero.h1':'What does<br>the <em>winner</em> get?','hero.sub':'Glory, recognition and the right to brag to your friends for the next 4 years. Plus a few more things.','hero.cta':'🏆 Compete for free',
+        'podio.label':'🥇 The podium','podio.title':'Top 3 in the standings','podio.sub':'At the end of the tournament, the global standings determine the winner. Prizes for the top 3.',
+        'p1.pos':'1st place','p1.title':'Predictor Champion','p1.prize':'Exclusive digital trophy, featured profile on the platform and the eternal right to say you won World Cup 2026.','p1.tag':'👑 Champion',
+        'p2.pos':'2nd place','p2.title':'Runner-up','p2.prize':'Permanent recognition in the predictor hall of fame. Digital plaque and special mention.','p2.tag':'🏅 Silver',
+        'p3.pos':'3rd place','p3.title':'Third place','p3.prize':'Mention in the final standings and special profile badge for the whole season.','p3.tag':'🥉 Bronze',
+        'extra.label':'✨ More prizes','extra.title':'Prizes for everyone','extra.sub':'It\'s not only about first place. There are recognitions throughout the whole tournament.',
+        'ex1.title':'Exact score','ex1.desc':'Every time you get the exact score right you earn 3 points. Get many and everyone will know.',
+        'ex2.title':'Best streak','ex2.desc':'The player with the most consecutive correct predictions earns a special streak badge.',
+        'ex3.title':'Best comeback','ex3.desc':'The player who climbs the most positions in the second half of the tournament. Never give up.',
+        'ex4.title':'Best group stage','ex4.desc':'The player who scores the most points in the 72 group stage matches earns a special badge.',
+        'ex5.title':'The dark horse caller','ex5.desc':'If you predict the tournament surprise (the underdog that went far), there\'s an exclusive recognition.',
+        'ex6.title':'Top recruiter','ex6.desc':'The player who invited the most friends to the platform.',
+        'score.label':'📊 Points system','score.title':'How points are earned','score.sub':'Simple, transparent, automatic. The system calculates at the end of every match.',
+        's1.desc':'Exact score (e.g. bet 2-1, ends 2-1)','s1.label':'pts','s2.desc':'Bonus for match with 4+ goals','s2.label':'bonus','s3.desc':'Correct winner + exact margin','s3.label':'pts','s4.desc':'Correct winner only','s4.label':'pt','s5.desc':'Wrong result','s5.label':'pts',
+        'cta.title':'Want to be<br>on the <em>podium</em>?','cta.sub':'Sign up free, load your predictions and compete to become the World Cup 2026 predictor champion.','cta.btn':'🏆 Compete for free now','cta.i1':'No card','cta.i2':'No app','cta.i3':'100% free','cta.i4':'Ready in 30 seconds',
+        'f.home':'Home','f.mundial':'World Cup 2026','f.amigos':'Invite friends','f.register':'Register','f.copy':'© 2026 Prode Caballito · Made with ⚽ in Buenos Aires',
+      }
+    };
+    function detectLang(){const s=localStorage.getItem('pc_lang');if(s&&translations[s])return s;const n=(navigator.language||'es').toLowerCase();if(n.startsWith('pt'))return 'pt';if(n.startsWith('es'))return 'es';return 'en';}
+    function applyLang(lang){const t=translations[lang];if(!t)return;document.documentElement.lang=lang==='pt'?'pt-BR':lang;if(t['meta.title'])document.title=t['meta.title'];const md=document.querySelector('meta[name="description"]');if(md&&t['meta.desc'])md.setAttribute('content',t['meta.desc']);document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t[k]!==undefined)el.textContent=t[k];});document.querySelectorAll('[data-i18n-html]').forEach(el=>{const k=el.getAttribute('data-i18n-html');if(t[k]!==undefined)el.innerHTML=t[k];});document.querySelectorAll('[data-lang-btn]').forEach(btn=>{btn.classList.toggle('active',btn.getAttribute('data-lang-btn')===lang);});}
+    function setLang(lang){localStorage.setItem('pc_lang',lang);applyLang(lang);}
+    applyLang(detectLang());
+  </script>
+</body>
+</html>

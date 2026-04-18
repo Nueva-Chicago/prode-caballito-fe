@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n-meta="title">Prode Caballito | Mundial 2026 – Jugá el prode oficial</title>
+  <meta name="description" data-i18n-meta="desc" content="El Mundial 2026 llega a USA, Canadá y México. Predecí todos los partidos, competí con amigos y seguí el ranking en tiempo real. Gratis." />
+  <link rel="canonical" href="https://prodecaballito.com/landing/mundial.html" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://prodecaballito.com/landing/mundial.html" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: #f8fafc; color: #1f2937; }
+    a { text-decoration: none; color: inherit; }
+
+    /* NAV */
+    .nav { position: sticky; top: 0; z-index: 100; background: #001A4B; box-shadow: 0 2px 12px rgba(0,0,0,0.25); }
+    .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 1.25rem; height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .nav-logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1rem; color: #fff; }
+    .nav-logo span { color: #FFDF00; font-size: 1.3rem; }
+    .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+    .nav-links a { color: rgba(255,255,255,0.75); font-size: 0.85rem; font-weight: 600; padding: 0.4rem 0.75rem; border-radius: 8px; transition: background 0.15s, color 0.15s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-cta { background: #FFDF00; color: #001A4B; font-size: 0.82rem; font-weight: 800; padding: 0.45rem 1.1rem; border-radius: 10px; border: none; cursor: pointer; transition: filter 0.15s; white-space: nowrap; }
+    .nav-cta:hover { filter: brightness(0.92); }
+    .lang-switcher { display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.08); border-radius: 8px; padding: 2px; }
+    .lang-btn { background: none; border: none; cursor: pointer; font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.5); padding: 4px 7px; border-radius: 6px; transition: background 0.15s, color 0.15s; letter-spacing: 0.02em; }
+    .lang-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+    .lang-btn.active { background: #FFDF00; color: #001A4B; }
+    @media (max-width: 600px) { .nav-links { display: none; } }
+
+    /* HERO */
+    .hero { position: relative; min-height: 88vh; display: flex; flex-direction: column; justify-content: center; overflow: hidden; background: #001A4B; }
+    .hero-bg { position: absolute; inset: 0; background-image: url('https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=1600&q=80'); background-size: cover; background-position: center top; opacity: 0.22; }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,26,75,0.97) 0%, rgba(0,26,75,0.8) 60%, rgba(0,26,75,0.5) 100%); }
+    .hero-inner { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; padding: 4rem 1.5rem 3rem; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,223,0,0.12); border: 1px solid rgba(255,223,0,0.35); color: #FFDF00; font-size: 0.78rem; font-weight: 700; padding: 0.35rem 0.9rem; border-radius: 99px; margin-bottom: 1.5rem; }
+    .hero-h1 { font-size: clamp(2.1rem, 6vw, 3.8rem); font-weight: 900; color: #fff; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 1.25rem; max-width: 760px; }
+    .hero-h1 em { color: #FFDF00; font-style: normal; }
+    .hero-sub { font-size: clamp(1rem, 2.5vw, 1.2rem); color: rgba(255,255,255,0.72); max-width: 560px; line-height: 1.6; margin-bottom: 2.25rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.5rem; }
+    .btn-primary { display: inline-block; background: #FFDF00; color: #001A4B; font-weight: 900; font-size: 1.05rem; padding: 0.9rem 2.2rem; border-radius: 14px; border: none; cursor: pointer; box-shadow: 0 4px 20px rgba(255,223,0,0.35); transition: transform 0.15s, filter 0.15s; }
+    .btn-primary:hover { transform: translateY(-2px); filter: brightness(0.95); }
+    .btn-secondary { display: inline-block; color: rgba(255,255,255,0.7); font-size: 0.9rem; font-weight: 600; padding: 0.9rem 1.4rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; transition: border-color 0.15s, color 0.15s; }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.55); color: #fff; }
+
+    /* SEDES */
+    .sedes { background: #001A4B; padding: 1.5rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); }
+    .sedes-inner { max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; }
+    .sede { display: flex; align-items: center; gap: 0.6rem; color: rgba(255,255,255,0.65); font-size: 0.88rem; font-weight: 600; }
+    .sede-flag { font-size: 1.3rem; }
+    .sede strong { color: #FFDF00; }
+
+    /* SECTIONS */
+    .section { padding: 5rem 1.5rem; }
+    .section-label { text-align: center; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #001A4B; margin-bottom: 0.75rem; }
+    .section-title { text-align: center; font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 900; color: #0f172a; line-height: 1.2; margin-bottom: 0.75rem; }
+    .section-sub { text-align: center; font-size: 1rem; color: #64748b; max-width: 520px; margin: 0 auto 3.5rem; line-height: 1.6; }
+
+    /* FASES */
+    .fases-grid { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+    .fase-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.5rem 1.25rem; text-align: center; transition: transform 0.2s, box-shadow 0.2s; }
+    .fase-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,26,75,0.1); }
+    .fase-card.active { border: 2px solid #FFDF00; background: linear-gradient(135deg, #fffbeb, #fff); }
+    .fase-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .fase-card h3 { font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-bottom: 0.35rem; }
+    .fase-card p { font-size: 0.8rem; color: #64748b; line-height: 1.5; }
+    .fase-badge { display: inline-block; margin-top: 0.75rem; background: #001A4B; color: #FFDF00; font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 99px; }
+    .fase-card.active .fase-badge { background: #FFDF00; color: #001A4B; }
+
+    /* NUMEROS */
+    .numeros-bg { background: #001A4B; }
+    .numeros-grid { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.5rem; }
+    .numero { text-align: center; padding: 1.5rem 1rem; }
+    .numero-val { font-size: 2.8rem; font-weight: 900; color: #FFDF00; line-height: 1; }
+    .numero-label { font-size: 0.82rem; color: rgba(255,255,255,0.6); margin-top: 0.4rem; font-weight: 500; }
+
+    /* CALENDARIO */
+    .calendario-grid { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
+    .cal-item { display: flex; gap: 1.25rem; padding: 1.25rem 0; border-bottom: 1px solid #e2e8f0; align-items: flex-start; }
+    .cal-item:last-child { border-bottom: none; }
+    .cal-dot { flex-shrink: 0; width: 14px; height: 14px; border-radius: 50%; background: #e2e8f0; margin-top: 5px; border: 3px solid #fff; box-shadow: 0 0 0 2px #e2e8f0; }
+    .cal-dot.done { background: #001A4B; box-shadow: 0 0 0 2px #001A4B; }
+    .cal-dot.now { background: #FFDF00; box-shadow: 0 0 0 2px #FFDF00; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .cal-body { flex: 1; }
+    .cal-date { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+    .cal-title { font-size: 1rem; font-weight: 800; color: #0f172a; margin: 0.2rem 0 0.3rem; }
+    .cal-desc { font-size: 0.85rem; color: #64748b; }
+    .cal-tag { display: inline-block; margin-top: 0.5rem; background: rgba(255,223,0,0.18); color: #854d0e; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 99px; }
+    .cal-tag.live { background: rgba(0,26,75,0.1); color: #001A4B; }
+
+    /* URGENCY */
+    .urgency-bg { background: linear-gradient(135deg, #001A4B, #002B7F); padding: 5rem 1.5rem; text-align: center; }
+    .urgency-inner { max-width: 620px; margin: 0 auto; }
+    .urgency-inner h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900; color: #fff; line-height: 1.15; margin-bottom: 1rem; }
+    .urgency-inner h2 em { color: #FFDF00; font-style: normal; }
+    .urgency-inner p { color: rgba(255,255,255,0.65); font-size: 1.05rem; margin-bottom: 2rem; line-height: 1.6; }
+    .urgency-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-bottom: 2rem; }
+    .urgency-pill { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 99px; padding: 0.4rem 1rem; font-size: 0.82rem; color: rgba(255,255,255,0.7); font-weight: 600; }
+    .urgency-pill.hl { background: rgba(255,223,0,0.15); border-color: rgba(255,223,0,0.3); color: #FFDF00; }
+
+    /* FOOTER */
+    .footer { background: #000d26; padding: 2.5rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    .footer-inner { max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; }
+    .footer-logo { color: rgba(255,255,255,0.7); font-size: 0.9rem; font-weight: 700; }
+    .footer-logo span { color: #FFDF00; }
+    .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .footer-links a { color: rgba(255,255,255,0.4); font-size: 0.8rem; transition: color 0.15s; }
+    .footer-links a:hover { color: rgba(255,255,255,0.8); }
+    .footer-copy { color: rgba(255,255,255,0.25); font-size: 0.78rem; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="https://prodecaballito.com" class="nav-logo"><span>⚽</span> PRODE Caballito</a>
+      <div class="nav-links">
+        <a href="/landing/premios.html" data-i18n="nav.premios">Premios</a>
+        <a href="/landing/amigos.html" data-i18n="nav.amigos">Invitá amigos</a>
+        <a href="https://prodecaballito.com/login" data-i18n="nav.login">Iniciar sesión</a>
+      </div>
+      <div class="nav-right">
+        <div class="lang-switcher">
+          <button class="lang-btn" onclick="setLang('es')" data-lang-btn="es">🇦🇷 ES</button>
+          <button class="lang-btn" onclick="setLang('pt')" data-lang-btn="pt">🇧🇷 PT</button>
+          <button class="lang-btn" onclick="setLang('en')" data-lang-btn="en">🇬🇧 EN</button>
+        </div>
+        <a href="https://prodecaballito.com/register" class="nav-cta" data-i18n="nav.cta">Jugá gratis →</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-inner">
+      <div class="hero-badge" data-i18n="hero.badge">🔥 USA · Canadá · México · Junio–Julio 2026</div>
+      <h1 class="hero-h1" data-i18n-html="hero.h1">El <em>Mundial 2026</em> más grande de la historia.<br>Predecí cada partido.</h1>
+      <p class="hero-sub" data-i18n="hero.sub">48 selecciones, 104 partidos, el torneo más grande de todos los tiempos. Armá tu prode gratis y competí con tus amigos durante todo el certamen.</p>
+      <div class="hero-actions">
+        <a href="https://prodecaballito.com/register" class="btn-primary" data-i18n="hero.cta1">🏆 Quiero jugar gratis</a>
+        <a href="#fases" class="btn-secondary" data-i18n="hero.cta2">Ver el formato →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEDES -->
+  <div class="sedes">
+    <div class="sedes-inner">
+      <div class="sede"><span class="sede-flag">🇺🇸</span> <span data-i18n="sede.usa"><strong>USA</strong> · 78 partidos</span></div>
+      <div class="sede"><span class="sede-flag">🇨🇦</span> <span data-i18n="sede.can"><strong>Canadá</strong> · 13 partidos</span></div>
+      <div class="sede"><span class="sede-flag">🇲🇽</span> <span data-i18n="sede.mex"><strong>México</strong> · 13 partidos</span></div>
+      <div class="sede"><span class="sede-flag">🌍</span> <span data-i18n="sede.teams"><strong>48</strong> selecciones</span></div>
+      <div class="sede"><span class="sede-flag">⚽</span> <span data-i18n="sede.matches"><strong>104</strong> partidos</span></div>
+    </div>
+  </div>
+
+  <!-- NUMEROS -->
+  <section class="section numeros-bg" style="padding:3rem 1.5rem">
+    <div class="numeros-grid">
+      <div class="numero"><div class="numero-val">104</div><div class="numero-label" data-i18n="num.matches">partidos para predecir</div></div>
+      <div class="numero"><div class="numero-val">48</div><div class="numero-label" data-i18n="num.teams">selecciones</div></div>
+      <div class="numero"><div class="numero-val">16</div><div class="numero-label" data-i18n="num.sedes">ciudades sede</div></div>
+      <div class="numero"><div class="numero-val">32</div><div class="numero-label" data-i18n="num.days">días de competencia</div></div>
+    </div>
+  </section>
+
+  <!-- FASES -->
+  <section class="section" id="fases" style="background:#fff">
+    <p class="section-label" data-i18n="fases.label">⚡ El torneo</p>
+    <h2 class="section-title" data-i18n-html="fases.title">Predecí todas las fases.<br>Cada partido suma.</h2>
+    <p class="section-sub" data-i18n="fases.sub">Desde la fase de grupos hasta la gran final. Cargás tus pronósticos antes de cada partido y los puntos se calculan solos.</p>
+    <div class="fases-grid">
+      <div class="fase-card active">
+        <div class="fase-icon">🗓️</div>
+        <h3 data-i18n="fase1.title">Fase de Grupos</h3>
+        <p data-i18n="fase1.desc">12 grupos de 4 equipos. 72 partidos. La base del torneo.</p>
+        <span class="fase-badge" data-i18n="fase1.badge">72 partidos</span>
+      </div>
+      <div class="fase-card">
+        <div class="fase-icon">⚔️</div>
+        <h3 data-i18n="fase2.title">Octavos de Final</h3>
+        <p data-i18n="fase2.desc">Los 32 mejores clasificados. Eliminación directa.</p>
+        <span class="fase-badge" data-i18n="fase2.badge">16 partidos</span>
+      </div>
+      <div class="fase-card">
+        <div class="fase-icon">🎯</div>
+        <h3 data-i18n="fase3.title">Cuartos de Final</h3>
+        <p data-i18n="fase3.desc">Los 8 mejores del mundo. Alta tensión garantizada.</p>
+        <span class="fase-badge" data-i18n="fase3.badge">8 partidos</span>
+      </div>
+      <div class="fase-card">
+        <div class="fase-icon">🔥</div>
+        <h3 data-i18n="fase4.title">Semifinales</h3>
+        <p data-i18n="fase4.desc">Los 4 finalistas se definen. ¿Quién llega?</p>
+        <span class="fase-badge" data-i18n="fase4.badge">4 partidos</span>
+      </div>
+      <div class="fase-card">
+        <div class="fase-icon">🏆</div>
+        <h3 data-i18n="fase5.title">La Gran Final</h3>
+        <p data-i18n="fase5.desc">El partido más visto del planeta. El que más puntaje da.</p>
+        <span class="fase-badge" data-i18n="fase5.badge">Máximo puntaje</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CALENDARIO -->
+  <section class="section" style="background:#f8fafc">
+    <p class="section-label" data-i18n="cal.label">📅 Calendario clave</p>
+    <h2 class="section-title" data-i18n="cal.title">Las fechas importantes</h2>
+    <p class="section-sub" data-i18n="cal.sub">Anotá las fechas. No llegues tarde a cargar tus pronósticos.</p>
+    <div class="calendario-grid">
+      <div class="cal-item">
+        <div class="cal-dot now"></div>
+        <div class="cal-body">
+          <div class="cal-date" data-i18n="cal1.date">Ahora mismo</div>
+          <div class="cal-title" data-i18n="cal1.title">Registrarte y crear tu planilla</div>
+          <div class="cal-desc" data-i18n="cal1.desc">30 segundos y ya estás adentro. Sin tarjeta, sin app, sin vueltas.</div>
+          <span class="cal-tag" data-i18n="cal1.tag">⚡ Hacelo ya</span>
+        </div>
+      </div>
+      <div class="cal-item">
+        <div class="cal-dot"></div>
+        <div class="cal-body">
+          <div class="cal-date" data-i18n="cal2.date">11 junio 2026</div>
+          <div class="cal-title" data-i18n="cal2.title">Inicio de la Fase de Grupos</div>
+          <div class="cal-desc" data-i18n="cal2.desc">Arranca el partido inaugural. Después de este momento no podés modificar esos pronósticos.</div>
+          <span class="cal-tag live" data-i18n="cal2.tag">🗓 Anotate</span>
+        </div>
+      </div>
+      <div class="cal-item">
+        <div class="cal-dot"></div>
+        <div class="cal-body">
+          <div class="cal-date" data-i18n="cal3.date">2 julio 2026</div>
+          <div class="cal-title" data-i18n="cal3.title">Octavos de Final</div>
+          <div class="cal-desc" data-i18n="cal3.desc">Empieza el mata-mata. Los pronósticos de eliminación directa valen más.</div>
+          <span class="cal-tag live" data-i18n="cal3.tag">🔥 Alta tensión</span>
+        </div>
+      </div>
+      <div class="cal-item">
+        <div class="cal-dot"></div>
+        <div class="cal-body">
+          <div class="cal-date" data-i18n="cal4.date">19 julio 2026</div>
+          <div class="cal-title" data-i18n="cal4.title">La Gran Final</div>
+          <div class="cal-desc" data-i18n="cal4.desc">El partido más importante. El que define todo el torneo y el ganador del prode.</div>
+          <span class="cal-tag live" data-i18n="cal4.tag">🏆 El cierre</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- URGENCY CTA -->
+  <section class="urgency-bg">
+    <div class="urgency-inner">
+      <h2 data-i18n-html="cta.title">El mundial arranca pronto.<br><em>No llegues tarde.</em></h2>
+      <p data-i18n="cta.sub">Cuanto antes te registrás, más partidos podés predecir desde el inicio. Los pronósticos se cierran con cada partido.</p>
+      <div class="urgency-pills">
+        <span class="urgency-pill hl" data-i18n="cta.p1">⚡ 104 partidos</span>
+        <span class="urgency-pill hl" data-i18n="cta.p2">🏆 Ranking en vivo</span>
+        <span class="urgency-pill" data-i18n="cta.p3">✓ 100% gratis</span>
+        <span class="urgency-pill" data-i18n="cta.p4">✓ Sin app</span>
+      </div>
+      <a href="https://prodecaballito.com/register" class="btn-primary" style="font-size:1.1rem;padding:1rem 2.8rem" data-i18n="cta.btn">🏆 Quiero jugar gratis ahora</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo"><span>⚽</span> PRODE Caballito</div>
+      <nav class="footer-links">
+        <a href="https://prodecaballito.com" data-i18n="footer.home">Inicio</a>
+        <a href="/landing/premios.html" data-i18n="footer.premios">Premios</a>
+        <a href="/landing/amigos.html" data-i18n="footer.amigos">Invitá amigos</a>
+        <a href="https://prodecaballito.com/register" data-i18n="footer.register">Registrarse</a>
+      </nav>
+      <p class="footer-copy" data-i18n="footer.copy">© 2026 Prode Caballito · Hecho con ⚽ en Buenos Aires</p>
+    </div>
+  </footer>
+
+  <script>
+    const translations = {
+      es: {
+        'meta.title':'Prode Caballito | Mundial 2026 – Jugá el prode oficial','meta.desc':'El Mundial 2026 llega a USA, Canadá y México. Predecí todos los partidos, competí con amigos y seguí el ranking en tiempo real. Gratis.',
+        'nav.premios':'Premios','nav.amigos':'Invitá amigos','nav.login':'Iniciar sesión','nav.cta':'Jugá gratis →',
+        'hero.badge':'🔥 USA · Canadá · México · Junio–Julio 2026',
+        'hero.h1':'El <em>Mundial 2026</em> más grande de la historia.<br>Predecí cada partido.',
+        'hero.sub':'48 selecciones, 104 partidos, el torneo más grande de todos los tiempos. Armá tu prode gratis y competí con tus amigos durante todo el certamen.',
+        'hero.cta1':'🏆 Quiero jugar gratis','hero.cta2':'Ver el formato →',
+        'sede.usa':'<strong>USA</strong> · 78 partidos','sede.can':'<strong>Canadá</strong> · 13 partidos','sede.mex':'<strong>México</strong> · 13 partidos','sede.teams':'<strong>48</strong> selecciones','sede.matches':'<strong>104</strong> partidos',
+        'num.matches':'partidos para predecir','num.teams':'selecciones','num.sedes':'ciudades sede','num.days':'días de competencia',
+        'fases.label':'⚡ El torneo','fases.title':'Predecí todas las fases.<br>Cada partido suma.','fases.sub':'Desde la fase de grupos hasta la gran final. Cargás tus pronósticos antes de cada partido y los puntos se calculan solos.',
+        'fase1.title':'Fase de Grupos','fase1.desc':'12 grupos de 4 equipos. 72 partidos. La base del torneo.','fase1.badge':'72 partidos',
+        'fase2.title':'Octavos de Final','fase2.desc':'Los 32 mejores clasificados. Eliminación directa.','fase2.badge':'16 partidos',
+        'fase3.title':'Cuartos de Final','fase3.desc':'Los 8 mejores del mundo. Alta tensión garantizada.','fase3.badge':'8 partidos',
+        'fase4.title':'Semifinales','fase4.desc':'Los 4 finalistas se definen. ¿Quién llega?','fase4.badge':'4 partidos',
+        'fase5.title':'La Gran Final','fase5.desc':'El partido más visto del planeta. El que más puntaje da.','fase5.badge':'Máximo puntaje',
+        'cal.label':'📅 Calendario clave','cal.title':'Las fechas importantes','cal.sub':'Anotá las fechas. No llegues tarde a cargar tus pronósticos.',
+        'cal1.date':'Ahora mismo','cal1.title':'Registrarte y crear tu planilla','cal1.desc':'30 segundos y ya estás adentro. Sin tarjeta, sin app, sin vueltas.','cal1.tag':'⚡ Hacelo ya',
+        'cal2.date':'11 junio 2026','cal2.title':'Inicio de la Fase de Grupos','cal2.desc':'Arranca el partido inaugural. Después no podés modificar esos pronósticos.','cal2.tag':'🗓 Anotate',
+        'cal3.date':'2 julio 2026','cal3.title':'Octavos de Final','cal3.desc':'Empieza el mata-mata. Los pronósticos de eliminación directa valen más.','cal3.tag':'🔥 Alta tensión',
+        'cal4.date':'19 julio 2026','cal4.title':'La Gran Final','cal4.desc':'El partido más importante. El que define todo el torneo y el ganador del prode.','cal4.tag':'🏆 El cierre',
+        'cta.title':'El mundial arranca pronto.<br><em>No llegues tarde.</em>','cta.sub':'Cuanto antes te registrás, más partidos podés predecir desde el inicio. Los pronósticos se cierran con cada partido.',
+        'cta.p1':'⚡ 104 partidos','cta.p2':'🏆 Ranking en vivo','cta.p3':'✓ 100% gratis','cta.p4':'✓ Sin app','cta.btn':'🏆 Quiero jugar gratis ahora',
+        'footer.home':'Inicio','footer.premios':'Premios','footer.amigos':'Invitá amigos','footer.register':'Registrarse','footer.copy':'© 2026 Prode Caballito · Hecho con ⚽ en Buenos Aires',
+      },
+      pt: {
+        'meta.title':'Prode Caballito | Copa 2026 – Jogue o bolão oficial','meta.desc':'A Copa do Mundo 2026 chega nos EUA, Canadá e México. Preveja todos os jogos, compita com amigos e acompanhe o ranking. Grátis.',
+        'nav.premios':'Prêmios','nav.amigos':'Convide amigos','nav.login':'Entrar','nav.cta':'Jogar grátis →',
+        'hero.badge':'🔥 EUA · Canadá · México · Junho–Julho 2026',
+        'hero.h1':'A <em>Copa 2026</em> mais grande da história.<br>Preveja cada jogo.',
+        'hero.sub':'48 seleções, 104 jogos, o torneio mais grande de todos os tempos. Monte seu bolão grátis e compita com seus amigos durante todo o campeonato.',
+        'hero.cta1':'🏆 Quero jogar grátis','hero.cta2':'Ver o formato →',
+        'sede.usa':'<strong>EUA</strong> · 78 jogos','sede.can':'<strong>Canadá</strong> · 13 jogos','sede.mex':'<strong>México</strong> · 13 jogos','sede.teams':'<strong>48</strong> seleções','sede.matches':'<strong>104</strong> jogos',
+        'num.matches':'jogos para prever','num.teams':'seleções','num.sedes':'cidades-sede','num.days':'dias de competição',
+        'fases.label':'⚡ O torneio','fases.title':'Preveja todas as fases.<br>Cada jogo conta.','fases.sub':'Da fase de grupos até a grande final. Você carrega seus palpites antes de cada jogo e os pontos são calculados sozinhos.',
+        'fase1.title':'Fase de Grupos','fase1.desc':'12 grupos de 4 equipes. 72 jogos. A base do torneio.','fase1.badge':'72 jogos',
+        'fase2.title':'Oitavas de Final','fase2.desc':'Os 32 melhores classificados. Eliminação direta.','fase2.badge':'16 jogos',
+        'fase3.title':'Quartas de Final','fase3.desc':'Os 8 melhores do mundo. Alta tensão garantida.','fase3.badge':'8 jogos',
+        'fase4.title':'Semifinais','fase4.desc':'Os 4 finalistas são definidos. Quem chega?','fase4.badge':'4 jogos',
+        'fase5.title':'A Grande Final','fase5.desc':'O jogo mais assistido do planeta. O que mais pontos dá.','fase5.badge':'Pontuação máxima',
+        'cal.label':'📅 Calendário principal','cal.title':'As datas importantes','cal.sub':'Anote as datas. Não chegue tarde para carregar seus palpites.',
+        'cal1.date':'Agora mesmo','cal1.title':'Cadastrar-se e criar seu bolão','cal1.desc':'30 segundos e você já está dentro. Sem cartão, sem app, sem complicação.','cal1.tag':'⚡ Faça agora',
+        'cal2.date':'11 junho 2026','cal2.title':'Início da Fase de Grupos','cal2.desc':'Começa o jogo inaugural. Depois não pode mais modificar esses palpites.','cal2.tag':'🗓 Anote',
+        'cal3.date':'2 julho 2026','cal3.title':'Oitavas de Final','cal3.desc':'Começa o mata-mata. Os palpites de eliminação direta valem mais.','cal3.tag':'🔥 Alta tensão',
+        'cal4.date':'19 julho 2026','cal4.title':'A Grande Final','cal4.desc':'O jogo mais importante. O que define o torneio e o vencedor do bolão.','cal4.tag':'🏆 O encerramento',
+        'cta.title':'A copa começa em breve.<br><em>Não chegue tarde.</em>','cta.sub':'Quanto antes você se cadastra, mais jogos pode prever desde o início. Os palpites fecham com cada jogo.',
+        'cta.p1':'⚡ 104 jogos','cta.p2':'🏆 Ranking ao vivo','cta.p3':'✓ 100% grátis','cta.p4':'✓ Sem app','cta.btn':'🏆 Quero jogar grátis agora',
+        'footer.home':'Início','footer.premios':'Prêmios','footer.amigos':'Convide amigos','footer.register':'Cadastrar-se','footer.copy':'© 2026 Prode Caballito · Feito com ⚽ em Buenos Aires',
+      },
+      en: {
+        'meta.title':'Prode Caballito | World Cup 2026 – Play the official predictor','meta.desc':'World Cup 2026 comes to USA, Canada and Mexico. Predict every match, compete with friends and follow the live standings. Free.',
+        'nav.premios':'Prizes','nav.amigos':'Invite friends','nav.login':'Log in','nav.cta':'Play free →',
+        'hero.badge':'🔥 USA · Canada · Mexico · June–July 2026',
+        'hero.h1':'The biggest <em>World Cup</em> ever.<br>Predict every match.',
+        'hero.sub':'48 teams, 104 matches, the biggest tournament in history. Build your free predictor and compete with your friends throughout the whole event.',
+        'hero.cta1':'🏆 Play for free','hero.cta2':'See the format →',
+        'sede.usa':'<strong>USA</strong> · 78 matches','sede.can':'<strong>Canada</strong> · 13 matches','sede.mex':'<strong>Mexico</strong> · 13 matches','sede.teams':'<strong>48</strong> national teams','sede.matches':'<strong>104</strong> matches',
+        'num.matches':'matches to predict','num.teams':'national teams','num.sedes':'host cities','num.days':'days of competition',
+        'fases.label':'⚡ The tournament','fases.title':'Predict every stage.<br>Every match counts.','fases.sub':'From the group stage to the grand final. You load your predictions before each match and points are calculated automatically.',
+        'fase1.title':'Group Stage','fase1.desc':'12 groups of 4 teams. 72 matches. The foundation of the tournament.','fase1.badge':'72 matches',
+        'fase2.title':'Round of 32','fase2.desc':'The 32 best qualifiers. Direct elimination.','fase2.badge':'16 matches',
+        'fase3.title':'Quarter Finals','fase3.desc':'The 8 best in the world. High tension guaranteed.','fase3.badge':'8 matches',
+        'fase4.title':'Semifinals','fase4.desc':'The 4 finalists are decided. Who makes it?','fase4.badge':'4 matches',
+        'fase5.title':'The Grand Final','fase5.desc':'The most-watched match on the planet. The highest-scoring prediction.','fase5.badge':'Max points',
+        'cal.label':'📅 Key calendar','cal.title':'The important dates','cal.sub':'Mark the dates. Don\'t be late loading your predictions.',
+        'cal1.date':'Right now','cal1.title':'Sign up and create your bracket','cal1.desc':'30 seconds and you\'re in. No card, no app, no hassle.','cal1.tag':'⚡ Do it now',
+        'cal2.date':'June 11, 2026','cal2.title':'Group Stage kicks off','cal2.desc':'The opening match starts. After that you can\'t change those predictions.','cal2.tag':'🗓 Mark your calendar',
+        'cal3.date':'July 2, 2026','cal3.title':'Round of 32','cal3.desc':'Knockout stage begins. Elimination predictions are worth more.','cal3.tag':'🔥 High stakes',
+        'cal4.date':'July 19, 2026','cal4.title':'The Grand Final','cal4.desc':'The most important match. The one that decides the tournament and the predictor winner.','cal4.tag':'🏆 The finale',
+        'cta.title':'The World Cup starts soon.<br><em>Don\'t be late.</em>','cta.sub':'The earlier you sign up, the more matches you can predict from the start. Predictions close with each match.',
+        'cta.p1':'⚡ 104 matches','cta.p2':'🏆 Live rankings','cta.p3':'✓ 100% free','cta.p4':'✓ No app','cta.btn':'🏆 Play for free now',
+        'footer.home':'Home','footer.premios':'Prizes','footer.amigos':'Invite friends','footer.register':'Register','footer.copy':'© 2026 Prode Caballito · Made with ⚽ in Buenos Aires',
+      }
+    };
+    function detectLang(){const s=localStorage.getItem('pc_lang');if(s&&translations[s])return s;const n=(navigator.language||'es').toLowerCase();if(n.startsWith('pt'))return 'pt';if(n.startsWith('es'))return 'es';return 'en';}
+    function applyLang(lang){const t=translations[lang];if(!t)return;document.documentElement.lang=lang==='pt'?'pt-BR':lang;if(t['meta.title'])document.title=t['meta.title'];const md=document.querySelector('meta[name="description"]');if(md&&t['meta.desc'])md.setAttribute('content',t['meta.desc']);document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t[k]!==undefined)el.textContent=t[k];});document.querySelectorAll('[data-i18n-html]').forEach(el=>{const k=el.getAttribute('data-i18n-html');if(t[k]!==undefined)el.innerHTML=t[k];});document.querySelectorAll('[data-lang-btn]').forEach(btn=>{btn.classList.toggle('active',btn.getAttribute('data-lang-btn')===lang);});}
+    function setLang(lang){localStorage.setItem('pc_lang',lang);applyLang(lang);}
+    applyLang(detectLang());
+  </script>
+</body>
+</html>
