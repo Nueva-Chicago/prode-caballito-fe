@@ -4,6 +4,7 @@ import { format } from 'date-fns'
 import { es as esLocale } from 'date-fns/locale'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
+import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
@@ -413,9 +414,11 @@ export function Home() {
   const [planilla, setPlanilla] = useState<Planilla | null>(null)
   const [ranking, setRanking] = useState<RankingEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [now, setNow] = useState(new Date())
   const [showIOSGuide, setShowIOSGuide] = useState(false)
   const { state: pwaState, install: pwaInstall } = usePWAInstall()
+  const { addToast } = useToastStore()
   const [mundialCd, setMundialCd] = useState(getMundialCountdown)
 
   // Tema del equipo elegido por el usuario
@@ -453,6 +456,7 @@ export function Home() {
       ])
       setMatches(matchRes.data.data.matches)
       setRanking(rankRes.data.data.ranking)
+      if (!silent) setLoadError(false)
 
       const planillas: Planilla[] = planillaRes.data.data
       if (planillas.length > 0) {
@@ -465,6 +469,11 @@ export function Home() {
       }
     } catch (e) {
       console.error(e)
+      if (silent) {
+        addToast(t.home.refreshError, 'warning')
+      } else {
+        setLoadError(true)
+      }
     } finally {
       setLoading(false)
     }
@@ -511,6 +520,20 @@ export function Home() {
 
 
   if (loading) return <HomeSkeleton />
+
+  if (loadError) return (
+    <div className="max-w-4xl mx-auto px-4 py-20 flex flex-col items-center gap-4 text-center">
+      <span className="text-5xl">📡</span>
+      <p className="font-semibold t-text-nav">{t.home.loadError}</p>
+      <button
+        onClick={() => loadData()}
+        className="px-6 py-2.5 rounded-xl font-bold text-sm text-white transition-all hover:brightness-110 active:scale-95"
+        style={{ background: 'var(--theme-primary)' }}
+      >
+        {t.home.loadErrorRetry}
+      </button>
+    </div>
+  )
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">

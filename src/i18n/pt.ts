@@ -46,6 +46,9 @@ export const pt: T = {
     ctaTitle: (n: number) => n === 1 ? 'Tens 1 prognóstico pendente esta semana' : `Tens ${n} prognósticos pendentes esta semana`,
     ctaUrgent: (n: number) => n === 1 ? '⚠️ 1 jogo fecha em breve sem teu prognóstico' : `⚠️ ${n} jogos fecham em breve sem teu prognóstico`,
     ctaBtn: 'Completar agora →',
+    loadError: 'Não foi possível carregar a página. Verifique sua conexão.',
+    loadErrorRetry: 'Tentar novamente',
+    refreshError: 'Erro ao atualizar dados',
   },
   match: {
     vs: 'VS', live: 'AO VIVO', closed: 'Fechado', locked: 'Planilha fechada', bonus: 'BÔNUS +1', closesIn: 'Fecha em',
