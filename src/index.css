@@ -204,3 +204,14 @@ body {
 }
 
 a { text-decoration: none; color: inherit; }
+
+/* ── FORM INPUTS — always dark text on light bg regardless of theme ─ */
+/* Dark themes set --theme-page-text to near-white; inputs inherit it  */
+/* and become invisible on their white background. Class selectors      */
+/* (t-surface, t-text-page, etc.) have higher specificity and override. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="range"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="image"]):not([type="reset"]),
+select,
+textarea {
+  color: #111827;
+  background-color: #ffffff;
+}
