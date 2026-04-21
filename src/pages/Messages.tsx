@@ -92,7 +92,9 @@ export function Messages() {
         <div className="flex-1 flex flex-col bg-gray-50">
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 bg-white border-b shadow-sm">
-            <Link to="/messages" className="md:hidden text-gray-400 hover:text-gray-600 mr-1">←</Link>
+            <Link to="/messages" className="md:hidden -ml-1 flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors shrink-0" aria-label="Volver">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-[#001A4B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+            </Link>
             <div className="w-8 h-8 rounded-full bg-[#0042A5] flex items-center justify-center text-white font-bold text-sm">
               {selectedUser?.nombre[0].toUpperCase() || '?'}
             </div>

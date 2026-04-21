@@ -121,7 +121,9 @@ export function Planilla() {
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Link to="/profile" className="text-gray-400 hover:text-gray-600 text-lg">←</Link>
+        <Link to="/profile" className="-ml-1 flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors shrink-0" aria-label="Volver">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 t-text-nav" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+        </Link>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-[#001A4B]">{planilla.nombre_planilla}</h1>
           <div className="flex gap-2 mt-0.5">
