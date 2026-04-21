@@ -51,6 +51,8 @@ export interface Bet {
   estado?: string
   resultado_local?: number
   resultado_visitante?: number
+  remind_minutes?: number
+  scheduled_for?: string
 }
 
 export interface Planilla {

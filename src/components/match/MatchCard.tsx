@@ -14,6 +14,17 @@ import type { Match, Bet } from '@/types'
 
 const TWO_HOURS_MS = 2 * 60 * 60 * 1000
 
+function formatReminderCountdown(ms: number): string {
+  const totalMin = Math.floor(ms / 60000)
+  const days = Math.floor(totalMin / 1440)
+  const hours = Math.floor((totalMin % 1440) / 60)
+  const mins = totalMin % 60
+  if (days > 0) return `${days}d ${hours}h`
+  if (hours > 0) return `${hours}h ${mins}m`
+  if (mins > 0) return `${mins}m`
+  return '< 1m'
+}
+
 interface Props {
   match: Match
   bet?: Bet
@@ -75,6 +86,10 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
   const countdownH = Math.floor(msUntilClose / 3600000)
   const countdownM = Math.floor((msUntilClose % 3600000) / 60000)
   const countdownS = Math.floor((msUntilClose % 60000) / 1000)
+
+  const scheduledForMs = bet?.scheduled_for ? new Date(bet.scheduled_for).getTime() : null
+  const msUntilReminder = scheduledForMs ? scheduledForMs - nowMs : null
+  const hasActiveReminder = msUntilReminder !== null && msUntilReminder > 0
 
   const pointResult = isFinished && bet
     ? calcularPuntaje(
@@ -160,10 +175,15 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
 
       {/* Date/time bar */}
       {!isLive && !isFinished && (
-        <div className="flex items-center justify-center gap-1.5 bg-gray-50 border-b border-gray-100 px-4 py-1.5">
+        <div className="flex items-center justify-between gap-1.5 bg-gray-50 border-b border-gray-100 px-4 py-1.5">
           <span className="text-xs font-semibold text-gray-500">
             📅 {format(new Date(match.start_time), "EEE d MMM · HH:mm", { locale: dateLocale })} hs
           </span>
+          {hasActiveReminder && (
+            <span className="flex items-center gap-1 text-xs font-semibold text-[#0042A5]">
+              🔔 <span className="font-mono">{formatReminderCountdown(msUntilReminder!)}</span>
+            </span>
+          )}
         </div>
       )}
 
