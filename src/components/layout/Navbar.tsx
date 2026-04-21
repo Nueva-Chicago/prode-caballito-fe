@@ -17,6 +17,7 @@ export function Navbar() {
     { to: '/apuestas',     label: t.nav.bets,    icon: '⚽' },
     { to: '/matriz',       label: t.nav.matrix,  icon: '📊' },
     { to: '/ranking',      label: t.nav.ranking, icon: '🏆' },
+    { to: '/fixture',      label: t.nav.fixture, icon: '🗓️' },
     { to: '/reglamento',   label: t.nav.rules,   icon: '📖' },
   ]
 

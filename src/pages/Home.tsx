@@ -272,7 +272,7 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
       {/* Header */}
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">⚡ Próximo partido</p>
-        <Link to="/apuestas" className="text-[10px] font-semibold text-blue-500 hover:underline">
+        <Link to="/fixture" className="text-[10px] font-semibold text-blue-500 hover:underline">
           Ver fixture →
         </Link>
       </div>

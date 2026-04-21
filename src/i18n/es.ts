@@ -4,7 +4,7 @@ export const es = {
     ranking: 'Ranking', tournaments: 'Torneos', messages: 'Mensajes',
     rules: 'Reglas',
     admin: 'Admin', logout: 'Salir', logoutMobile: 'Cerrar sesión',
-    switchLang: 'Cambiar a Português',
+    switchLang: 'Cambiar a Português', fixture: 'Fixture',
   },
   home: {
     greeting: (n: string) => `¡Hola, ${n}!`,

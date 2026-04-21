@@ -17,6 +17,7 @@ import { Admin } from '@/pages/Admin'
 import { Reglamento } from '@/pages/Reglamento'
 import { Planilla } from '@/pages/Planilla'
 import { Tournaments } from '@/pages/Tournaments'
+import { Fixture } from '@/pages/Fixture'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -87,6 +88,9 @@ export default function App() {
         } />
         <Route path="/tournaments" element={
           <RequireAuth><RequireAdmin><AppLayout><Tournaments /></AppLayout></RequireAdmin></RequireAuth>
+        } />
+        <Route path="/fixture" element={
+          <RequireAuth><AppLayout><Fixture /></AppLayout></RequireAuth>
         } />
 
         {/* Admin */}

@@ -6,7 +6,7 @@ export const pt: T = {
     ranking: 'Classificação', tournaments: 'Torneios', messages: 'Mensagens',
     rules: 'Regras',
     admin: 'Admin', logout: 'Sair', logoutMobile: 'Fechar sessão',
-    switchLang: 'Mudar para Español',
+    switchLang: 'Mudar para Español', fixture: 'Fixture',
   },
   home: {
     greeting: (n: string) => `Olá, ${n}!`,
