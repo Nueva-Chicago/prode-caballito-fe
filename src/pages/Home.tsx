@@ -132,12 +132,12 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center gap-1">
       <div
-        className="text-2xl md:text-3xl font-black tabular-nums rounded-lg px-2.5 py-1.5 min-w-[46px] md:min-w-[54px] text-center leading-none"
+        className="text-3xl md:text-5xl font-black tabular-nums rounded-xl px-3 py-2 min-w-[62px] md:min-w-[80px] text-center leading-none"
         style={{ background: 'rgba(0,0,0,0.35)', color: 'var(--theme-secondary)', fontFamily: "'Arial Black', Arial, sans-serif" }}
       >
         {pad2(value)}
       </div>
-      <span className="text-[8px] font-black text-white/50 tracking-widest uppercase">{label}</span>
+      <span className="text-[9px] font-black text-white/50 tracking-widest uppercase">{label}</span>
     </div>
   )
 }
@@ -147,21 +147,21 @@ function HeroBadge({ tema, theme }: { tema: string; theme: { name: string; patte
   const showImg = !!theme.badgeUrl && !imgError
   return (
     <div
-      className="w-14 h-14 md:w-20 md:h-20 rounded-full flex items-center justify-center border-2 border-white/20 shadow-xl overflow-hidden shrink-0"
-      style={{ background: showImg ? 'rgba(255,255,255,0.12)' : (theme.pattern || 'var(--theme-primary)') }}
+      className="w-28 h-28 md:w-44 md:h-44 rounded-full flex items-center justify-center border-2 border-white/20 shadow-2xl overflow-hidden shrink-0"
+      style={{ background: showImg ? 'rgba(255,255,255,0.10)' : (theme.pattern || 'var(--theme-primary)') }}
     >
       {showImg
         ? <img
             src={theme.badgeUrl}
             alt={theme.name}
-            className="w-10 h-10 md:w-14 md:h-14 object-contain drop-shadow-lg"
+            className="w-20 h-20 md:w-36 md:h-36 object-contain drop-shadow-xl"
             onError={() => setImgError(true)}
           />
         : tema === 'neutral'
-          ? <span style={{ fontSize: 32, lineHeight: 1 }}>🇦🇷</span>
+          ? <span style={{ fontSize: 56, lineHeight: 1 }}>🇦🇷</span>
           : <span
-              className="text-2xl md:text-3xl font-black text-white drop-shadow"
-              style={{ fontFamily: "'Arial Black', Arial, sans-serif", textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}
+              className="text-5xl md:text-7xl font-black text-white drop-shadow"
+              style={{ fontFamily: "'Arial Black', Arial, sans-serif", textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}
             >
               {theme.name.split(' ')[0][0]}
             </span>
@@ -437,15 +437,16 @@ export function Home() {
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
 
       {/* ── 1+2. HERO + PRÓXIMO PARTIDO ─────────────────────────── */}
-      {/* Desktop: side by side in one block. Mobile: hero card solo */}
-      <div className="md:flex md:rounded-2xl md:overflow-hidden md:shadow-xl">
+      {/* Mobile: edge-to-edge (-mx-4 cancela el px-4 del padre)     */}
+      {/* Desktop: side by side, rounded, shadow                      */}
+      <div className="-mx-4 md:mx-0 md:flex md:rounded-2xl md:overflow-hidden md:shadow-2xl">
 
       {/* Hero */}
       <div
-        className="rounded-2xl md:rounded-none text-white overflow-hidden relative md:flex-[3]"
+        className="text-white overflow-hidden relative md:flex-[3]"
         style={{
           background: `linear-gradient(135deg, var(--theme-nav-bg) 0%, var(--theme-primary) 65%, var(--theme-nav-bg) 100%)`,
-          minHeight: 180,
+          minHeight: 240,
         }}
       >
         {/* Jersey pattern overlay */}
@@ -617,16 +618,16 @@ export function Home() {
 
         <Link
           to="/apuestas"
-          className="bg-white rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col items-center gap-1"
+          className="t-surface rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all border t-border-page flex flex-col items-center gap-1"
         >
           <div className="text-2xl">⚽</div>
           <div className="text-xs font-semibold t-text-nav">{t.home.bet}</div>
           {totalUnbet > 0 ? (
-            <span className="text-[10px] font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">
               {t.home.pending(totalUnbet)}
             </span>
           ) : (
-            <span className="text-[10px] font-bold bg-green-100 text-green-600 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
               {t.home.upToDate}
             </span>
           )}
@@ -634,7 +635,7 @@ export function Home() {
 
         <Link
           to="/ranking"
-          className="bg-white rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col items-center gap-1"
+          className="t-surface rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all border t-border-page flex flex-col items-center gap-1"
         >
           <div className="text-2xl">🏆</div>
           <div className="text-xs font-semibold t-text-nav">{t.home.ranking}</div>
@@ -643,35 +644,35 @@ export function Home() {
               #{myEntry.position}
             </span>
           ) : (
-            <span className="text-[10px] text-gray-400 px-2 py-0.5">{t.home.noPosition}</span>
+            <span className="text-[10px] t-text-muted px-2 py-0.5">{t.home.noPosition}</span>
           )}
         </Link>
 
         <Link
           to="/matriz"
-          className="bg-white rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col items-center gap-1"
+          className="t-surface rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all border t-border-page flex flex-col items-center gap-1"
         >
           <div className="text-2xl">📊</div>
           <div className="text-xs font-semibold t-text-nav">{t.home.matrix}</div>
           {ptsDiff !== null ? (
             ptsDiff === 0 ? (
-              <span className="text-[10px] font-bold bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">
                 {t.home.leader}
               </span>
             ) : (
-              <span className="text-[10px] font-bold bg-sky-100 text-sky-600 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold bg-sky-500/20 text-sky-400 px-2 py-0.5 rounded-full">
                 {t.home.fromFirst(ptsDiff)}
               </span>
             )
           ) : (
-            <span className="text-[10px] text-gray-400 px-2 py-0.5">{t.home.seeTable}</span>
+            <span className="text-[10px] t-text-muted px-2 py-0.5">{t.home.seeTable}</span>
           )}
         </Link>
       </div>
 
       {/* ── 3. PODIO ────────────────────────────────────────────── */}
       {top3.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="t-surface rounded-2xl border t-border-page shadow-sm overflow-hidden">
           <div className="t-bg-nav px-4 py-2.5 flex items-center justify-between">
             <p className="text-xs font-bold text-white/90 uppercase tracking-wide">{t.home.currentRanking}</p>
             <Link to="/ranking" className="text-xs text-white/60 hover:text-white transition-colors">
@@ -686,28 +687,28 @@ export function Home() {
               const isMe = r.user_id === user?.id
               const isFirst = idx === 0
               const podiumH = isFirst ? 'h-10' : idx === 1 ? 'h-6' : 'h-4'
-              const podiumBg = isFirst ? 'bg-yellow-400' : idx === 1 ? 'bg-gray-300' : 'bg-amber-500/70'
+              const podiumBg = isFirst ? 'bg-yellow-400' : idx === 1 ? 'bg-white/20' : 'bg-amber-500/50'
               const avatarSize = isFirst ? 'w-14 h-14' : 'w-10 h-10'
-              const avatarBorder = isFirst ? 'border-2 border-yellow-400' : 'border border-gray-200'
+              const avatarBorder = isFirst ? 'border-2 border-yellow-400' : 'border t-border-page'
 
               return (
                 <div key={r.planilla_id} className="flex flex-col items-center gap-1 flex-1">
                   <div className="relative">
                     {r.user_avatar
                       ? <img src={r.user_avatar} alt="" className={`${avatarSize} rounded-full object-cover ${avatarBorder}`} />
-                      : <div className={`${avatarSize} rounded-full flex items-center justify-center font-black text-sm ${isMe ? 't-bg-primary text-white' : isFirst ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-500'}`}>
+                      : <div className={`${avatarSize} rounded-full flex items-center justify-center font-black text-sm ${isMe ? 't-bg-primary text-white' : isFirst ? 'bg-yellow-400/20 text-yellow-400' : 't-surface t-text-muted'}`}>
                           {r.user_name[0].toUpperCase()}
                         </div>
                     }
                     <span className="absolute -top-1 -right-1 text-base leading-none">{MEDAL[idx]}</span>
                   </div>
 
-                  <p className={`text-center font-semibold truncate w-full px-0.5 leading-tight ${isFirst ? 'text-xs t-text-nav' : 'text-[10px] text-gray-500'}`}>
+                  <p className={`text-center font-semibold truncate w-full px-0.5 leading-tight ${isFirst ? 'text-xs t-text-nav' : 'text-[10px] t-text-muted'}`}>
                     {r.user_name.split(' ')[0]}
                     {isMe && <span className="t-text-primary"> {t.home.you}</span>}
                   </p>
 
-                  <p className={`font-black ${isFirst ? 'text-sm t-text-primary' : 'text-xs text-gray-500'}`}>
+                  <p className={`font-black ${isFirst ? 'text-sm t-text-primary' : 'text-xs t-text-muted'}`}>
                     {r.puntos_totales}
                     <span className="font-normal text-[9px] ml-0.5">{t.ranking.pts}</span>
                   </p>
@@ -719,8 +720,8 @@ export function Home() {
           </div>
 
           {myEntry && myEntry.position > 3 && (
-            <div className="mx-4 mb-4 mt-1 rounded-xl px-4 py-2.5 flex items-center justify-between border"
-              style={{ background: 'color-mix(in srgb, var(--theme-primary) 8%, white)', borderColor: 'color-mix(in srgb, var(--theme-primary) 20%, white)' }}>
+            <div className="mx-4 mb-4 mt-1 rounded-xl px-4 py-2.5 flex items-center justify-between border t-border-page"
+              style={{ background: 'color-mix(in srgb, var(--theme-primary) 12%, var(--theme-page-surface))' }}>
               <div className="flex items-center gap-2">
                 <span className="text-base font-black t-text-primary">#{myEntry.position}</span>
                 <span className="text-sm font-semibold t-text-nav">{myEntry.user_name.split(' ')[0]}</span>
@@ -728,7 +729,7 @@ export function Home() {
               <div className="text-right">
                 <span className="font-black t-text-primary">{myEntry.puntos_totales}{t.ranking.pts}</span>
                 {ptsDiff !== null && ptsDiff > 0 && (
-                  <p className="text-[10px] text-gray-400">{t.home.fromFirst(ptsDiff)}</p>
+                  <p className="text-[10px] t-text-muted">{t.home.fromFirst(ptsDiff)}</p>
                 )}
               </div>
             </div>
@@ -741,7 +742,7 @@ export function Home() {
         <h2 className="text-sm font-bold t-text-nav">{t.home.nextMatches}</h2>
 
         {upcoming.length === 0 ? (
-          <p className="text-gray-400 text-sm text-center py-8">{t.home.noUpcoming}</p>
+          <p className="t-text-muted text-sm text-center py-8">{t.home.noUpcoming}</p>
         ) : (
           upcoming.map((m) => (
             <MatchCard
@@ -757,7 +758,7 @@ export function Home() {
 
         {recentFinished.length > 0 && (
           <>
-            <h3 className="text-sm font-semibold text-gray-500 mt-4">{t.home.lastResults}</h3>
+            <h3 className="text-sm font-semibold t-text-muted mt-4">{t.home.lastResults}</h3>
             {recentFinished.map((m) => (
               <MatchCard key={m.id} match={m} bet={bets[m.id]} readonly />
             ))}

@@ -84,6 +84,50 @@
   --theme-on-primary:  #ffffff;
 }
 
+/* ── PAGE-LEVEL THEME VARIABLES ─────────────────────────────────── */
+/* Equipos claros: fondo gris suave, cards blancas                   */
+:root,
+[data-theme="neutral"],
+[data-theme="river"],
+[data-theme="racing"],
+[data-theme="estudiantes"] {
+  --theme-page-bg:         #F1F4F9;
+  --theme-page-surface:    #FFFFFF;
+  --theme-page-border:     #E5E7EB;
+  --theme-page-text:       #111827;
+  --theme-page-text-muted: #6B7280;
+}
+
+/* Equipos oscuros: fondo casi negro del club, cards translúcidas   */
+[data-theme="boca"] {
+  --theme-page-bg:         #03091A;
+  --theme-page-surface:    rgba(255,255,255,0.055);
+  --theme-page-border:     rgba(255,255,255,0.09);
+  --theme-page-text:       #F0F4FF;
+  --theme-page-text-muted: rgba(240,244,255,0.50);
+}
+[data-theme="independiente"] {
+  --theme-page-bg:         #120006;
+  --theme-page-surface:    rgba(255,255,255,0.055);
+  --theme-page-border:     rgba(255,255,255,0.09);
+  --theme-page-text:       #FFF0F3;
+  --theme-page-text-muted: rgba(255,240,243,0.50);
+}
+[data-theme="sanlorenzo"] {
+  --theme-page-bg:         #040A1E;
+  --theme-page-surface:    rgba(255,255,255,0.055);
+  --theme-page-border:     rgba(255,255,255,0.09);
+  --theme-page-text:       #EEF2FF;
+  --theme-page-text-muted: rgba(238,242,255,0.50);
+}
+[data-theme="huracan"] {
+  --theme-page-bg:         #0A0A0A;
+  --theme-page-surface:    rgba(255,255,255,0.055);
+  --theme-page-border:     rgba(255,255,255,0.09);
+  --theme-page-text:       #F5F5F5;
+  --theme-page-text-muted: rgba(245,245,245,0.50);
+}
+
 /* ── THEME UTILITIES ────────────────────────────────────────────── */
 
 /* Fondo primario del tema (azul, rojo, etc.) */
@@ -143,14 +187,20 @@
 /* Score / puntos destacados */
 .t-score { color: var(--theme-primary); }
 
+/* Page-level surface y texto (dark/light según equipo) */
+.t-surface      { background: var(--theme-page-surface); }
+.t-border-page  { border-color: var(--theme-page-border); }
+.t-text-page    { color: var(--theme-page-text); }
+.t-text-muted   { color: var(--theme-page-text-muted); }
+
 /* ── BASE ───────────────────────────────────────────────────────── */
 
 body {
   margin: 0;
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
-  background-color: #f9fafb;
-  color: #1f2937;
+  background-color: var(--theme-page-bg, #f9fafb);
+  color: var(--theme-page-text, #1f2937);
 }
 
 a { text-decoration: none; color: inherit; }
