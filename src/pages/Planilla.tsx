@@ -75,6 +75,14 @@ export function Planilla() {
     }
   }
 
+  const refreshBets = async () => {
+    if (!planillaId) return
+    const r = await api.get(`/bets/planillas/${planillaId}/bets?t=${Date.now()}`)
+    const betMap: Record<string, Bet> = {}
+    for (const b of r.data.data) betMap[b.match_id] = b
+    setBets(betMap)
+  }
+
   const isOwner = planilla?.user_id === user?.id
   const isAdmin = user?.rol === 'admin'
   const canEdit = isOwner || isAdmin
@@ -203,7 +211,7 @@ export function Planilla() {
             match={m}
             bet={bets[m.id]}
             planillaId={canEdit ? planillaId : undefined}
-            onBetSaved={(b) => setBets({ ...bets, [m.id]: b })}
+            onBetSaved={refreshBets}
             onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
             readonly={!canEdit}
           />

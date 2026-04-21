@@ -336,6 +336,14 @@ export function Home() {
     }
   }
 
+  const refreshBets = async () => {
+    if (!planilla) return
+    const betRes = await api.get(`/bets/planillas/${planilla.id}/bets?t=${Date.now()}`)
+    const betMap: Record<string, Bet> = {}
+    for (const b of betRes.data.data) betMap[b.match_id] = b
+    setBets(betMap)
+  }
+
   const pendingMatches = matches.filter(m => m.estado !== 'finished')
   const finishedMatches = matches.filter(m => m.estado === 'finished')
 
@@ -700,7 +708,7 @@ export function Home() {
               match={m}
               bet={bets[m.id]}
               planillaId={planilla?.id}
-              onBetSaved={(b) => setBets({ ...bets, [m.id]: b })}
+              onBetSaved={refreshBets}
               onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
             />
           ))
