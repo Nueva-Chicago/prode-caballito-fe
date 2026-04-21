@@ -226,7 +226,7 @@ function NextMatchBanner({ matches, bets, embedded = false }: { matches: Match[]
 function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Record<string, Bet> }) {
   const [now, setNow] = useState(Date.now())
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 60000)
+    const id = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(id)
   }, [])
   const match = matches
@@ -241,6 +241,7 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
   const cdDays  = Math.floor(diffMs / 86400000)
   const cdHours = Math.floor((diffMs % 86400000) / 3600000)
   const cdMins  = Math.floor((diffMs % 3600000) / 60000)
+  const cdSecs  = Math.floor((diffMs % 60000) / 1000)
 
   return (
     <div className="hidden md:flex flex-col justify-center px-6 py-5 md:flex-[2] border-l border-gray-100 bg-white gap-4">
@@ -250,14 +251,14 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
         <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">
           FALTA PARA EL PRÓXIMO PARTIDO
         </p>
-        <div className="flex items-end justify-center gap-2">
-          {[{ v: cdDays, l: 'DÍAS' }, { v: cdHours, l: 'HS' }, { v: cdMins, l: 'MIN' }].map(({ v, l }, i) => (
-            <div key={l} className="flex items-end gap-2">
+        <div className="flex items-end justify-center gap-1.5">
+          {[{ v: cdDays, l: 'DÍAS' }, { v: cdHours, l: 'HS' }, { v: cdMins, l: 'MIN' }, { v: cdSecs, l: 'SEG' }].map(({ v, l }, i) => (
+            <div key={l} className="flex items-end gap-1.5">
               {i > 0 && <span className="text-gray-200 font-black text-lg pb-4">:</span>}
               <div className="flex flex-col items-center gap-1">
                 <div
-                  className="text-2xl font-black tabular-nums rounded-lg px-2.5 py-1 min-w-[48px] text-center leading-none"
-                  style={{ background: '#001A4B', color: '#FFDF00', fontFamily: "'Arial Black', Arial, sans-serif" }}
+                  className="text-2xl font-black tabular-nums rounded-lg px-2 py-1 min-w-[42px] text-center leading-none"
+                  style={{ background: '#001A4B', color: l === 'SEG' ? 'rgba(255,223,0,0.6)' : '#FFDF00', fontFamily: "'Arial Black', Arial, sans-serif" }}
                 >
                   {pad2(v)}
                 </div>
