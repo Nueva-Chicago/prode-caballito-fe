@@ -9,6 +9,7 @@ import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
 import { teamFlag } from '@/utils/teamFlags'
+import { TEAM_THEMES } from '@/types'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 /* ── Flip clock display ──────────────────────────────────────────── */
@@ -111,6 +112,35 @@ function FlipDisplay({ value }: { value: string }) {
 }
 
 function pad2(n: number) { return String(n).padStart(2, '0') }
+
+/* ── Countdown al Mundial ────────────────────────────────────────── */
+const MUNDIAL_START = new Date('2026-06-11T19:00:00Z') // México vs Sudáfrica
+
+function getMundialCountdown() {
+  const diff = MUNDIAL_START.getTime() - Date.now()
+  if (diff <= 0) return null
+  const totalSecs = Math.floor(diff / 1000)
+  return {
+    days:  Math.floor(totalSecs / 86400),
+    hours: Math.floor((totalSecs % 86400) / 3600),
+    mins:  Math.floor((totalSecs % 3600) / 60),
+    secs:  totalSecs % 60,
+  }
+}
+
+function CountdownUnit({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <div
+        className="text-2xl md:text-3xl font-black tabular-nums rounded-lg px-2.5 py-1.5 min-w-[46px] md:min-w-[54px] text-center leading-none"
+        style={{ background: 'rgba(0,0,0,0.35)', color: 'var(--theme-secondary)', fontFamily: "'Arial Black', Arial, sans-serif" }}
+      >
+        {pad2(value)}
+      </div>
+      <span className="text-[8px] font-black text-white/50 tracking-widest uppercase">{label}</span>
+    </div>
+  )
+}
 
 function NextMatchBanner({ matches, bets, embedded = false }: { matches: Match[]; bets: Record<string, Bet>; embedded?: boolean }) {
   const [now, setNow] = useState(Date.now())
@@ -216,21 +246,23 @@ function HomeSkeleton() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
       {/* Hero */}
-      <div className="t-gradient-hero rounded-2xl p-5 text-white">
-        <div className="flex items-start justify-between gap-3">
-          <div className="space-y-2 flex-1">
-            <div className="animate-pulse bg-white/30 h-3 w-20 rounded" />
-            <div className="animate-pulse bg-white/40 h-6 w-44 rounded" />
-            <div className="animate-pulse bg-white/30 h-4 w-56 rounded" />
+      <div className="t-gradient-hero rounded-2xl p-5 text-white" style={{ minHeight: 180 }}>
+        <div className="flex items-center justify-between gap-4">
+          <div className="space-y-2.5 flex-1">
+            <div className="animate-pulse bg-green-400/30 h-3 w-36 rounded-full" />
+            <div className="space-y-1.5">
+              <div className="animate-pulse bg-white/40 h-5 w-40 rounded" />
+              <div className="animate-pulse bg-white/35 h-5 w-36 rounded" />
+              <div className="animate-pulse bg-white/30 h-5 w-44 rounded" />
+            </div>
+            <div className="animate-pulse bg-white/30 h-8 w-40 rounded-lg" />
           </div>
-          <div className="animate-pulse bg-white/20 rounded-full shrink-0 w-14 h-14" />
-        </div>
-        <div className="mt-4 space-y-2">
-          <div className="flex justify-between">
-            <div className="animate-pulse bg-white/30 h-3 w-28 rounded" />
-            <div className="animate-pulse bg-white/30 h-3 w-8 rounded" />
+          <div className="shrink-0 flex flex-col items-center gap-3">
+            <div className="flex gap-1">
+              {[0,1,2,3].map(i => <div key={i} className="animate-pulse bg-white/20 rounded-lg w-10 h-12" />)}
+            </div>
+            <div className="animate-pulse bg-white/20 rounded-full w-16 h-16" />
           </div>
-          <div className="animate-pulse bg-white/20 h-2 w-full rounded-full" />
         </div>
       </div>
       {/* Quick access */}
@@ -291,11 +323,22 @@ export function Home() {
   const [now, setNow] = useState(new Date())
   const [showIOSGuide, setShowIOSGuide] = useState(false)
   const { state: pwaState, install: pwaInstall } = usePWAInstall()
+  const [mundialCd, setMundialCd] = useState(getMundialCountdown)
+
+  // Tema del equipo elegido por el usuario
+  const tema = user?.tema_equipo || 'neutral'
+  const theme = TEAM_THEMES[tema] || TEAM_THEMES.neutral
 
   // Reloj para el countdown (cada minuto)
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 60000)
     return () => clearInterval(interval)
+  }, [])
+
+  // Countdown al Mundial (cada segundo)
+  useEffect(() => {
+    const id = setInterval(() => setMundialCd(getMundialCountdown()), 1000)
+    return () => clearInterval(id)
   }, [])
 
   useEffect(() => { loadData() }, [])
@@ -400,91 +443,93 @@ export function Home() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
 
-      {/* ── 1. HERO ─────────────────────────────────────────────── */}
-      <div className="t-gradient-hero rounded-2xl text-white overflow-hidden">
-        <div className="md:grid md:grid-cols-[55fr_45fr]">
+      {/* ── 1. HERO MUNDIAL ─────────────────────────────────────── */}
+      <div
+        className="rounded-2xl text-white overflow-hidden relative"
+        style={{
+          background: `linear-gradient(135deg, var(--theme-nav-bg) 0%, var(--theme-primary) 65%, var(--theme-nav-bg) 100%)`,
+          minHeight: 180,
+        }}
+      >
+        {/* Jersey pattern overlay */}
+        {theme.pattern && (
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: theme.pattern, opacity: 0.07 }}
+          />
+        )}
 
-          {/* Columna izquierda */}
-          <div className="p-5 md:border-r md:border-white/10">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-white/60 uppercase tracking-widest mb-0.5">{timeGreeting}</p>
-                <h1 className="text-xl font-bold leading-tight">{t.home.greeting(user?.nombre || '')} 👋</h1>
-                <p className="text-white/75 text-sm mt-1 leading-snug">{contextMessage}</p>
-              </div>
+        <div className="relative px-5 py-5 flex items-center gap-4 md:gap-8">
+          {/* Left: headline + CTA */}
+          <div className="flex-1 min-w-0">
+            {/* Badge PRONÓSTICOS EXCLUSIVOS */}
+            <div className="inline-flex items-center gap-1.5 border border-green-500/40 bg-green-500/15 text-green-400 text-[9px] font-black px-2 py-0.5 rounded-full mb-2.5 tracking-wide uppercase">
+              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shrink-0" />
+              Pronósticos exclusivos
             </div>
 
-            {tournamentName && (
-              <div className="mt-3">
-                <span className="inline-flex items-center gap-1.5 bg-white/15 border border-white/25 px-3 py-1 rounded-full text-[11px] font-semibold text-white/90">
-                  🏆 {tournamentName}
-                </span>
-              </div>
-            )}
+            <h1 className="font-black text-white leading-tight mb-2.5"
+              style={{ fontSize: 'clamp(17px, 4.5vw, 26px)', lineHeight: 1.15, fontFamily: "'Arial Black', Arial, sans-serif" }}>
+              EL MUNDIAL<br />SE JUEGA<br />ACÁ TAMBIÉN
+            </h1>
 
-            {progress && (
-              <div className="mt-3">
-                <div className="flex justify-between text-xs mb-1 text-white/80">
-                  <span>{t.home.completedBets}</span>
-                  <span className="font-bold">{progress.done}/{progress.total}</span>
-                </div>
-                <div className="bg-white/20 rounded-full h-2">
-                  <div
-                    className="t-bg-secondary h-2 rounded-full transition-all"
-                    style={{ width: `${progress.total ? Math.min((progress.done / progress.total) * 100, 100) : 0}%` }}
-                  />
-                </div>
-              </div>
-            )}
+            <p className="text-white/55 text-[11px] mb-3 leading-snug hidden sm:block">
+              Arrancá, apostá y competí con tus amigos.<br />El Mundial 2026 te espera.
+            </p>
 
-            {/* ⏰ Cierra pronto */}
-            {closingSoon.length > 0 && (
-              <div className="mt-3 space-y-1.5">
-                <p className="text-[11px] text-white/60 font-semibold uppercase tracking-wide">⏰ {t.home.closingSoon}</p>
-                {closingSoon.map(m => (
-                  <div key={m.id} className="flex items-center justify-between bg-black/20 rounded-xl px-3 py-2 border border-white/10">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse shrink-0" />
-                      <span className="text-xs font-medium text-white/90 truncate">
-                        {m.home_team} vs {m.away_team}
-                      </span>
-                      {!bets[m.id] && (
-                        <span className="shrink-0 text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded-full font-semibold">
-                          {t.home.noBet}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-xs font-black text-red-300 shrink-0 ml-2">
-                      {formatCountdown(new Date(m.time_cutoff).getTime(), now.getTime())}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+            <Link
+              to="/apuestas"
+              className="inline-flex items-center gap-1.5 font-black text-xs px-4 py-2 rounded-lg transition-all hover:brightness-110 active:scale-95"
+              style={{ background: 'var(--theme-secondary)', color: 'var(--theme-accent-text)' }}
+            >
+              EMPIEZA TU PRODE ⚽
+            </Link>
 
-            {/* 📲 Botón instalar app */}
+            <p className="text-white/30 text-[9px] tracking-widest mt-2 uppercase hidden sm:block">
+              Jueves, 11 de Junio 2026
+            </p>
+
             {pwaState.type !== 'installed' && pwaState.type !== 'unavailable' && (
-              <div className="mt-3 pt-3 border-t border-white/10">
-                <button
-                  onClick={() => pwaState.type === 'ios' ? setShowIOSGuide(true) : pwaInstall()}
-                  className="flex items-center gap-2 text-xs font-semibold text-white/70 hover:text-white transition-colors group"
-                >
-                  <span className="text-base">📲</span>
-                  <span>{t.home.installApp}</span>
-                  <span className="text-white/30 group-hover:text-white/60 transition-colors">→</span>
-                </button>
-              </div>
+              <button
+                onClick={() => pwaState.type === 'ios' ? setShowIOSGuide(true) : pwaInstall()}
+                className="block text-white/25 text-[9px] mt-1 hover:text-white/50 transition-colors"
+              >
+                📲 {t.home.installApp}
+              </button>
             )}
           </div>
 
-          {/* Columna derecha — próximo partido (solo desktop) */}
-          <div
-            className="hidden md:flex flex-col justify-center px-6 py-5"
-            style={{ background: 'linear-gradient(135deg, #0a0f1e 0%, #001A4B 100%)' }}
-          >
-            <NextMatchBanner matches={matches} bets={bets} embedded />
-          </div>
+          {/* Right: countdown + decoration */}
+          <div className="shrink-0 flex flex-col items-center gap-3">
+            {/* Countdown */}
+            {mundialCd ? (
+              <div className="flex items-end gap-1">
+                <CountdownUnit value={mundialCd.days}  label="días" />
+                <span className="text-white/30 font-black pb-4 text-lg">:</span>
+                <CountdownUnit value={mundialCd.hours} label="hs" />
+                <span className="text-white/30 font-black pb-4 text-lg">:</span>
+                <CountdownUnit value={mundialCd.mins}  label="min" />
+                <span className="text-white/30 font-black pb-4 text-lg">:</span>
+                <CountdownUnit value={mundialCd.secs}  label="seg" />
+              </div>
+            ) : (
+              <span className="text-white/60 text-sm font-bold">¡Empezó! 🎉</span>
+            )}
 
+            {/* Circle decoration — jersey pattern or flag */}
+            <div
+              className="w-14 h-14 md:w-20 md:h-20 rounded-full flex items-center justify-center border-2 border-white/20 shadow-xl overflow-hidden shrink-0"
+              style={{ background: theme.pattern || 'var(--theme-primary)' }}
+            >
+              {tema === 'neutral'
+                ? <span style={{ fontSize: 32, lineHeight: 1 }}>🇦🇷</span>
+                : <span className="text-2xl md:text-3xl font-black text-white drop-shadow"
+                    style={{ fontFamily: "'Arial Black', Arial, sans-serif", textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+                    {theme.name.split(' ')[0][0]}
+                  </span>
+              }
+            </div>
+          </div>
         </div>
       </div>
 
@@ -531,10 +576,8 @@ export function Home() {
         </>
       )}
 
-      {/* ── 2. PRÓXIMO PARTIDO — solo mobile (desktop va dentro del hero) ── */}
-      <div className="md:hidden">
-        <NextMatchBanner matches={matches} bets={bets} />
-      </div>
+      {/* ── 2. PRÓXIMO PARTIDO ──────────────────────────────────── */}
+      <NextMatchBanner matches={matches} bets={bets} />
 
       {/* ── 3. CTA PRONÓSTICOS PENDIENTES ───────────────────────── */}
       {totalUnbet > 0 && (
