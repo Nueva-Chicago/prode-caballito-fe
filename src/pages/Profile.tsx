@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
@@ -18,6 +18,17 @@ export function Profile() {
   const [waConsent, setWaConsent] = useState(user?.whatsapp_consent || false)
   const [savingWa, setSavingWa] = useState(false)
   const push = usePushNotifications()
+
+  // Cargar datos frescos al montar para asegurar whatsapp_number actualizado
+  useEffect(() => {
+    if (!user?.id) return
+    api.get(`/users/${user.id}`).then(({ data }) => {
+      const u = data.data
+      updateUser({ whatsapp_number: u.whatsapp_number, whatsapp_consent: u.whatsapp_consent })
+      setWaNumber(u.whatsapp_number || '')
+      setWaConsent(u.whatsapp_consent || false)
+    }).catch(() => { /* silencioso */ })
+  }, [user?.id])
 
   const handleSaveName = async () => {
     try {
