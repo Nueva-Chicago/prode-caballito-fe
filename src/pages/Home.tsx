@@ -113,6 +113,13 @@ function FlipDisplay({ value }: { value: string }) {
 
 function pad2(n: number) { return String(n).padStart(2, '0') }
 
+function getGreeting(now: Date): string {
+  const h = now.getHours()
+  if (h < 12) return 'Buenos días'
+  if (h < 20) return 'Buenas tardes'
+  return 'Buenas noches'
+}
+
 /* ── Countdown al Mundial ────────────────────────────────────────── */
 const MUNDIAL_START = new Date('2026-06-11T19:00:00Z') // México vs Sudáfrica
 
@@ -541,28 +548,60 @@ export function Home() {
               <p className="text-white/70 text-sm font-bold mb-3">¡El Mundial empezó! 🎉</p>
             )}
 
-            {/* Badge PRONÓSTICOS EXCLUSIVOS */}
-            <div className="inline-flex items-center gap-1.5 border border-green-500/40 bg-green-500/15 text-green-400 text-[9px] font-black px-2 py-0.5 rounded-full mb-2 tracking-wide uppercase">
-              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shrink-0" />
-              Pronósticos exclusivos
-            </div>
-
-            <h1 className="font-black text-white leading-tight mb-3"
-              style={{ fontSize: 'clamp(18px, 3.5vw, 28px)', lineHeight: 1.1, fontFamily: "'Arial Black', Arial, sans-serif" }}>
-              EL MUNDIAL<br />SE JUEGA<br />ACÁ TAMBIÉN
+            {/* Saludo personalizado */}
+            <p className="text-white/55 text-xs font-semibold mb-0.5 tracking-wide">
+              {getGreeting(now)}
+            </p>
+            <h1 className="font-black text-white leading-tight mb-2"
+              style={{ fontSize: 'clamp(22px, 4vw, 32px)', lineHeight: 1.05, fontFamily: "'Arial Black', Arial, sans-serif" }}>
+              {user?.nombre?.split(' ')[0] || 'Jugador'}
             </h1>
 
-            <Link
-              to="/apuestas"
-              className="inline-flex items-center gap-1.5 font-black text-xs px-4 py-2 rounded-lg transition-all hover:brightness-110 active:scale-95"
-              style={{ background: 'var(--theme-secondary)', color: 'var(--theme-accent-text)' }}
-            >
-              EMPIEZA TU PRODE ⚽
-            </Link>
+            {/* Estado en el ranking */}
+            {myEntry ? (
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-white/90 font-black text-sm">#{myEntry.position}</span>
+                <span className="text-white/30 text-xs">·</span>
+                <span className="font-bold text-sm" style={{ color: 'var(--theme-secondary)' }}>
+                  {myEntry.puntos_totales} pts
+                </span>
+                {ptsDiff !== null && ptsDiff > 0 && (
+                  <span className="text-white/35 text-[10px]">({ptsDiff} del líder)</span>
+                )}
+                {ptsDiff === 0 && (
+                  <span className="text-yellow-400 text-[10px] font-bold">¡Líder! 🏆</span>
+                )}
+              </div>
+            ) : (
+              <p className="text-white/45 text-xs mb-3">Empezá tu prode ⚽</p>
+            )}
 
-            <p className="text-white/25 text-[9px] tracking-widest mt-2 uppercase">
-              Jueves, 11 Jun 2026
-            </p>
+            {/* CTA contextual según estado */}
+            {urgentUnbet > 0 ? (
+              <Link
+                to="/apuestas"
+                className="inline-flex items-center gap-1.5 font-black text-xs px-4 py-2 rounded-lg transition-all hover:brightness-110 active:scale-95"
+                style={{ background: '#ef4444', color: '#fff' }}
+              >
+                ⚠️ Apostar ({urgentUnbet} urgentes)
+              </Link>
+            ) : totalUnbet > 0 ? (
+              <Link
+                to="/apuestas"
+                className="inline-flex items-center gap-1.5 font-black text-xs px-4 py-2 rounded-lg transition-all hover:brightness-110 active:scale-95"
+                style={{ background: 'var(--theme-secondary)', color: 'var(--theme-accent-text)' }}
+              >
+                Apostar ahora ⚽
+              </Link>
+            ) : (
+              <Link
+                to="/ranking"
+                className="inline-flex items-center gap-1.5 font-black text-xs px-4 py-2 rounded-lg transition-all hover:brightness-110 active:scale-95"
+                style={{ background: 'var(--theme-secondary)', color: 'var(--theme-accent-text)' }}
+              >
+                Ver ranking 🏆
+              </Link>
+            )}
 
             {pwaState.type !== 'installed' && pwaState.type !== 'unavailable' && (
               <button
