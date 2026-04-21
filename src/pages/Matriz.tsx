@@ -342,7 +342,7 @@ export function Matriz() {
                 const pts = tournamentPts.get(r.planilla_id) ?? 0
                 const pos = ri + 1
                 return (
-                  <tr key={rowKey} className={`${rowBg} hover:bg-yellow-50/50 transition-colors ${isUnpaid && !isMe ? 'border-l-4 border-orange-400' : ''}`}>
+                  <tr key={rowKey} className={`${rowBg} ${isMe ? 'hover:bg-blue-100/60' : 'hover:bg-yellow-50/50'} transition-colors ${isUnpaid && !isMe ? 'border-l-4 border-orange-400' : ''}`}>
                     <td className={`sticky left-0 px-1.5 sm:px-2 py-1.5 font-medium z-10 border-r border-gray-100 ${rowBg} min-w-[140px] sm:min-w-auto`}>
                       <div className="flex items-center gap-2">
                         <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isMe ? 'bg-[#0042A5] text-white' : 'bg-gray-200 text-gray-600'}`}>
@@ -408,6 +408,7 @@ export function Matriz() {
                           <td key={m.id} className="px-1 py-1.5 text-center">
                             <span
                               onClick={(e) => handleBadgeClick(e, m.id, rowKey, b, m, res)}
+                              title={`${m.home_team} vs ${m.away_team}: ${b.home}-${b.away} · ${t.matrix.popLabels[res.color]}`}
                               className={`inline-block px-1.5 py-0.5 rounded font-bold text-[11px] cursor-pointer select-none transition-all
                                 ${POINT_COLORS[res.color]}
                                 ${isActive ? 'ring-2 ring-offset-1 ring-gray-400 scale-110' : 'hover:scale-105 hover:shadow-md'}
