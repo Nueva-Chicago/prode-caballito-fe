@@ -8,130 +8,6 @@ import { teamFlag } from '@/utils/teamFlags'
 import { useAuthStore } from '@/store/authStore'
 import type { Match, RankingEntry } from '@/types'
 
-type BetEntry = { home: number; away: number }
-
-interface MatchStat {
-  match: Match
-  exact: number
-  correct: number
-  total: number
-  topPred: { score: string; count: number } | null
-}
-
-function computeMatchStats(match: Match, bets: BetMap, ranking: RankingEntry[]): MatchStat {
-  let exact = 0, correct = 0, total = 0
-  const predCounts: Record<string, number> = {}
-  ranking.forEach(r => {
-    const b = bets[r.planilla_id]?.[match.id] as BetEntry | undefined
-    if (!b) return
-    total++
-    const key = `${b.home}-${b.away}`
-    predCounts[key] = (predCounts[key] || 0) + 1
-    const res = calcularPuntaje(
-      { goles_local: b.home, goles_visitante: b.away },
-      { resultado_local: match.resultado_local!, resultado_visitante: match.resultado_visitante! }
-    )
-    if (res.color === 'rojo' || res.color === 'celeste') exact++
-    if (res.puntos > 0) correct++
-  })
-  const topEntry = Object.entries(predCounts).sort(([, a], [, b]) => b - a)[0]
-  return { match, exact, correct, total, topPred: topEntry ? { score: topEntry[0], count: topEntry[1] } : null }
-}
-
-function ViralHighlights({ stats, lang }: { stats: MatchStat[]; lang: string }) {
-  const t = useT()
-  const [expanded, setExpanded] = useState(false)
-  const [copied, setCopied] = useState<string | null>(null)
-
-  if (stats.length === 0) return null
-
-  const displayed = expanded ? stats : stats.slice(0, 3)
-
-  const handleShare = async (s: MatchStat) => {
-    const m = s.match
-    const text = t.viral.shareText(
-      lang === 'pt' && m.home_team_pt ? m.home_team_pt : m.home_team,
-      lang === 'pt' && m.away_team_pt ? m.away_team_pt : m.away_team,
-      m.resultado_local!, m.resultado_visitante!,
-      s.exact, s.total
-    )
-    if (navigator.share) {
-      await navigator.share({ text, url: 'https://prodecaballito.com/ranking' }).catch(() => {})
-    } else {
-      await navigator.clipboard.writeText(text)
-      setCopied(m.id)
-      setTimeout(() => setCopied(null), 2000)
-    }
-  }
-
-  return (
-    <div className="max-w-7xl mx-auto px-2 space-y-2">
-      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{t.viral.title}</p>
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {displayed.map(s => {
-          const m = s.match
-          const exactPct = s.total > 0 ? Math.round((s.exact / s.total) * 100) : 0
-          const isHard = s.total > 0 && (s.exact === 0 || exactPct <= 10)
-          const isEasy = s.total > 0 && exactPct >= 50
-          return (
-            <div key={m.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-3 space-y-2">
-              {/* Header */}
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="text-base">{teamFlag(m.home_team) || '🏳'}</span>
-                  <span className="font-black text-[#001A4B] text-sm tabular-nums">{m.resultado_local}-{m.resultado_visitante}</span>
-                  <span className="text-base">{teamFlag(m.away_team) || '🏳'}</span>
-                </div>
-                {isHard && <span className="text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded-full shrink-0">{t.viral.hardest}</span>}
-                {!isHard && isEasy && <span className="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full shrink-0">{t.viral.easiest}</span>}
-              </div>
-              {/* Teams */}
-              <p className="text-[11px] text-gray-400 truncate">
-                {(lang === 'pt' && m.home_team_pt ? m.home_team_pt : m.home_team)} vs {(lang === 'pt' && m.away_team_pt ? m.away_team_pt : m.away_team)}
-              </p>
-              {/* Stats */}
-              {s.total > 0 ? (
-                <div className="space-y-1">
-                  <p className="text-xs font-semibold text-gray-700">{t.viral.exact(s.exact, s.total)}</p>
-                  {/* Progress bar */}
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${s.exact === 0 ? 'bg-gray-300' : 'bg-red-400'}`}
-                      style={{ width: `${exactPct}%` }}
-                    />
-                  </div>
-                  {s.topPred && (
-                    <p className="text-[11px] text-gray-400">{t.viral.topPred(s.topPred.score, s.topPred.count)}</p>
-                  )}
-                </div>
-              ) : (
-                <p className="text-xs text-gray-400">{t.viral.noBets}</p>
-              )}
-              {/* Share */}
-              {s.total > 0 && (
-                <button
-                  onClick={() => handleShare(s)}
-                  className="w-full text-xs font-semibold text-[#001A4B] border border-gray-200 rounded-lg py-1.5 hover:bg-gray-50 transition-colors"
-                >
-                  {copied === m.id ? t.viral.copied : t.viral.share}
-                </button>
-              )}
-            </div>
-          )
-        })}
-      </div>
-      {stats.length > 3 && (
-        <button
-          onClick={() => setExpanded(v => !v)}
-          className="text-xs text-gray-400 hover:text-gray-600 font-medium"
-        >
-          {expanded ? t.viral.seeLess : t.viral.seeAll + ` (${stats.length - 3} más)`}
-        </button>
-      )}
-    </div>
-  )
-}
-
 type BetMap = Record<string, Record<string, { home: number; away: number }>>
 
 interface ActiveCell {
@@ -307,19 +183,11 @@ export function Matriz() {
     setActiveCell({ matchId, rowKey, bet, match, result, rect })
   }, [activeCell])
 
-  const lang = useAuthStore(s => s.user?.idioma_pref || 'es')
 
   const filteredMatches = matches
   const finishedMatches = filteredMatches.filter(m => m.estado === 'finished')
   const pendingMatches  = filteredMatches.filter(m => m.estado !== 'finished')
   const allMatches = [...finishedMatches, ...pendingMatches]
-
-  // Viral stats: last finished matches sorted by date desc
-  const viralStats = useMemo(() => {
-    return [...finishedMatches]
-      .sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime())
-      .map(m => computeMatchStats(m, bets, ranking))
-  }, [finishedMatches, bets, ranking])
 
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
@@ -405,9 +273,6 @@ export function Matriz() {
           {filterColors.size === 0 && <span className="text-gray-400 ml-1">{t.matrix.legend}</span>}
         </div>
       )}
-
-      {/* Viral highlights */}
-      {viralStats.length > 0 && <ViralHighlights stats={viralStats} lang={lang} />}
 
       {activeCell && (
         <BetPopover cell={activeCell} onClose={() => setActiveCell(null)} />
