@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
 import { Spinner } from '@/components/ui/Spinner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
 import { teamFlag } from '@/utils/teamFlags'
 import { useAuthStore } from '@/store/authStore'
@@ -279,9 +280,7 @@ export function Matriz() {
       )}
 
       {allMatches.length === 0 ? (
-        <div className="max-w-7xl mx-auto px-2 text-center py-10 text-gray-400 text-sm">
-          {t.matrix.noMatches}
-        </div>
+        <EmptyState icon="📊" message={t.matrix.noMatches} className="max-w-7xl mx-auto px-2" />
       ) : (
         <>
         {/* ── Sticky header fuera del overflow-x container ────────────────

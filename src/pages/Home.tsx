@@ -5,6 +5,7 @@ import { es as esLocale } from 'date-fns/locale'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
@@ -865,7 +866,7 @@ export function Home() {
         <h2 className="text-sm font-bold t-text-nav">{t.home.nextMatches}</h2>
 
         {upcoming.length === 0 ? (
-          <p className="t-text-muted text-sm text-center py-8">{t.home.noUpcoming}</p>
+          <EmptyState icon="📅" message={t.home.noUpcoming} />
         ) : (
           upcoming.map((m) => (
             <MatchCard

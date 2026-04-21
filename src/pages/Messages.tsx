@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { Spinner } from '@/components/ui/Spinner'
+import { EmptyState } from '@/components/ui/EmptyState'
 import type { Message } from '@/types'
 
 interface Conversation {
@@ -112,7 +113,7 @@ export function Messages() {
         </div>
         <div className="flex-1 overflow-y-auto">
           {conversations.length === 0 && (
-            <p className="text-sm text-gray-400 text-center py-8">{t.messages.noConversations}</p>
+            <EmptyState icon="💬" message={t.messages.noConversations} />
           )}
           {conversations.map((c) => (
             <Link

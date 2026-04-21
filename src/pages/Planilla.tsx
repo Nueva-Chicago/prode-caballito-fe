@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { POINT_COLORS } from '@/utils/scoring'
 
 function PlanillaSkeleton() {
@@ -205,7 +206,7 @@ export function Planilla() {
       {/* Partidos */}
       <div className="space-y-3">
         {filtered.length === 0 && (
-          <p className="text-gray-400 text-sm text-center py-10">{t.planilla.noMatches}</p>
+          <EmptyState icon="🔍" message={t.planilla.noMatches} />
         )}
         {filtered.map((m) => (
           <MatchCard

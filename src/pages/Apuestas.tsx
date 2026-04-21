@@ -3,6 +3,7 @@ import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useToastStore } from '@/store/toastStore'
 import { teamFlag } from '@/utils/teamFlags'
 
@@ -365,7 +366,7 @@ export function Apuestas() {
       {/* Lista de partidos */}
       <div className="space-y-3">
         {filtered.length === 0 && (
-          <p className="text-gray-400 text-sm text-center py-10">{t.bets.noMatches}</p>
+          <EmptyState icon="⚽" message={t.bets.noMatches} />
         )}
         {filtered.map((m) => (
           <MatchCard

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
@@ -174,11 +175,7 @@ export function Ranking() {
           )}
 
           {showOnlyFavorites && displayRanking.length === 0 && (
-            <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-6 text-center">
-              <div className="text-3xl mb-2">⭐</div>
-              <p className="text-sm text-yellow-800 font-semibold">{t.ranking.noFavorites}</p>
-              <p className="text-xs text-yellow-600 mt-1">{t.ranking.noFavoritesDesc}</p>
-            </div>
+            <EmptyState icon="⭐" message={`${t.ranking.noFavorites}. ${t.ranking.noFavoritesDesc}`} />
           )}
 
           {/* Tabla */}
