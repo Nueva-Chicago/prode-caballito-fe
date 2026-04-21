@@ -61,7 +61,7 @@ export function Profile() {
   const initPhone = useMemo(() => parsePhone(user?.whatsapp_number || ''), [])
   const [waCountry, setWaCountry] = useState(initPhone.code)
   const [waLocal, setWaLocal] = useState(initPhone.local)
-  const [waConsent, setWaConsent] = useState(user?.whatsapp_consent || false)
+  const [waConsent, setWaConsent] = useState(user?.whatsapp_consent ?? true)
   const [savingWa, setSavingWa] = useState(false)
   const push = usePushNotifications()
 
@@ -74,7 +74,7 @@ export function Profile() {
       const parsed = parsePhone(u.whatsapp_number || '')
       setWaCountry(parsed.code)
       setWaLocal(parsed.local)
-      setWaConsent(u.whatsapp_consent || false)
+      setWaConsent(u.whatsapp_consent ?? true)
     }).catch(() => { /* silencioso */ })
   }, [user?.id])
 
