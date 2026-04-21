@@ -72,12 +72,12 @@ export function Ranking() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [togglingFav, setTogglingFav] = useState<string | null>(null)
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false)
-  const [favHintDismissed, setFavHintDismissed] = useState(
-    () => localStorage.getItem('prode_fav_hint_v1') === '1'
+  const [favBannerVisible, setFavBannerVisible] = useState(
+    () => localStorage.getItem('prode_fav_banner_v2') !== '0'
   )
-  const dismissFavHint = () => {
-    localStorage.setItem('prode_fav_hint_v1', '1')
-    setFavHintDismissed(true)
+  const closeFavBanner = () => {
+    localStorage.setItem('prode_fav_banner_v2', '0')
+    setFavBannerVisible(false)
   }
 
   useEffect(() => {
@@ -135,7 +135,7 @@ export function Ranking() {
       <h1 className="text-xl font-bold t-text-nav">{t.ranking.title}</h1>
 
       {/* Favoritos */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex items-center gap-2 flex-wrap">
         <button
           onClick={() => setShowOnlyFavorites(v => !v)}
           className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
@@ -151,19 +151,25 @@ export function Ranking() {
             </span>
           )}
         </button>
+
       </div>
 
-      {/* Hint de primer uso — solo si no tiene favoritos y no fue descartado */}
-      {!loading && favorites.size === 0 && !favHintDismissed && (
-        <div className="flex items-start gap-3 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3">
-          <span className="text-xl shrink-0 mt-0.5">⭐</span>
+      {/* Banner explicativo — cerrable, se recuerda con localStorage */}
+      {favBannerVisible && (
+        <div className="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 flex gap-3 items-start">
+          <span className="text-xl shrink-0">⭐</span>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-yellow-900">{t.ranking.favHintTitle}</p>
             <p className="text-xs text-yellow-700 mt-0.5 leading-relaxed">{t.ranking.favHintDesc}</p>
+            <div className="mt-2 flex flex-col gap-1">
+              <p className="text-xs text-yellow-700"><span className="font-semibold">1.</span> {t.ranking.favStep1}</p>
+              <p className="text-xs text-yellow-700"><span className="font-semibold">2.</span> {t.ranking.favStep2}</p>
+              <p className="text-xs text-yellow-700"><span className="font-semibold">3.</span> {t.ranking.favStep3}</p>
+            </div>
           </div>
           <button
-            onClick={dismissFavHint}
-            className="shrink-0 text-yellow-400 hover:text-yellow-600 transition-colors text-lg leading-none mt-0.5"
+            onClick={closeFavBanner}
+            className="shrink-0 text-yellow-400 hover:text-yellow-700 transition-colors text-xl leading-none mt-0.5"
             aria-label="Cerrar"
           >
             ×

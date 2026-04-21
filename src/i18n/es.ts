@@ -111,8 +111,11 @@ export const es = {
     follow: 'Agregar a mi grupo',
     unfollow: 'Quitar de mi grupo',
     favHintTitle: '⭐ Armá tu grupo privado',
-    favHintDesc: 'Seguí a tus amigos con la ⭐ y filtrá el ranking para competir solo con ellos.',
+    favHintDesc: 'Desde la Matriz o el Ranking podés seguir las planillas de tus amigos y competir solo con ellos en un campeonato privado.',
     favHintCta: 'Entendido',
+    favStep1: 'Tocá ☆ en cualquier jugador del Ranking o la Matriz para agregarlo a tu grupo.',
+    favStep2: 'Filtrá con "⭐ Favoritos" para ver solo el ranking de tu grupo.',
+    favStep3: 'Comparate con tus amigos y competí en tu propio campeonato.',
   },
   matrix: {
     title: '📊 Matriz de Pronósticos',
