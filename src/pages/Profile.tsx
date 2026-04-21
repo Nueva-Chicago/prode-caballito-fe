@@ -20,6 +20,29 @@ const COUNTRY_CODES = [
   { code: '+1', flag: '🇺🇸', name: 'EE.UU.' },
 ]
 
+// Redimensiona y comprime una imagen usando Canvas. Devuelve base64 sin el prefijo data:...
+function compressImage(file: File, maxPx: number, quality: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height))
+      const w = Math.round(img.width * scale)
+      const h = Math.round(img.height * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(img, 0, 0, w, h)
+      const dataUrl = canvas.toDataURL('image/jpeg', quality)
+      resolve(dataUrl.split(',')[1])
+    }
+    img.onerror = reject
+    img.src = url
+  })
+}
+
 function parsePhone(full: string): { code: string; local: string } {
   if (!full) return { code: '+54', local: '' }
   const match = COUNTRY_CODES.find(c => full.startsWith(c.code))
@@ -89,16 +112,12 @@ export function Profile() {
     if (!file) return
     setUploadingPhoto(true)
     try {
-      const reader = new FileReader()
-      const base64 = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve((reader.result as string).split(',')[1])
-        reader.onerror = reject
-        reader.readAsDataURL(file)
-      })
+      // Redimensionar y comprimir en cliente antes de subir (evita 413 de API Gateway)
+      const base64 = await compressImage(file, 600, 0.82)
       const { data } = await api.post('/users/upload-avatar', {
         image: base64,
-        fileName: file.name,
-        contentType: file.type,
+        fileName: file.name.replace(/\.[^.]+$/, '.jpg'),
+        contentType: 'image/jpeg',
       })
       updateUser({ foto_url: data.data.url })
       show(t.profile.photoUpdated, 'success')

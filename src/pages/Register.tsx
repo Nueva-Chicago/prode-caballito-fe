@@ -6,6 +6,26 @@ import { useAuthStore } from '@/store/authStore'
 
 type Step = 'form' | 'verify' | 'complete'
 
+function compressImage(file: File, maxPx: number, quality: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height))
+      const w = Math.round(img.width * scale)
+      const h = Math.round(img.height * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
+      resolve(canvas.toDataURL('image/jpeg', quality).split(',')[1])
+    }
+    img.onerror = reject
+    img.src = url
+  })
+}
+
 const COUNTRY_CODES = [
   { code: '+54', flag: '🇦🇷', name: 'Argentina' },
   { code: '+55', flag: '🇧🇷', name: 'Brasil' },
@@ -113,15 +133,11 @@ export function Register() {
       if (photoFile && data.data?.token) {
         try {
           const reader = new FileReader()
-          const base64 = await new Promise<string>((resolve, reject) => {
-            reader.onload = () => resolve((reader.result as string).split(',')[1])
-            reader.onerror = reject
-            reader.readAsDataURL(photoFile)
-          })
+          const base64 = await compressImage(photoFile, 600, 0.82)
           await api.post('/users/upload-avatar', {
             image: base64,
-            fileName: photoFile.name,
-            contentType: photoFile.type,
+            fileName: photoFile.name.replace(/\.[^.]+$/, '.jpg'),
+            contentType: 'image/jpeg',
           }, {
             headers: { Authorization: `Bearer ${data.data.token}` }
           })
