@@ -13,10 +13,11 @@ export function Navbar() {
   const [switchingLang, setSwitchingLang] = useState(false)
 
   const navLinks = [
-    { to: '/',            label: t.nav.home,        icon: '🏠' },
-    { to: '/apuestas',    label: t.nav.bets,         icon: '⚽' },
-    { to: '/matriz',      label: t.nav.matrix,       icon: '📊' },
-    { to: '/ranking',     label: t.nav.ranking,      icon: '🏆' },
+    { to: '/',             label: t.nav.home,    icon: '🏠' },
+    { to: '/apuestas',     label: t.nav.bets,    icon: '⚽' },
+    { to: '/matriz',       label: t.nav.matrix,  icon: '📊' },
+    { to: '/ranking',      label: t.nav.ranking, icon: '🏆' },
+    { to: '/reglamento',   label: t.nav.rules,   icon: '📖' },
   ]
 
   const adminLinks = [

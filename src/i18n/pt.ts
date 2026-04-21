@@ -4,6 +4,7 @@ export const pt: T = {
   nav: {
     home: 'Início', bets: 'Prognósticos', matrix: 'Matriz',
     ranking: 'Classificação', tournaments: 'Torneios', messages: 'Mensagens',
+    rules: 'Regras',
     admin: 'Admin', logout: 'Sair', logoutMobile: 'Fechar sessão',
     switchLang: 'Mudar para Español',
   },

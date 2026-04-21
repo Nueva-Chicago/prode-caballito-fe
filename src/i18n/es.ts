@@ -2,6 +2,7 @@ export const es = {
   nav: {
     home: 'Inicio', bets: 'Pronósticos', matrix: 'Matriz',
     ranking: 'Ranking', tournaments: 'Torneos', messages: 'Mensajes',
+    rules: 'Reglas',
     admin: 'Admin', logout: 'Salir', logoutMobile: 'Cerrar sesión',
     switchLang: 'Cambiar a Português',
   },
