@@ -351,7 +351,6 @@ export function Home() {
       ])
       setMatches(matchRes.data.data.matches)
       setRanking(rankRes.data.data.ranking)
-      const tours = tourRes.data.data || []
 
       const planillas: Planilla[] = planillaRes.data.data
       if (planillas.length > 0) {
@@ -380,11 +379,6 @@ export function Home() {
   const pendingMatches = matches.filter(m => m.estado !== 'finished')
   const finishedMatches = matches.filter(m => m.estado === 'finished')
 
-  const progress = planilla ? {
-    done: pendingMatches.filter(m => bets[m.id]).length,
-    total: pendingMatches.length,
-  } : null
-
   const totalUnbet = matches
     .filter(m => m.estado !== 'finished' && !bets[m.id])
     .length
@@ -408,25 +402,6 @@ export function Home() {
   const ptsDiff = leader && myEntry ? leader.puntos_totales - myEntry.puntos_totales : null
   const top3 = ranking.slice(0, 3)
 
-  // ── Saludo personalizado ──────────────────────────────────────────
-  const hour = now.getHours()
-  const timeGreeting = hour >= 6 && hour < 13
-    ? t.home.goodMorning
-    : hour >= 13 && hour < 20
-      ? t.home.goodAfternoon
-      : t.home.goodEvening
-
-  const contextMessage = (() => {
-    const isLeading = myEntry?.position === 1
-    const allDone = totalUnbet === 0 && matches.filter(m => m.estado !== 'finished').length > 0
-    if (isLeading && allDone) return t.home.contextLeadingAllDone
-    if (isLeading) return t.home.contextLeading
-    if (myEntry && myEntry.position <= 3) return t.home.contextPodium(myEntry.position)
-    if (allDone) return t.home.contextAllDone
-    if (totalUnbet > 0) return t.home.contextPending(totalUnbet)
-    if (myEntry) return t.home.contextDefault(myEntry.position)
-    return t.home.contextNoRanking
-  })()
 
   if (loading) return <HomeSkeleton />
 

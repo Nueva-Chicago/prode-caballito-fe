@@ -54,7 +54,7 @@ const TEAMS = [
 export function Register() {
   const navigate = useNavigate()
   const { show } = useToastStore()
-  const { login } = useAuthStore()
+  const { setAuth } = useAuthStore()
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [step, setStep] = useState<Step>('form')
@@ -148,7 +148,7 @@ export function Register() {
 
       // Auto-login with returned tokens
       if (data.data?.token && data.data?.user) {
-        login(data.data.user, data.data.token, data.data.refreshToken)
+        setAuth(data.data.user, data.data.token, data.data.refreshToken)
         show('¡Bienvenido a ProdeCaballito!', 'success')
         navigate('/')
       } else {
