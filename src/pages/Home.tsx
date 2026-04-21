@@ -237,8 +237,36 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
 
   const hasBet = !!bets[match.id]
   const dateStr = format(new Date(match.start_time), "EEE d MMM · HH:mm", { locale: esLocale })
+  const diffMs = Math.max(0, new Date(match.start_time).getTime() - now)
+  const cdDays  = Math.floor(diffMs / 86400000)
+  const cdHours = Math.floor((diffMs % 86400000) / 3600000)
+  const cdMins  = Math.floor((diffMs % 3600000) / 60000)
+
   return (
     <div className="hidden md:flex flex-col justify-center px-6 py-5 md:flex-[2] border-l border-gray-100 bg-white gap-4">
+
+      {/* Countdown */}
+      <div className="text-center">
+        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">
+          FALTA PARA EL PRÓXIMO PARTIDO
+        </p>
+        <div className="flex items-end justify-center gap-2">
+          {[{ v: cdDays, l: 'DÍAS' }, { v: cdHours, l: 'HS' }, { v: cdMins, l: 'MIN' }].map(({ v, l }, i) => (
+            <div key={l} className="flex items-end gap-2">
+              {i > 0 && <span className="text-gray-200 font-black text-lg pb-4">:</span>}
+              <div className="flex flex-col items-center gap-1">
+                <div
+                  className="text-2xl font-black tabular-nums rounded-lg px-2.5 py-1 min-w-[48px] text-center leading-none"
+                  style={{ background: '#001A4B', color: '#FFDF00', fontFamily: "'Arial Black', Arial, sans-serif" }}
+                >
+                  {pad2(v)}
+                </div>
+                <span className="text-[8px] font-black text-gray-400 tracking-widest">{l}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -289,59 +317,6 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
           🎯 Apostar ahora →
         </Link>
       )}
-    </div>
-  )
-}
-
-/* Countdown al próximo partido — barra independiente, encima del card del partido */
-function NextMatchCountdown({ matches }: { matches: Match[] }) {
-  const [now, setNow] = useState(Date.now())
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 60000)
-    return () => clearInterval(id)
-  }, [])
-
-  const match = matches
-    .filter(m => m.estado !== 'finished' && new Date(m.start_time).getTime() > now)
-    .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())[0] || null
-
-  if (!match) return null
-
-  const diffMs = Math.max(0, new Date(match.start_time).getTime() - now)
-  const diffDays  = Math.floor(diffMs / 86400000)
-  const diffHours = Math.floor((diffMs % 86400000) / 3600000)
-  const diffMins  = Math.floor((diffMs % 3600000) / 60000)
-
-  const units = [
-    { v: diffDays,  l: 'DÍAS' },
-    { v: diffHours, l: 'HS' },
-    { v: diffMins,  l: 'MIN' },
-  ]
-
-  return (
-    <div
-      className="rounded-2xl px-5 py-4 flex flex-col items-center gap-2"
-      style={{ background: '#001A4B' }}
-    >
-      <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">
-        FALTA PARA EL PRÓXIMO PARTIDO
-      </p>
-      <div className="flex items-end gap-2">
-        {units.map(({ v, l }, i) => (
-          <div key={l} className="flex items-end gap-2">
-            {i > 0 && <span className="text-white/25 font-black text-xl pb-4">:</span>}
-            <div className="flex flex-col items-center gap-1">
-              <div
-                className="text-3xl font-black tabular-nums rounded-lg px-3 py-1.5 min-w-[56px] text-center leading-none"
-                style={{ background: 'rgba(255,255,255,0.08)', color: '#FFDF00', fontFamily: "'Arial Black', Arial, sans-serif" }}
-              >
-                {pad2(v)}
-              </div>
-              <span className="text-[8px] font-black text-white/35 tracking-widest">{l}</span>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }
@@ -664,10 +639,7 @@ export function Home() {
         </>
       )}
 
-      {/* ── 2. COUNTDOWN AL PRÓXIMO PARTIDO ─────────────────────── */}
-      <NextMatchCountdown matches={matches} />
-
-      {/* ── 2b. PRÓXIMO PARTIDO flip clock (mobile) ──────────────── */}
+      {/* ── 2. PRÓXIMO PARTIDO flip clock (mobile) ───────────────── */}
       <div className="md:hidden">
         <NextMatchBanner matches={matches} bets={bets} />
       </div>
