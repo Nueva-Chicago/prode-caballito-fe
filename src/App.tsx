@@ -34,7 +34,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main>{children}</main>
+      <main className="pb-14 md:pb-0">{children}</main>
     </div>
   )
 }
@@ -74,10 +74,10 @@ export default function App() {
           <RequireAuth><AppLayout><Profile /></AppLayout></RequireAuth>
         } />
         <Route path="/messages" element={
-          <RequireAuth><AppLayout><Messages /></AppLayout></RequireAuth>
+          <RequireAuth><RequireAdmin><AppLayout><Messages /></AppLayout></RequireAdmin></RequireAuth>
         } />
         <Route path="/messages/:userId" element={
-          <RequireAuth><AppLayout><Messages /></AppLayout></RequireAuth>
+          <RequireAuth><RequireAdmin><AppLayout><Messages /></AppLayout></RequireAdmin></RequireAuth>
         } />
         <Route path="/reglamento" element={
           <RequireAuth><AppLayout><Reglamento /></AppLayout></RequireAuth>
@@ -86,7 +86,7 @@ export default function App() {
           <RequireAuth><AppLayout><Planilla /></AppLayout></RequireAuth>
         } />
         <Route path="/tournaments" element={
-          <RequireAuth><AppLayout><Tournaments /></AppLayout></RequireAuth>
+          <RequireAuth><RequireAdmin><AppLayout><Tournaments /></AppLayout></RequireAdmin></RequireAuth>
         } />
 
         {/* Admin */}

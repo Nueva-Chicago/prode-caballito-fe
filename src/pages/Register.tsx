@@ -15,6 +15,7 @@ export function Register() {
   const [form, setForm] = useState({ nombre: '', email: '', password: '' })
   const [code, setCode] = useState('')
   const [tema, setTema] = useState('neutral')
+  const [telefono, setTelefono] = useState('')
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,7 +61,7 @@ export function Register() {
     e.preventDefault()
     setLoading(true)
     try {
-      await api.post('/auth/complete-registration', { userId, tema_equipo: tema })
+      await api.post('/auth/complete-registration', { userId, tema_equipo: tema, telefono })
       show('¡Registro completado! Iniciá sesión', 'success')
       navigate('/login')
     } catch (e: unknown) {
@@ -149,14 +150,29 @@ export function Register() {
 
           {step === 'complete' && (
             <form onSubmit={handleComplete} className="space-y-4">
-              <p className="text-sm text-gray-600 text-center">¡Email verificado! Elegí tu equipo favorito:</p>
-              <div className="grid grid-cols-2 gap-2">
-                {teams.map((t) => (
-                  <button key={t.value} type="button" onClick={() => setTema(t.value)}
-                    className={`py-2 px-3 rounded-xl text-sm font-medium border-2 transition-all ${tema === t.value ? 'border-[#0042A5] bg-blue-50 text-[#0042A5]' : 'border-gray-200 hover:border-gray-300'}`}>
-                    {t.label}
-                  </button>
-                ))}
+              <p className="text-sm text-gray-600 text-center">¡Email verificado! Completá tu perfil:</p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">📱 Número de teléfono</label>
+                <input
+                  type="tel"
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value.replace(/\D/g, ''))}
+                  placeholder="Ej: 1112345678"
+                  maxLength={15}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
+                />
+                <p className="text-xs text-gray-400 mt-1">Sin código de país. Podés modificarlo después desde tu perfil.</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2">🏟️ Equipo favorito</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {teams.map((t) => (
+                    <button key={t.value} type="button" onClick={() => setTema(t.value)}
+                      className={`py-2 px-3 rounded-xl text-sm font-medium border-2 transition-all ${tema === t.value ? 'border-[#0042A5] bg-blue-50 text-[#0042A5]' : 'border-gray-200 hover:border-gray-300'}`}>
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
               </div>
               <button type="submit" disabled={loading}
                 className="w-full bg-[#FFDF00] text-[#001A4B] font-bold py-3 rounded-xl hover:bg-yellow-400 disabled:opacity-50 transition-colors">

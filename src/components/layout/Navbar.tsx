@@ -17,8 +17,10 @@ export function Navbar() {
     { to: '/apuestas',    label: t.nav.bets,         icon: '⚽' },
     { to: '/matriz',      label: t.nav.matrix,       icon: '📊' },
     { to: '/ranking',     label: t.nav.ranking,      icon: '🏆' },
-    { to: '/tournaments', label: t.nav.tournaments,  icon: '🎯' },
-    { to: '/messages',    label: t.nav.messages,     icon: '💬' },
+  ]
+
+  const adminLinks = [
+    { to: '/messages', label: t.nav.messages, icon: '💬' },
   ]
 
   const handleLogout = async () => {
@@ -60,6 +62,18 @@ export function Navbar() {
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-1">
           {navLinks.map((l) => (
+            <Link
+              key={l.to}
+              to={l.to}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10"
+              style={location.pathname === l.to
+                ? { background: 'rgba(255,255,255,0.18)', color: 'var(--theme-secondary)' }
+                : undefined}
+            >
+              {l.label}
+            </Link>
+          ))}
+          {isAdmin() && adminLinks.map((l) => (
             <Link
               key={l.to}
               to={l.to}
@@ -133,6 +147,12 @@ export function Navbar() {
               <span>{l.icon}</span>{l.label}
             </Link>
           ))}
+          {isAdmin() && adminLinks.map((l) => (
+            <Link key={l.to} to={l.to} onClick={() => setMenuOpen(false)}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-sm">
+              <span>{l.icon}</span>{l.label}
+            </Link>
+          ))}
           {isAdmin() && (
             <Link to="/admin" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-sm">
               <span>⚙️</span>{t.nav.admin}
@@ -148,6 +168,26 @@ export function Navbar() {
           </button>
         </div>
       )}
+
+      {/* Mobile bottom tab bar — compacto, fuera del <nav> sticky */}
+      <div
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-t border-gray-200 flex"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        {[...navLinks, ...(isAdmin() ? adminLinks : [])].map((l) => (
+          <Link
+            key={l.to}
+            to={l.to}
+            className="flex-1 flex flex-col items-center justify-center py-1.5 gap-0.5 transition-colors"
+            style={location.pathname === l.to
+              ? { color: 'var(--theme-primary)' }
+              : { color: '#9ca3af' }}
+          >
+            <span className="text-base leading-none">{l.icon}</span>
+            <span className="text-[9px] font-medium leading-none">{l.label}</span>
+          </Link>
+        ))}
+      </div>
     </nav>
   )
 }

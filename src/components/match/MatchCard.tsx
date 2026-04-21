@@ -21,6 +21,7 @@ interface Props {
   onBetSaved?: (bet: Bet) => void
   onBetDeleted?: (matchId: string) => void
   readonly?: boolean
+  planillaLocked?: boolean
   now?: number
 }
 
@@ -43,7 +44,7 @@ function TeamDisplay({ team }: { team: string }) {
   )
 }
 
-export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, readonly, now: nowProp }: Props) {
+export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, readonly, planillaLocked, now: nowProp }: Props) {
   const { show } = useToastStore()
   const t = useT()
   const lang = useAuthStore(s => s.user?.idioma_pref || 'es')
@@ -52,6 +53,10 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
   )
   const [saving, setSaving] = useState(false)
   const [editing, setEditing] = useState(false)
+  const REMINDER_MINUTES = [5, 10, 15, 30, 60] as const
+  type ReminderMinutes = typeof REMINDER_MINUTES[number]
+  const [reminderEnabled, setReminderEnabled] = useState(false)
+  const [reminderMinutes, setReminderMinutes] = useState<ReminderMinutes>(15)
 
   // Team names in user's language
   const homeTeam = (lang === 'pt' && match.home_team_pt) ? match.home_team_pt : match.home_team
@@ -90,10 +95,12 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
         planilla_id: planillaId,
         match_id: match.id,
         score,
+        remind_before_minutes: reminderEnabled && !isClosed ? reminderMinutes : null,
       })
-      show(t.match.saved, 'success')
+      show(reminderEnabled ? t.match.reminderSet(reminderMinutes) : t.match.saved, 'success')
       onBetSaved?.(data.data)
       setEditing(false)
+      setReminderEnabled(false)
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || t.match.errorSave
       show(msg, 'error')
@@ -115,7 +122,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
     }
   }
 
-  const canEdit = !isClosed && !isFinished && !readonly && planillaId
+  const canEdit = !isClosed && !isFinished && !readonly && !planillaLocked && planillaId
 
   return (
     <div className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all ${
@@ -151,13 +158,26 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
         </div>
       )}
 
+      {/* Date/time bar */}
+      {!isLive && !isFinished && (
+        <div className="flex items-center justify-center gap-1.5 bg-gray-50 border-b border-gray-100 px-4 py-1.5">
+          <span className="text-xs font-semibold text-gray-500">
+            📅 {format(new Date(match.start_time), "EEE d MMM · HH:mm", { locale: dateLocale })} hs
+          </span>
+        </div>
+      )}
+
       {/* Body: 3-column */}
       <div className="px-4 pt-5 pb-0 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
 
         {/* Local */}
         <div className="flex flex-col items-center gap-2">
-          <span className="text-[34px] font-[500] text-[#001A4B] leading-none tabular-nums">
-            {isFinished ? match.resultado_local : '—'}
+          <span className={`text-[34px] leading-none tabular-nums ${
+            isFinished ? 'font-[500] text-[#001A4B]'
+            : bet ? 'font-black text-[#0042A5]'
+            : 'font-[300] text-gray-300'
+          }`}>
+            {isFinished ? match.resultado_local : bet ? bet.goles_local : '—'}
           </span>
           <TeamDisplay team={match.home_team} />
           <span className="text-xs font-semibold text-[#001A4B] text-center leading-tight">
@@ -178,21 +198,18 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
               )}
             </>
           ) : (
-            <>
-              <span className="text-xs text-gray-400 font-medium">{t.match.vs}</span>
-              {!isFinished && (
-                <span className="text-[11px] text-gray-400 text-center leading-snug whitespace-nowrap">
-                  {format(new Date(match.start_time), "d MMM HH:mm", { locale: dateLocale })}
-                </span>
-              )}
-            </>
+            <span className="text-xs text-gray-400 font-medium">{isFinished ? t.match.vs : 'VS'}</span>
           )}
         </div>
 
         {/* Visitante */}
         <div className="flex flex-col items-center gap-2">
-          <span className="text-[34px] font-[500] text-[#001A4B] leading-none tabular-nums">
-            {isFinished ? match.resultado_visitante : '—'}
+          <span className={`text-[34px] leading-none tabular-nums ${
+            isFinished ? 'font-[500] text-[#001A4B]'
+            : bet ? 'font-black text-[#0042A5]'
+            : 'font-[300] text-gray-300'
+          }`}>
+            {isFinished ? match.resultado_visitante : bet ? bet.goles_visitante : '—'}
           </span>
           <TeamDisplay team={match.away_team} />
           <span className="text-xs font-semibold text-[#001A4B] text-center leading-tight">
@@ -201,19 +218,48 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
         </div>
       </div>
 
+      {/* Recordatorio — visible solo en modo edición y partido no cerrado */}
+      {editing && !isClosed && (
+        <div className="mx-4 mt-3 pt-3 border-t border-gray-100 space-y-2">
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={reminderEnabled}
+              onChange={e => setReminderEnabled(e.target.checked)}
+              className="w-4 h-4 accent-[#0042A5] cursor-pointer shrink-0"
+            />
+            <span className="text-xs text-gray-500">{t.match.remindMe}</span>
+          </label>
+          {reminderEnabled && (
+            <div className="flex items-center gap-2 pl-6">
+              <select
+                value={reminderMinutes}
+                onChange={e => setReminderMinutes(Number(e.target.value) as ReminderMinutes)}
+                className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+              >
+                {REMINDER_MINUTES.map(m => (
+                  <option key={m} value={m}>{t.match.reminderOption(m)}</option>
+                ))}
+              </select>
+              <span className="text-xs text-gray-400">{t.match.beforeKickoff}</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Footer */}
       <div className="mx-4 mt-4 mb-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-3 min-h-[36px]">
 
-        {/* Left: pronóstico */}
+        {/* Left: pronóstico — solo muestra pill en partidos terminados (puntaje) o cuando no hay apuesta */}
         <div className="flex items-center gap-2">
-          {editing ? null : bet ? (
-            <span className={`text-sm font-bold px-2.5 py-1 rounded-full ${pointResult ? POINT_COLORS[pointResult.color] : 'bg-blue-100 text-blue-700'}`}>
+          {editing ? null : isFinished && bet && pointResult ? (
+            <span className={`text-sm font-bold px-2.5 py-1 rounded-full ${POINT_COLORS[pointResult.color]}`}>
               {bet.goles_local}-{bet.goles_visitante}
-              {pointResult && <span className="ml-1 opacity-80">· {pointResult.puntos}pts</span>}
+              <span className="ml-1 opacity-80">· {pointResult.puntos}pts</span>
             </span>
-          ) : (
+          ) : !isFinished && !bet && !editing ? (
             <span className="text-xs text-gray-400 italic">{t.match.noBet}</span>
-          )}
+          ) : null}
           {editing && (
             <input
               type="text"
@@ -239,7 +285,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
                 >
                   {saving ? '...' : t.match.bet}
                 </button>
-                <button onClick={() => setEditing(false)} className="text-xs text-gray-400 hover:text-gray-600">
+                <button onClick={() => { setEditing(false); setReminderEnabled(false) }} className="text-xs text-gray-400 hover:text-gray-600">
                   {t.match.cancel}
                 </button>
               </>
@@ -261,6 +307,10 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
                 {t.match.bet}
               </button>
             )
+          ) : planillaLocked && !isFinished ? (
+            <span className="text-xs bg-gray-100 text-gray-400 px-2.5 py-1 rounded-full font-medium">
+              🔒 {t.match.locked}
+            </span>
           ) : isClosed && !isFinished ? (
             <span className="text-xs bg-red-100 text-red-500 px-2.5 py-1 rounded-full font-medium">
               {t.match.closed}

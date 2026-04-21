@@ -6,25 +6,9 @@ import { api } from '@/api/client'
 import { Modal } from '@/components/ui/Modal'
 import { Spinner } from '@/components/ui/Spinner'
 import { useToastStore } from '@/store/toastStore'
-import { useTeamBadgesStore, getTeamBadge } from '@/store/teamBadgesStore'
-import { teamFlag } from '@/utils/teamFlags'
 import type { Match, Tournament } from '@/types'
 
-type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'desbloqueos' | 'escudos'
-
-interface UnlockRequest {
-  id: string
-  status: 'pending' | 'approved' | 'rejected'
-  requester_name: string
-  requester_email: string
-  target_name: string
-  home_team: string
-  away_team: string
-  start_time: string
-  created_at: string
-  payment_reference?: string
-  payment_amount?: number
-}
+type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast'
 
 export function Admin() {
   const { show } = useToastStore()
@@ -40,11 +24,7 @@ export function Admin() {
     home_team: '', away_team: '', start_time: '', tournament_id: '', halftime_minutes: '15',
   })
   const [resultForm, setResultForm] = useState({ resultado_local: '', resultado_visitante: '' })
-  const [unlockRequests, setUnlockRequests] = useState<UnlockRequest[]>([])
-  const [loadingUnlocks, setLoadingUnlocks] = useState(false)
-
   useEffect(() => { loadData() }, [])
-  useEffect(() => { if (tab === 'desbloqueos') loadUnlockRequests() }, [tab])
 
   const loadData = async () => {
     setLoading(true)
@@ -136,45 +116,12 @@ export function Admin() {
     setShowMatchModal(true)
   }
 
-  const loadUnlockRequests = async () => {
-    setLoadingUnlocks(true)
-    try {
-      const res = await api.get('/bets/unlock-requests')
-      setUnlockRequests(res.data.data || [])
-    } catch {
-      show('Error al cargar solicitudes', 'error')
-    } finally {
-      setLoadingUnlocks(false)
-    }
-  }
-
-  const handleApproveUnlock = async (id: string) => {
-    try {
-      await api.put(`/bets/unlock-requests/${id}/approve`)
-      show('Solicitud aprobada ✓', 'success')
-      setUnlockRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved' } : r))
-    } catch {
-      show('Error al aprobar', 'error')
-    }
-  }
-
-  const handleRejectUnlock = async (id: string) => {
-    try {
-      await api.put(`/bets/unlock-requests/${id}/reject`)
-      show('Solicitud rechazada', 'info')
-      setUnlockRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'rejected' } : r))
-    } catch {
-      show('Error al rechazar', 'error')
-    }
-  }
-
   const tabs: { id: Tab; label: string }[] = [
     { id: 'partidos', label: '⚽ Partidos' },
     { id: 'planillas', label: '📋 Planillas' },
     { id: 'usuarios', label: '👥 Usuarios' },
     { id: 'torneos', label: '🏆 Torneos' },
-    { id: 'desbloqueos', label: '🔓 Desbloqueos' },
-    { id: 'escudos',     label: '🛡️ Escudos' },
+    { id: 'broadcast',   label: '📣 WhatsApp' },
   ]
 
   return (
@@ -210,76 +157,8 @@ export function Admin() {
       {/* Tab: Planillas y Usuarios */}
       {(tab === 'planillas' || tab === 'usuarios') && <AdminSubTab tab={tab} />}
 
-      {/* Tab: Desbloqueos */}
-      {tab === 'desbloqueos' && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-500">
-              {unlockRequests.filter(r => r.status === 'pending').length} solicitudes pendientes
-            </p>
-            <button onClick={loadUnlockRequests} className="text-xs text-[#0042A5] font-medium hover:underline">
-              Actualizar
-            </button>
-          </div>
-          {loadingUnlocks ? (
-            <div className="flex justify-center py-10"><Spinner /></div>
-          ) : unlockRequests.length === 0 ? (
-            <div className="text-center py-10 text-gray-400 text-sm">No hay solicitudes</div>
-          ) : (
-            <div className="space-y-2">
-              {unlockRequests.map((r) => (
-                <div key={r.id} className={`bg-white rounded-xl border p-4 flex items-start gap-3 ${r.status === 'pending' ? 'border-orange-200' : 'border-gray-100'}`}>
-                  <div className="text-xl shrink-0">{r.status === 'pending' ? '⏳' : r.status === 'approved' ? '✅' : '❌'}</div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#001A4B]">
-                      {r.requester_name}
-                      <span className="font-normal text-gray-400"> quiere ver apuesta de </span>
-                      {r.target_name}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5">{r.home_team} vs {r.away_team}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {format(new Date(r.created_at), "d MMM yyyy HH:mm", { locale: es })}
-                    </p>
-                    {r.payment_amount != null && (
-                      <div className={`mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${r.payment_reference ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                        {r.payment_reference ? '✅' : '⚠️'}
-                        {r.payment_reference
-                          ? `Comprobante: ${r.payment_reference}`
-                          : `Pago requerido $${r.payment_amount} — sin comprobante`
-                        }
-                      </div>
-                    )}
-                  </div>
-                  {r.status === 'pending' && (
-                    <div className="flex gap-2 shrink-0">
-                      <button
-                        onClick={() => handleApproveUnlock(r.id)}
-                        className="text-xs bg-green-600 text-white font-bold px-3 py-1.5 rounded-lg hover:bg-green-700 transition-colors"
-                      >
-                        Aprobar
-                      </button>
-                      <button
-                        onClick={() => handleRejectUnlock(r.id)}
-                        className="text-xs bg-red-100 text-red-600 font-bold px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors"
-                      >
-                        Rechazar
-                      </button>
-                    </div>
-                  )}
-                  {r.status !== 'pending' && (
-                    <span className={`text-xs font-semibold px-2 py-1 rounded-full shrink-0 ${r.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
-                      {r.status === 'approved' ? 'Aprobada' : 'Rechazada'}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Tab: Escudos */}
-      {tab === 'escudos' && <EscudosTab matches={matches} />}
+      {/* Tab: Broadcast WhatsApp */}
+      {tab === 'broadcast' && <BroadcastTab />}
 
       {/* Modal partido */}
       <Modal open={showMatchModal} onClose={() => setShowMatchModal(false)} title={editMatch ? 'Editar Partido' : 'Nuevo Partido'}>
@@ -289,17 +168,15 @@ export function Admin() {
               <label className="block text-xs font-medium text-gray-600 mb-1">Equipo Local</label>
               <input value={matchForm.home_team} onChange={(e) => setMatchForm({ ...matchForm, home_team: e.target.value })}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" required />
-              <TeamBadgeInput teamName={matchForm.home_team} />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Equipo Visitante</label>
               <input value={matchForm.away_team} onChange={(e) => setMatchForm({ ...matchForm, away_team: e.target.value })}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" required />
-              <TeamBadgeInput teamName={matchForm.away_team} />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Fecha y hora</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">📅 Fecha y hora del partido <span className="text-gray-400 font-normal">(hora local Argentina)</span></label>
             <input type="datetime-local" value={matchForm.start_time} onChange={(e) => setMatchForm({ ...matchForm, start_time: e.target.value })}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" required />
           </div>
@@ -347,66 +224,6 @@ export function Admin() {
           </button>
         </form>
       </Modal>
-    </div>
-  )
-}
-
-/* ── TeamBadgeInput ──────────────────────────────────────────────────── */
-function TeamBadgeInput({ teamName }: { teamName: string }) {
-  const { badges, setBadge } = useTeamBadgesStore()
-  const { show } = useToastStore()
-  const current = teamName ? getTeamBadge(teamName, badges) : null
-  const flag = teamName ? teamFlag(teamName) : null
-  const [url, setUrl] = useState(current || '')
-  const [preview, setPreview] = useState(current || '')
-  const [saving, setSaving] = useState(false)
-
-  useEffect(() => {
-    const c = teamName ? (getTeamBadge(teamName, badges) || '') : ''
-    setUrl(c)
-    setPreview(c)
-  }, [teamName, badges])
-
-  const handleSave = async () => {
-    if (!teamName.trim() || !url.trim()) return
-    setSaving(true)
-    try {
-      await api.post('/teams/badges', { team_name: teamName, badge_url: url })
-      setBadge(teamName, url)
-      show(`Escudo de ${teamName} guardado ✓`, 'success')
-    } catch {
-      show('Error al guardar escudo', 'error')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  return (
-    <div className="mt-1.5 flex items-center gap-2">
-      <div className="w-9 h-9 rounded-lg border border-gray-200 overflow-hidden flex items-center justify-center bg-gray-50 shrink-0">
-        {preview
-          ? <img src={preview} alt="" className="w-full h-full object-contain p-0.5"
-              onError={() => setPreview('')} />
-          : flag
-            ? <span style={{ fontSize: 22 }}>{flag}</span>
-            : <span className="text-[10px] text-gray-300">—</span>
-        }
-      </div>
-      <input
-        type="text"
-        value={url}
-        onChange={(e) => { setUrl(e.target.value); setPreview(e.target.value) }}
-        placeholder="URL del escudo (png/svg)..."
-        className="flex-1 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#0042A5]"
-      />
-      <button
-        type="button"
-        onClick={handleSave}
-        disabled={saving || !url.trim() || !teamName.trim()}
-        className="text-xs bg-[#0042A5] text-white px-3 py-1.5 rounded-lg hover:bg-[#003080] disabled:opacity-40 shrink-0 font-medium"
-      >
-        {saving ? '...' : 'Guardar'}
-      </button>
     </div>
   )
 }
@@ -500,7 +317,7 @@ function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResu
             <thead>
               <tr className="bg-gray-50 text-xs text-gray-500 border-b">
                 <th className="text-left px-4 py-2 font-semibold">Partido</th>
-                <th className="text-left px-4 py-2 font-semibold hidden md:table-cell">Fecha</th>
+                <th className="text-left px-4 py-2 font-semibold">Fecha</th>
                 <th className="text-center px-4 py-2 font-semibold">Estado</th>
                 <th className="text-center px-4 py-2 font-semibold">Resultado</th>
                 <th className="text-right px-4 py-2 font-semibold">Acciones</th>
@@ -516,7 +333,7 @@ function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResu
                     <span className="text-gray-400 mx-1">vs</span>
                     <span className="font-medium text-[#001A4B]">{m.away_team}</span>
                   </td>
-                  <td className="px-4 py-3 text-gray-500 text-xs hidden md:table-cell">
+                  <td className="px-4 py-3 text-gray-500 text-xs">
                     {format(new Date(m.start_time), "d MMM HH:mm", { locale: es })}
                   </td>
                   <td className="px-4 py-3 text-center">
@@ -1131,143 +948,65 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
   )
 }
 
-/* ── EscudosTab ──────────────────────────────────────────────────────── */
-function EscudosTab({ matches }: { matches: Match[] }) {
+/* ── BroadcastTab ────────────────────────────────────────────────────── */
+function BroadcastTab() {
   const { show } = useToastStore()
-  const { badges, setBadge, removeBadge } = useTeamBadgesStore()
-  const [editTeam, setEditTeam] = useState<string | null>(null)
-  const [urlInput, setUrlInput] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [newTeam, setNewTeam] = useState('')
-  const [newUrl, setNewUrl] = useState('')
+  const [message, setMessage] = useState('')
+  const [sending, setSending] = useState(false)
+  const [result, setResult] = useState<{ total: number; sent: number; failed: number } | null>(null)
 
-  // Equipos únicos de todos los partidos
-  const teams = Array.from(new Set(
-    matches.flatMap(m => [m.home_team, m.away_team])
-  )).sort()
-
-  const teamsWithBadge = teams.filter(t => badges[t.toUpperCase().trim()])
-  const teamsWithoutBadge = teams.filter(t => !badges[t.toUpperCase().trim()])
-
-  const handleSave = async (teamName: string, url: string) => {
-    if (!url.trim() || !teamName.trim()) return
-    setSaving(true)
+  const handleSend = async () => {
+    if (!message.trim()) { show('Escribí un mensaje', 'error'); return }
+    if (!confirm('¿Enviar este mensaje por WhatsApp a todos los usuarios que dieron su consentimiento?')) return
+    setSending(true)
+    setResult(null)
     try {
-      const normalizedName = teamName.trim().toUpperCase()
-      await api.post('/teams/badges', { team_name: normalizedName, badge_url: url.trim() })
-      setBadge(normalizedName, url.trim())
-      show(`Escudo de ${normalizedName} guardado ✓`, 'success')
-      setEditTeam(null)
-      setNewTeam('')
-      setNewUrl('')
+      const { data } = await api.post('/internal/broadcast-whatsapp', { message }, {
+        headers: { 'x-internal-secret': import.meta.env.VITE_INTERNAL_SECRET || '' },
+      })
+      setResult(data.data)
+      show(`Enviado: ${data.data.sent} ✓ / ${data.data.failed} ✗`, data.data.failed === 0 ? 'success' : 'error')
     } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al guardar escudo'
+      const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al enviar'
       show(msg, 'error')
     } finally {
-      setSaving(false)
-    }
-  }
-
-  const handleDelete = async (teamName: string) => {
-    try {
-      await api.delete(`/teams/badges/${encodeURIComponent(teamName)}`)
-      removeBadge(teamName)
-      show('Escudo eliminado', 'info')
-    } catch {
-      show('Error al eliminar', 'error')
+      setSending(false)
     }
   }
 
   return (
-    <div className="space-y-4">
-      {/* Agregar nuevo escudo manual */}
-      <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-3">
-        <h3 className="text-sm font-semibold text-[#001A4B]">Agregar escudo manualmente</h3>
-        <div className="flex gap-2 flex-wrap">
-          <input
-            value={newTeam}
-            onChange={e => setNewTeam(e.target.value)}
-            placeholder="Nombre del equipo (ej: Brazil)"
-            className="flex-1 min-w-40 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
-          />
-          <input
-            value={newUrl}
-            onChange={e => setNewUrl(e.target.value)}
-            placeholder="URL del escudo (https://...)"
-            className="flex-1 min-w-52 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
-          />
-          {newUrl && (
-            <img src={newUrl} alt="" className="w-10 h-10 object-contain rounded border border-gray-200"
-              onError={e => (e.currentTarget.style.display = 'none')} />
-          )}
+    <div className="space-y-4 max-w-lg">
+      <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
+        <div>
+          <h3 className="text-sm font-semibold text-[#001A4B] mb-1">📣 Mensaje broadcast por WhatsApp</h3>
+          <p className="text-xs text-gray-400">Se enviará a todos los jugadores que tienen número de WhatsApp y dieron su consentimiento.</p>
+        </div>
+        <textarea
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          placeholder={"Ejemplo:\n⚽ PRODE Caballito\n\nRecordá apostar el partido de hoy antes de las 20:00 hs.\n\n👉 prodecaballito.com/apuestas"}
+          rows={6}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5] resize-none"
+        />
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-400">{message.length} caracteres</span>
           <button
-            onClick={() => handleSave(newTeam, newUrl)}
-            disabled={saving || !newTeam || !newUrl}
-            className="bg-[#001A4B] text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-[#002870] disabled:opacity-50"
+            onClick={handleSend}
+            disabled={sending || !message.trim()}
+            className="t-btn-cta text-sm px-5 py-2 disabled:opacity-50"
           >
-            Guardar
+            {sending ? 'Enviando...' : '📤 Enviar a todos'}
           </button>
         </div>
+        {result && (
+          <div className="bg-gray-50 rounded-lg px-4 py-3 text-sm space-y-1">
+            <p className="font-medium text-[#001A4B]">Resultado del envío</p>
+            <p className="text-gray-600">Total destinatarios: <span className="font-semibold">{result.total}</span></p>
+            <p className="text-green-600">Enviados: <span className="font-semibold">{result.sent}</span></p>
+            {result.failed > 0 && <p className="text-red-500">Fallidos: <span className="font-semibold">{result.failed}</span></p>}
+          </div>
+        )}
       </div>
-
-      {/* Equipos sin escudo */}
-      {teamsWithoutBadge.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-          <div className="px-4 py-2 bg-orange-50 border-b border-orange-100">
-            <p className="text-xs font-semibold text-orange-700">Sin escudo ({teamsWithoutBadge.length})</p>
-          </div>
-          {teamsWithoutBadge.map(team => (
-            <div key={team} className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 last:border-0">
-              <span className="text-lg w-8 text-center">{teamFlag(team) || '🏳️'}</span>
-              <span className="flex-1 text-sm font-medium text-gray-700">{team}</span>
-              {editTeam === team ? (
-                <div className="flex gap-2 items-center">
-                  <input
-                    value={urlInput}
-                    onChange={e => setUrlInput(e.target.value)}
-                    placeholder="URL del escudo..."
-                    autoFocus
-                    className="border border-gray-200 rounded-lg px-2 py-1 text-xs w-52 focus:outline-none focus:ring-1 focus:ring-[#0042A5]"
-                  />
-                  {urlInput && (
-                    <img src={urlInput} alt="" className="w-8 h-8 object-contain rounded border"
-                      onError={e => (e.currentTarget.style.display = 'none')} />
-                  )}
-                  <button onClick={() => handleSave(team, urlInput)} disabled={saving}
-                    className="text-xs bg-green-600 text-white font-bold px-2 py-1 rounded-lg">✓</button>
-                  <button onClick={() => setEditTeam(null)}
-                    className="text-xs bg-gray-100 text-gray-600 font-bold px-2 py-1 rounded-lg">✕</button>
-                </div>
-              ) : (
-                <button onClick={() => { setEditTeam(team); setUrlInput('') }}
-                  className="text-xs bg-[#0042A5] text-white font-bold px-3 py-1 rounded-lg hover:bg-[#003080]">
-                  + Agregar
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Equipos con escudo */}
-      {teamsWithBadge.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-          <div className="px-4 py-2 bg-green-50 border-b border-green-100">
-            <p className="text-xs font-semibold text-green-700">Con escudo ({teamsWithBadge.length})</p>
-          </div>
-          {teamsWithBadge.map(team => (
-            <div key={team} className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 last:border-0">
-              <img src={badges[team.toUpperCase().trim()]} alt={team}
-                className="w-8 h-8 object-contain rounded border border-gray-100" />
-              <span className="flex-1 text-sm font-medium text-gray-700">{team}</span>
-              <button onClick={() => handleDelete(team)}
-                className="text-xs bg-red-100 text-red-600 font-bold px-2 py-1 rounded-lg hover:bg-red-200">
-                Quitar
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   )
 }

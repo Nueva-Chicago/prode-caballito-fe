@@ -1,17 +1,82 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- Fondo blanco circulo -->
-  <circle cx="50" cy="50" r="48" fill="white" stroke="#222" stroke-width="3"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="geometricPrecision">
+  <defs>
+    <clipPath id="ball">
+      <circle cx="32" cy="32" r="30"/>
+    </clipPath>
+    <radialGradient id="ballGrad" cx="40%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e4e4e4"/>
+    </radialGradient>
+    <radialGradient id="navyGrad" cx="45%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#1a2f6e"/>
+      <stop offset="100%" stop-color="#000e30"/>
+    </radialGradient>
+    <radialGradient id="greenGrad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#4dcc7a"/>
+      <stop offset="100%" stop-color="#1a6b38"/>
+    </radialGradient>
+    <radialGradient id="redGrad" cx="65%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ff5050"/>
+      <stop offset="100%" stop-color="#aa1010"/>
+    </radialGradient>
+    <radialGradient id="blueGrad" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#3366ee"/>
+      <stop offset="100%" stop-color="#0a1e88"/>
+    </radialGradient>
+  </defs>
 
-  <!-- Pentágono central negro -->
-  <polygon points="50,20 63,30 58,45 42,45 37,30" fill="#1a1a1a"/>
+  <!-- Shadow -->
+  <circle cx="33" cy="33.5" r="29" fill="rgba(0,0,0,0.18)"/>
 
-  <!-- Pentágonos alrededor -->
-  <polygon points="77,35 88,48 82,62 68,60 65,45" fill="#1a1a1a"/>
-  <polygon points="77,65 68,78 53,76 50,62 62,54" fill="#1a1a1a"/>
-  <polygon points="23,35 37,45 35,60 21,62 12,48" fill="#1a1a1a"/>
-  <polygon points="23,65 38,54 50,62 47,76 32,78" fill="#1a1a1a"/>
-  <polygon points="50,80 58,68 68,72 65,85 50,90" fill="#1a1a1a"/>
+  <!-- Base white ball -->
+  <circle cx="32" cy="32" r="30" fill="url(#ballGrad)"/>
 
-  <!-- Borde -->
-  <circle cx="50" cy="50" r="48" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+  <g clip-path="url(#ball)">
+    <!-- Black corner patches -->
+    <ellipse cx="6"  cy="18" rx="9"  ry="11" fill="#111" transform="rotate(-28 6 18)"/>
+    <ellipse cx="58" cy="18" rx="9"  ry="11" fill="#111" transform="rotate(28 58 18)"/>
+    <ellipse cx="6"  cy="47" rx="8"  ry="10" fill="#111" transform="rotate(22 6 47)"/>
+    <ellipse cx="58" cy="47" rx="8"  ry="10" fill="#111" transform="rotate(-22 58 47)"/>
+    <ellipse cx="32" cy="2"  rx="11" ry="7"  fill="#111"/>
+
+    <!-- Navy center blob -->
+    <path d="M32 8
+             C40 12, 54 22, 55 36
+             C56 48, 45 57, 32 57
+             C19 57, 8 48, 9 36
+             C10 22, 24 12, 32 8 Z"
+          fill="url(#navyGrad)"/>
+
+    <!-- Green left petal -->
+    <path d="M3 15 C9 8, 23 13, 24 26
+             C25 37, 16 45, 8 43
+             C0 41, -3 27, 3 15 Z"
+          fill="url(#greenGrad)"/>
+    <path d="M7 17 C12 12, 19 16, 20 25 C21 32, 15 38, 11 36"
+          fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Red right petal -->
+    <path d="M61 15 C55 8, 41 13, 40 26
+             C39 37, 48 45, 56 43
+             C64 41, 67 27, 61 15 Z"
+          fill="url(#redGrad)"/>
+    <path d="M57 17 C52 12, 45 16, 44 25 C43 32, 49 38, 53 36"
+          fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Blue bottom petal -->
+    <path d="M15 59 C19 51, 45 51, 49 59
+             C53 67, 40 72, 32 72
+             C24 72, 11 67, 15 59 Z"
+          fill="url(#blueGrad)"/>
+    <path d="M19 58 C23 53, 41 53, 45 58"
+          fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Ball outline -->
+  <circle cx="32" cy="32" r="30" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="1.5"/>
+
+  <!-- "26" text -->
+  <text x="32" y="38" font-family="Arial Black, Arial, sans-serif"
+        font-weight="900" font-size="15" fill="white"
+        text-anchor="middle" letter-spacing="-0.5">26</text>
 </svg>

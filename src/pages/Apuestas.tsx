@@ -4,6 +4,7 @@ import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { useToastStore } from '@/store/toastStore'
+import { teamFlag } from '@/utils/teamFlags'
 
 function ApuestasSkeleton() {
   return (
@@ -29,8 +30,7 @@ function ApuestasSkeleton() {
     </div>
   )
 }
-import { useCountdown, formatCountdown } from '@/hooks/useCountdown'
-import type { Match, Bet, Planilla, Tournament } from '@/types'
+import type { Match, Bet, Planilla } from '@/types'
 
 export function Apuestas() {
   const { show } = useToastStore()
@@ -38,15 +38,14 @@ export function Apuestas() {
   const [matches, setMatches] = useState<Match[]>([])
   const [bets, setBets] = useState<Record<string, Bet>>({})
   const [planillas, setPlanillas] = useState<Planilla[]>([])
-  const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [selectedPlanilla, setSelectedPlanilla] = useState<string>('')
-  const [selectedTournament, setSelectedTournament] = useState<string>('all')
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'todos' | 'pendientes' | 'finalizados'>('todos')
   const [search, setSearch] = useState('')
   const [showNewPlanilla, setShowNewPlanilla] = useState(false)
-  const [newPlanillaName, setNewPlanillaName] = useState('')
   const [creatingPlanilla, setCreatingPlanilla] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [lockingPlanilla, setLockingPlanilla] = useState(false)
   const [now, setNow] = useState(Date.now())
   const livePollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -79,25 +78,14 @@ export function Apuestas() {
     return () => { if (livePollingRef.current) clearInterval(livePollingRef.current) }
   }, [matches])
 
-  // Cuando cambia el torneo, selecciona la primera planilla válida para ese torneo
-  useEffect(() => {
-    if (selectedTournament === 'all') return
-    const validPlanillas = planillas.filter(p => p.tournament_ids?.includes(selectedTournament))
-    if (validPlanillas.length > 0 && !validPlanillas.find(p => p.id === selectedPlanilla)) {
-      setSelectedPlanilla(validPlanillas[0].id)
-    }
-  }, [selectedTournament, planillas])
-
   const loadInitial = async () => {
     setLoading(true)
     try {
-      const [matchRes, planRes, tourRes] = await Promise.all([
+      const [matchRes, planRes] = await Promise.all([
         api.get('/matches?limit=200'),
         api.get('/planillas'),
-        api.get('/tournaments').catch(() => ({ data: { data: [] } })),
       ])
       setMatches(matchRes.data.data.matches)
-      setTournaments(tourRes.data.data || [])
       const pl: Planilla[] = planRes.data.data
       setPlanillas(pl)
       if (pl.length > 0) {
@@ -122,21 +110,13 @@ export function Apuestas() {
   }
 
   const handleCreatePlanilla = async () => {
-    if (!newPlanillaName.trim()) return
     setCreatingPlanilla(true)
     try {
-      const tournamentCtx = noBeetsInTournament && selectedTournament !== 'all'
-        ? selectedTournament
-        : undefined
-      const { data } = await api.post('/planillas', {
-        nombre_planilla: newPlanillaName.trim(),
-        ...(tournamentCtx ? { tournament_id: tournamentCtx } : {}),
-      })
+      const { data } = await api.post('/planillas')
       const created: Planilla = data.data
       setPlanillas(prev => [...prev, created])
       setSelectedPlanilla(created.id)
       setBets({})
-      setNewPlanillaName('')
       setShowNewPlanilla(false)
       show(t.bets.planillaCreated(created.nombre_planilla), 'success')
     } catch {
@@ -146,29 +126,30 @@ export function Apuestas() {
     }
   }
 
-  const tournamentMatches = selectedTournament === 'all'
-    ? matches
-    : matches.filter(m => m.tournament_id === selectedTournament)
+  const handleLockPlanilla = async () => {
+    if (!selectedPlanilla || lockingPlanilla) return
+    setLockingPlanilla(true)
+    try {
+      await api.put(`/planillas/${selectedPlanilla}/lock`)
+      setPlanillas(prev => prev.map(p => p.id === selectedPlanilla ? { ...p, precio_pagado: true } : p))
+      setShowConfirmModal(false)
+      show(t.bets.planillaLocked, 'success')
+    } catch {
+      show(t.bets.errorLock, 'error')
+    } finally {
+      setLockingPlanilla(false)
+    }
+  }
 
   // Live matches (pinned at top)
   const liveMatches = useMemo(
-    () => tournamentMatches.filter(m => m.estado === 'live'),
-    [tournamentMatches]
+    () => matches.filter(m => m.estado === 'live'),
+    [matches]
   )
 
-  // Next match to close (for countdown banner)
-  const nextClosingMatch = useMemo(() => {
-    return tournamentMatches
-      .filter(m => m.estado !== 'finished' && new Date(m.time_cutoff).getTime() > now)
-      .sort((a, b) => new Date(a.time_cutoff).getTime() - new Date(b.time_cutoff).getTime())[0] ?? null
-  }, [tournamentMatches, now])
+  const pendingMatches = matches.filter(m => m.estado !== 'finished')
 
-  const nextCloseDate = nextClosingMatch ? new Date(nextClosingMatch.time_cutoff) : null
-  const nextCloseCountdown = useCountdown(nextCloseDate)
-
-  const pendingMatches = tournamentMatches.filter(m => m.estado !== 'finished')
-
-  const filtered = tournamentMatches.filter((m) => {
+  const filtered = matches.filter((m) => {
     if (filter === 'pendientes' && m.estado === 'finished') return false
     if (filter === 'finalizados' && m.estado !== 'finished') return false
     if (search) {
@@ -179,21 +160,11 @@ export function Apuestas() {
   })
 
   const progress = {
-    done: Object.keys(bets).filter(mid => tournamentMatches.find(m => m.id === mid)).length,
+    done: Object.keys(bets).filter(mid => matches.find(m => m.id === mid)).length,
     total: pendingMatches.length,
   }
 
-  const selectedTournamentName = tournaments.find(tour => tour.id === selectedTournament)?.name
-
-  // Planillas del torneo seleccionado:
-  // - Sin asociaciones aún (planilla nueva) → disponible en cualquier torneo
-  // - Con asociaciones → solo si incluye este torneo
-  const planillasForTournament = selectedTournament === 'all'
-    ? planillas
-    : planillas.filter(p => !p.tournament_ids?.length || p.tournament_ids.includes(selectedTournament))
-
-  // Solo muestra "sin planillas" si la planilla ya tiene torneos pero ninguno es el seleccionado
-  const noBeetsInTournament = selectedTournament !== 'all' && planillasForTournament.length === 0
+  const selectedPlanillaObj = planillas.find(p => p.id === selectedPlanilla)
 
   if (loading) return <ApuestasSkeleton />
 
@@ -212,14 +183,9 @@ export function Apuestas() {
             <select
               value={selectedPlanilla}
               onChange={(e) => setSelectedPlanilla(e.target.value)}
-              disabled={noBeetsInTournament}
-              className={`w-full appearance-none border rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5] pr-8 font-medium transition-all ${
-                noBeetsInTournament
-                  ? 'border-gray-200 text-gray-400 cursor-not-allowed opacity-60'
-                  : 'border-gray-200 t-text-nav'
-              }`}
+              className="w-full appearance-none border border-gray-200 t-text-nav rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5] pr-8 font-medium transition-all"
             >
-              {planillasForTournament.map((p) => (
+              {planillas.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre_planilla}</option>
               ))}
             </select>
@@ -231,42 +197,13 @@ export function Apuestas() {
           </div>
         )}
         <button
-          onClick={() => {
-            if (noBeetsInTournament && selectedTournamentName) {
-              setNewPlanillaName(selectedTournamentName)
-            }
-            setShowNewPlanilla(true)
-          }}
+          onClick={() => setShowNewPlanilla(true)}
           className="shrink-0 w-10 h-10 rounded-xl t-bg-primary text-white font-bold text-lg flex items-center justify-center hover:opacity-90 transition-opacity"
           title={t.bets.newPlanilla}
         >
           +
         </button>
       </div>
-
-      {/* Banner: torneo sin planilla activa */}
-      {noBeetsInTournament && planillas.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
-          <span className="text-xl shrink-0">📋</span>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-blue-800">
-              {t.bets.noBeetsTitle(selectedTournamentName || '')}
-            </p>
-            <p className="text-xs text-blue-600 mt-0.5">
-              {t.bets.noBeetsDesc}
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              setNewPlanillaName(selectedTournamentName || '')
-              setShowNewPlanilla(true)
-            }}
-            className="shrink-0 t-btn-primary text-xs px-3 py-2"
-          >
-            {t.bets.new}
-          </button>
-        </div>
-      )}
 
       {/* Modal nueva planilla */}
       {showNewPlanilla && (
@@ -282,26 +219,16 @@ export function Apuestas() {
             <p className="text-xs text-gray-400 mb-4">
               {t.bets.planillaIndependent}
             </p>
-            <input
-              type="text"
-              value={newPlanillaName}
-              onChange={(e) => setNewPlanillaName(e.target.value)}
-              placeholder={t.bets.planillaPlaceholder}
-              autoFocus
-              maxLength={40}
-              onKeyDown={(e) => e.key === 'Enter' && handleCreatePlanilla()}
-              className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5] mb-4"
-            />
             <div className="flex gap-3">
               <button
-                onClick={() => { setShowNewPlanilla(false); setNewPlanillaName('') }}
+                onClick={() => setShowNewPlanilla(false)}
                 className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl"
               >
                 {t.bets.cancel}
               </button>
               <button
                 onClick={handleCreatePlanilla}
-                disabled={!newPlanillaName.trim() || creatingPlanilla}
+                disabled={creatingPlanilla}
                 className="flex-1 t-btn-primary text-sm py-3 disabled:opacity-40"
               >
                 {creatingPlanilla ? '...' : t.bets.createPlanilla}
@@ -311,25 +238,61 @@ export function Apuestas() {
         </>
       )}
 
-      {/* Selector de torneo */}
-      {tournaments.length > 0 && (
-        <div className="flex gap-1 flex-wrap">
+      {/* Botón confirmar planilla */}
+      {selectedPlanillaObj && !selectedPlanillaObj.precio_pagado && (() => {
+        const missing = pendingMatches.filter(m => !bets[m.id]).length
+        const allDone = missing === 0 && pendingMatches.length > 0
+        return (
           <button
-            onClick={() => setSelectedTournament('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === 'all' ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+            onClick={() => allDone && setShowConfirmModal(true)}
+            disabled={!allDone}
+            className={`w-full font-bold py-3 rounded-xl text-sm transition-colors border-2 ${
+              allDone
+                ? 'border-[#0042A5] text-[#0042A5] hover:bg-[#0042A5] hover:text-white cursor-pointer'
+                : 'border-gray-300 text-gray-400 bg-gray-50 cursor-not-allowed'
+            }`}
           >
-            {t.bets.all}
+            {allDone ? `🔒 ${t.bets.confirmPlanilla}` : `⏳ ${t.bets.missingBets(missing)}`}
           </button>
-          {tournaments.map(tour => (
-            <button
-              key={tour.id}
-              onClick={() => setSelectedTournament(tour.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === tour.id ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
-            >
-              {tour.name}
-            </button>
-          ))}
-        </div>
+        )
+      })()}
+
+      {/* Modal confirmar y cerrar planilla */}
+      {showConfirmModal && (
+        <>
+          <div className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm" />
+          <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 z-50 bg-white rounded-3xl shadow-2xl p-6 max-w-lg mx-auto max-h-[80vh] flex flex-col">
+            <h3 className="font-bold text-lg text-gray-900 mb-1">🔒 {t.bets.confirmPlanillaTitle}</h3>
+            <p className="text-sm text-gray-500 mb-4">{t.bets.confirmPlanillaDesc}</p>
+            <div className="overflow-y-auto flex-1 space-y-1 mb-4">
+              {matches.filter(m => bets[m.id]).map(m => (
+                <div key={m.id} className="flex justify-between items-center text-sm py-2 border-b border-gray-100">
+                  <span className="text-gray-700 truncate mr-2">
+                    {teamFlag(m.home_team)} {m.home_team} vs {m.away_team} {teamFlag(m.away_team)}
+                  </span>
+                  <span className="font-mono font-bold text-[#0042A5] shrink-0">
+                    {bets[m.id].goles_local} – {bets[m.id].goles_visitante}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="flex-1 border-2 border-gray-200 text-gray-600 font-bold py-3 rounded-xl text-sm"
+              >
+                {t.bets.keepEditing}
+              </button>
+              <button
+                onClick={handleLockPlanilla}
+                disabled={lockingPlanilla}
+                className="flex-1 t-btn-primary py-3 text-sm disabled:opacity-40"
+              >
+                {lockingPlanilla ? '...' : t.bets.confirmLock}
+              </button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Filtros + búsqueda */}
@@ -360,21 +323,6 @@ export function Apuestas() {
         />
       </div>
 
-      {/* Banner: próximo cierre */}
-      {nextCloseCountdown && nextClosingMatch && (
-        <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-          <span className="text-lg shrink-0">⏳</span>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-amber-800">{t.bets.nextClose}</p>
-            <p className="text-xs text-amber-600 truncate">
-              {nextClosingMatch.home_team} vs {nextClosingMatch.away_team}
-            </p>
-          </div>
-          <span className="font-mono font-black text-amber-700 text-sm shrink-0">
-            {formatCountdown(nextCloseCountdown.h, nextCloseCountdown.m, nextCloseCountdown.s)}
-          </span>
-        </div>
-      )}
 
       {/* Sección EN VIVO */}
       {liveMatches.length > 0 && (
@@ -389,6 +337,7 @@ export function Apuestas() {
               match={m}
               bet={bets[m.id]}
               planillaId={selectedPlanilla || undefined}
+              planillaLocked={selectedPlanillaObj?.precio_pagado}
               onBetSaved={(b) => setBets({ ...bets, [m.id]: b })}
               onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
               now={now}
@@ -409,6 +358,7 @@ export function Apuestas() {
             match={m}
             bet={bets[m.id]}
             planillaId={selectedPlanilla || undefined}
+            planillaLocked={selectedPlanillaObj?.precio_pagado}
             onBetSaved={(b) => setBets({ ...bets, [m.id]: b })}
             onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
             now={now}

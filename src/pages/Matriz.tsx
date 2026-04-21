@@ -6,7 +6,7 @@ import { Spinner } from '@/components/ui/Spinner'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
 import { teamFlag } from '@/utils/teamFlags'
 import { useAuthStore } from '@/store/authStore'
-import type { Match, RankingEntry, Tournament } from '@/types'
+import type { Match, RankingEntry } from '@/types'
 
 type BetEntry = { home: number; away: number }
 
@@ -241,96 +241,34 @@ export function Matriz() {
   const [matches, setMatches] = useState<Match[]>([])
   const [ranking, setRanking] = useState<RankingEntry[]>([])
   const [bets, setBets] = useState<BetMap>({})
-  const [tournaments, setTournaments] = useState<Tournament[]>([])
-  const [selectedTournament, setSelectedTournament] = useState<string>('')
   const [loading, setLoading] = useState(true)
-  const [loadingTournament, setLoadingTournament] = useState(false)
   const [activeCell, setActiveCell] = useState<ActiveCell | null>(null)
   const [filterColors, setFilterColors] = useState<Set<string>>(new Set())
-  const [unlocks, setUnlocks] = useState<Map<string, 'approved' | 'pending'>>(new Map())
-  const [pendingUnlock, setPendingUnlock] = useState<{ targetUserId: string; targetName: string; match: Match } | null>(null)
-  const [unlocking, setUnlocking] = useState(false)
-  const [payStep, setPayStep] = useState<'info' | 'reference'>('info')
-  const [paymentRef, setPaymentRef] = useState('')
-  const [unlockConfig, setUnlockConfig] = useState<{ price: number; currency: string; payment_link: string; free: boolean }>({ price: 0, currency: 'ARS', payment_link: '', free: true })
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [togglingFav, setTogglingFav] = useState<string | null>(null)
+  const [showVedaModal, setShowVedaModal] = useState(false)
   const tableRef = useRef<HTMLDivElement>(null)
+  const headerInnerRef = useRef<HTMLDivElement>(null)
 
-  const parseUnlocks = (data: { target_user_id: string; match_id: string; status: string }[]) => {
-    const map = new Map<string, 'approved' | 'pending'>()
-    data.forEach(u => map.set(`${u.target_user_id}_${u.match_id}`, u.status as 'approved' | 'pending'))
-    return map
+  const onBodyScroll = () => {
+    if (headerInnerRef.current && tableRef.current) {
+      headerInnerRef.current.scrollLeft = tableRef.current.scrollLeft
+    }
   }
-
-  const refreshUnlocks = useCallback(async () => {
-    try {
-      const { data } = await api.get('/bets/my-unlocks')
-      setUnlocks(parseUnlocks(data.data || []))
-    } catch { /* silent */ }
-  }, [])
 
   useEffect(() => {
     Promise.all([
       api.get('/matches?limit=200'),
       api.get('/ranking?limit=200&include_unpaid=true'),
       api.get('/bets/all-for-matrix'),
-      api.get('/tournaments'),
-      api.get('/bets/my-unlocks').catch(() => ({ data: { data: [] } })),
-      api.get('/bets/unlock-price').catch(() => ({ data: { data: { price: 0, currency: 'ARS', payment_link: '', free: true } } })),
       api.get('/ranking/favorites').catch(() => ({ data: { data: [] } })),
-    ]).then(([mRes, rRes, bRes, tRes, uRes, priceRes, favRes]) => {
+    ]).then(([mRes, rRes, bRes, favRes]) => {
       setMatches(mRes.data.data.matches)
       setRanking(rRes.data.data.ranking)
       setBets(bRes.data.data)
-      const tourList = tRes.data.data || []
-      setTournaments(tourList)
-      if (tourList.length > 0) setSelectedTournament(tourList[0].id)
-      setUnlocks(parseUnlocks(uRes.data.data || []))
-      if (priceRes.data.data) setUnlockConfig(priceRes.data.data)
       setFavorites(new Set(favRes.data.data || []))
     }).finally(() => setLoading(false))
   }, [])
-
-  // Refresca el estado de unlocks cuando el usuario vuelve a esta pestaña
-  // (ej: el admin aprueba en Admin y luego vuelve a Matriz)
-  useEffect(() => {
-    window.addEventListener('focus', refreshUnlocks)
-    return () => window.removeEventListener('focus', refreshUnlocks)
-  }, [refreshUnlocks])
-
-  const handleRequestUnlock = async () => {
-    if (!pendingUnlock) return
-    setUnlocking(true)
-    try {
-      await api.post('/bets/request-unlock', {
-        target_user_id: pendingUnlock.targetUserId,
-        match_id: pendingUnlock.match.id,
-        payment_reference: paymentRef.trim() || undefined,
-      })
-      const key = `${pendingUnlock.targetUserId}_${pendingUnlock.match.id}`
-      setUnlocks(prev => new Map([...prev, [key, 'pending']]))
-      setPendingUnlock(null)
-      setPayStep('info')
-      setPaymentRef('')
-    } catch {
-      setPendingUnlock(null)
-      setPayStep('info')
-      setPaymentRef('')
-    } finally {
-      setUnlocking(false)
-    }
-  }
-
-  const handleClosePendingUnlock = () => {
-    setPendingUnlock(null)
-    setPayStep('info')
-    setPaymentRef('')
-  }
-
-  useEffect(() => {
-    setLoadingTournament(false)
-  }, [selectedTournament])
 
   const handleToggleFavorite = useCallback(async (planillaId: string, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -366,9 +304,7 @@ export function Matriz() {
 
   const lang = useAuthStore(s => s.user?.idioma_pref || 'es')
 
-  const filteredMatches = selectedTournament
-    ? matches.filter(m => m.tournament_id === selectedTournament)
-    : matches
+  const filteredMatches = matches
   const finishedMatches = filteredMatches.filter(m => m.estado === 'finished')
   const pendingMatches  = filteredMatches.filter(m => m.estado !== 'finished')
   const allMatches = [...finishedMatches, ...pendingMatches]
@@ -382,9 +318,7 @@ export function Matriz() {
 
   if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
 
-  const baseRows: RankingEntry[] = selectedTournament
-    ? ranking.filter(r => allMatches.some(m => bets[r.planilla_id]?.[m.id]))
-    : ranking
+  const baseRows: RankingEntry[] = ranking
 
   const tournamentPts = new Map<string, number>()
   baseRows.forEach(r => {
@@ -419,46 +353,6 @@ export function Matriz() {
           0%   { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
-        @keyframes neon-pulse {
-          0%, 100% { box-shadow: 0 0 4px #84cc16, 0 0 8px #84cc16; }
-          50%       { box-shadow: 0 0 8px #bef264, 0 0 16px #a3e635; }
-        }
-        .badge-unlocked {
-          display: inline-flex;
-          align-items: center;
-          gap: 2px;
-          padding: 2px 6px;
-          border-radius: 5px;
-          font-size: 11px;
-          font-weight: 900;
-          background: linear-gradient(135deg, #bef264 0%, #84cc16 100%);
-          color: #1a2e05;
-          animation: neon-pulse 2s ease-in-out infinite;
-          white-space: nowrap;
-          cursor: default;
-          letter-spacing: 0.02em;
-        }
-        .badge-paid {
-          background: linear-gradient(90deg, #92400e 0%, #d97706 30%, #fde68a 50%, #d97706 70%, #92400e 100%);
-          background-size: 200% 100%;
-          animation: shimmer 2.4s linear infinite;
-          color: #451a03;
-          font-weight: 900;
-          font-size: 10px;
-          border-radius: 5px;
-          padding: 2px 5px;
-          display: inline-flex;
-          align-items: center;
-          gap: 2px;
-          letter-spacing: 0.02em;
-          box-shadow: 0 0 0 1px #d97706, 0 1px 4px rgba(217,119,6,0.4);
-          cursor: default;
-          user-select: none;
-          white-space: nowrap;
-        }
-        .badge-paid:hover {
-          box-shadow: 0 0 0 1px #d97706, 0 2px 8px rgba(217,119,6,0.6);
-        }
       `}</style>
 
       <div className="max-w-7xl mx-auto px-2 flex items-start justify-between flex-wrap gap-3">
@@ -469,19 +363,6 @@ export function Matriz() {
           </p>
         </div>
 
-        {tournaments.length > 0 && (
-          <div className="flex gap-1 flex-wrap">
-            {tournaments.map(tour => (
-              <button
-                key={tour.id}
-                onClick={(e) => { e.stopPropagation(); setSelectedTournament(tour.id) }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTournament === tour.id ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
-              >
-                {tour.name}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       {finishedMatches.length > 0 && (
@@ -527,49 +408,71 @@ export function Matriz() {
         <BetPopover cell={activeCell} onClose={() => setActiveCell(null)} />
       )}
 
-      {loadingTournament ? (
-        <div className="flex justify-center py-10"><Spinner /></div>
-      ) : allMatches.length === 0 ? (
+      {allMatches.length === 0 ? (
         <div className="max-w-7xl mx-auto px-2 text-center py-10 text-gray-400 text-sm">
           {t.matrix.noMatches}
         </div>
       ) : (
-        <div ref={tableRef} className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-280px)] [scrollbar-width:thin] [scrollbar-color:rgba(100,116,139,0.6)_rgba(203,213,225,0.4)] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-500/60 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-200/40">
-          <table className="text-xs border-collapse min-w-max">
-            <thead>
-              <tr className="bg-[#001A4B] text-white">
-                <th className="sticky top-0 left-0 bg-[#001A4B] px-2 py-2 text-left font-semibold z-30 min-w-[140px] sm:min-w-[180px]">
-                  {t.ranking.player}
-                </th>
-                <th className="sticky top-0 px-2 py-2 text-center font-semibold w-14 bg-[#001A4B] z-20">{t.ranking.pts}</th>
-                {allMatches.map((m) => (
-                  <th key={m.id} className="sticky top-0 px-1 py-2 text-center font-medium min-w-[60px] bg-[#001A4B] z-20">
-                    {teamFlag(m.home_team)
-                      ? <div className="text-base leading-none">{teamFlag(m.home_team)}</div>
-                      : <div className="truncate max-w-[55px]">{m.home_team.substring(0,3).toUpperCase()}</div>
-                    }
-                    <div className="text-[10px] text-white/60">vs</div>
-                    {teamFlag(m.away_team)
-                      ? <div className="text-base leading-none">{teamFlag(m.away_team)}</div>
-                      : <div className="truncate max-w-[55px]">{m.away_team.substring(0,3).toUpperCase()}</div>
-                    }
-                    {m.estado === 'finished' && (
-                      <div className="text-[#FFDF00] font-bold text-[11px]">{m.resultado_local}-{m.resultado_visitante}</div>
-                    )}
+        <>
+        {/* ── Sticky header fuera del overflow-x container ────────────────
+            Fix iOS Safari: sticky en <th> se rompe si cualquier ancestor
+            tiene overflow-x:auto. Solución: header en div sticky separado,
+            sincronizado con el body via JS onBodyScroll.
+        ── */}
+        <div className="sticky top-14 z-20 overflow-hidden shadow-sm">
+          <div ref={headerInnerRef} className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <table className="text-xs border-collapse min-w-max">
+              <thead>
+                <tr className="bg-[#001A4B] text-white">
+                  <th className="sticky left-0 bg-[#001A4B] px-2 py-2 text-left font-semibold z-30 min-w-[140px] sm:min-w-[180px]">
+                    {t.ranking.player}
                   </th>
-                ))}
+                  <th className="px-2 py-2 text-center font-semibold w-14 bg-[#001A4B]">{t.ranking.pts}</th>
+                  {allMatches.map((m) => (
+                    <th key={m.id} className="px-1 py-2 text-center font-medium min-w-[60px] bg-[#001A4B]">
+                      {teamFlag(m.home_team)
+                        ? <div className="text-base leading-none">{teamFlag(m.home_team)}</div>
+                        : <div className="truncate max-w-[55px]">{m.home_team.substring(0,3).toUpperCase()}</div>
+                      }
+                      <div className="text-[10px] text-white/60">vs</div>
+                      {teamFlag(m.away_team)
+                        ? <div className="text-base leading-none">{teamFlag(m.away_team)}</div>
+                        : <div className="truncate max-w-[55px]">{m.away_team.substring(0,3).toUpperCase()}</div>
+                      }
+                      {m.estado === 'finished' && (
+                        <div className="text-[#FFDF00] font-bold text-[11px]">{m.resultado_local}-{m.resultado_visitante}</div>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+
+        {/* ── Body con scroll horizontal del usuario ── */}
+        <div ref={tableRef} onScroll={onBodyScroll} className="overflow-x-auto [scrollbar-width:thin] [scrollbar-color:rgba(100,116,139,0.6)_rgba(203,213,225,0.4)] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-500/60 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-200/40">
+          <table className="text-xs border-collapse min-w-max">
+            {/* thead invisible: fuerza que las columnas del body tengan
+                el mismo ancho mínimo que el header visible */}
+            <thead aria-hidden>
+              <tr className="invisible">
+                <th className="min-w-[140px] sm:min-w-[180px] p-0" />
+                <th className="w-14 p-0" />
+                {allMatches.map((m) => <th key={m.id} className="min-w-[60px] p-0" />)}
               </tr>
             </thead>
             <tbody>
               {rows.map((r, ri) => {
                 const isMe = r.user_id === user?.id
+                const isUnpaid = !r.precio_pagado
                 const playerBets = getBetsForRow(r)
-                const rowBg = isMe ? 'bg-blue-50' : ri % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                const rowBg = isMe ? 'bg-blue-50' : isUnpaid ? 'bg-orange-50' : ri % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                 const rowKey = `${r.planilla_id}-${ri}`
                 const pts = tournamentPts.get(r.planilla_id) ?? 0
                 const pos = ri + 1
                 return (
-                  <tr key={rowKey} className={`${rowBg} hover:bg-yellow-50/50 transition-colors`}>
+                  <tr key={rowKey} className={`${rowBg} hover:bg-yellow-50/50 transition-colors ${isUnpaid && !isMe ? 'border-l-4 border-orange-400' : ''}`}>
                     <td className={`sticky left-0 px-1.5 sm:px-2 py-1.5 font-medium z-10 border-r border-gray-100 ${rowBg} min-w-[140px] sm:min-w-auto`}>
                       <div className="flex items-center gap-2">
                         <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isMe ? 'bg-[#0042A5] text-white' : 'bg-gray-200 text-gray-600'}`}>
@@ -581,12 +484,17 @@ export function Matriz() {
                               {r.user_name[0].toUpperCase()}
                             </div>
                         }
-                        <div className="min-w-0 flex-1 hidden sm:block">
-                          <div className={`truncate max-w-[105px] font-semibold ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
+                        <div className="min-w-0 flex-1">
+                          <div className={`truncate max-w-[90px] sm:max-w-[105px] text-[11px] sm:text-xs font-semibold ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
                             {r.user_name}
                           </div>
                           {r.nombre_planilla && (
-                            <div className="text-[10px] text-gray-400 truncate max-w-[105px]">{r.nombre_planilla}</div>
+                            <span className="block text-[10px] text-gray-400 truncate max-w-[90px]">{r.nombre_planilla}</span>
+                          )}
+                          {isUnpaid && (
+                            <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-orange-500 text-white leading-none whitespace-nowrap">
+                              ⚠️ {t.ranking.noOfficial}
+                            </span>
                           )}
                         </div>
                         {r.whatsapp_number && !isMe && (
@@ -642,34 +550,12 @@ export function Matriz() {
                         )
                       }
 
-                      const unlockStatus = unlocks.get(`${r.user_id}_${m.id}`)
-                      if (isMe || isCutoffPassed || unlockStatus === 'approved') {
+                      // Partido pendiente: solo el propio usuario ve su apuesta (o si el cutoff ya pasó)
+                      if (isMe || isCutoffPassed) {
                         if (!b) return <td key={m.id} className="px-1 py-1.5 text-center text-gray-300">—</td>
-                        // Apuesta desbloqueada (aprobada) — badge fluor neon
-                        if (!isMe && !isCutoffPassed && unlockStatus === 'approved') {
-                          return (
-                            <td key={m.id} className="px-1 py-1.5 text-center">
-                              <span className="badge-unlocked" title="Desbloqueada ✓">
-                                🔓 {b.home}-{b.away}
-                              </span>
-                            </td>
-                          )
-                        }
                         return (
                           <td key={m.id} className="px-1 py-1.5 text-center text-gray-500 font-medium">
                             {b.home}-{b.away}
-                          </td>
-                        )
-                      }
-
-                      if (unlockStatus === 'pending') {
-                        const isPaid = !unlockConfig.free
-                        return (
-                          <td key={m.id} className="px-1 py-1.5 text-center">
-                            {isPaid
-                              ? <span className="badge-paid" title={t.matrix.paid}>🪙 $</span>
-                              : <span className="inline-block text-[13px]" title={t.matrix.pendingFree}>⏳</span>
-                            }
                           </td>
                         )
                       }
@@ -678,9 +564,9 @@ export function Matriz() {
                         <td key={m.id} className="px-1 py-1.5 text-center">
                           {b
                             ? <span
-                                onClick={(e) => { e.stopPropagation(); setPendingUnlock({ targetUserId: r.user_id, targetName: r.user_name, match: m }) }}
-                                className="inline-block px-1.5 py-0.5 rounded text-[13px] bg-gray-100 select-none cursor-pointer hover:bg-gray-200 transition-colors"
-                                title={t.matrix.lockTitle}
+                                onClick={(e) => { e.stopPropagation(); setShowVedaModal(true) }}
+                                className="inline-block text-[13px] cursor-pointer select-none opacity-50 hover:opacity-80 transition-opacity"
+                                title="Período de veda activo"
                               >🔒</span>
                             : <span className="text-gray-200">—</span>
                           }
@@ -693,125 +579,39 @@ export function Matriz() {
             </tbody>
           </table>
         </div>
+        </>
       )}
 
-      {/* Sheet de desbloqueo */}
-      {pendingUnlock && (
+      {/* Modal: período de veda */}
+      {showVedaModal && (
         <>
-          <div className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm" onClick={handleClosePendingUnlock} />
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl max-w-lg mx-auto p-6"
-            style={{ animation: 'slideUp 0.2s ease-out both' }}>
-            <style>{`@keyframes slideUp { from { transform: translateY(100%); opacity:0; } to { transform: translateY(0); opacity:1; } }`}</style>
-            <div className="flex justify-center mb-4">
-              <div className="w-10 h-1 rounded-full bg-gray-200" />
-            </div>
-
-            <div className="text-center mb-4">
-              <div className="text-3xl mb-2">{unlockConfig.free ? '🔓' : '💳'}</div>
-              <h3 className="font-bold t-text-nav text-base">
-                {unlockConfig.free ? t.matrix.unlockTitle : t.matrix.payStep1Title}
-              </h3>
-              <p className="text-sm text-gray-600 mt-1 font-medium">{pendingUnlock.targetName}</p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                {pendingUnlock.match.home_team} vs {pendingUnlock.match.away_team}
-              </p>
-            </div>
-
-            {/* FLUJO GRATUITO */}
-            {unlockConfig.free && (
-              <>
-                <p className="text-xs text-gray-400 text-center mb-5 leading-relaxed">
-                  {t.matrix.freeInstructions}
+          <div className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm" onClick={() => setShowVedaModal(false)} />
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-6 pointer-events-none">
+            <div
+              className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 pointer-events-auto"
+              style={{ animation: 'pop 0.2s ease-out both' }}
+            >
+              <div className="text-center space-y-3">
+                <div className="text-4xl">🔒</div>
+                <h3 className="font-bold text-[#001A4B] text-base">Período de veda activo</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Las apuestas de otros jugadores no se pueden ver hasta que finalice el período de veda de este partido.
                 </p>
-                <div className="flex gap-3">
-                  <button onClick={handleClosePendingUnlock}
-                    className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
-                    {t.matrix.cancel}
-                  </button>
-                  <button onClick={handleRequestUnlock} disabled={unlocking}
-                    className="flex-1 t-btn-primary text-sm py-3">
-                    {unlocking ? t.matrix.sending : t.matrix.sendRequest}
-                  </button>
-                </div>
-              </>
-            )}
-
-            {/* FLUJO PAGO — paso 1 */}
-            {!unlockConfig.free && payStep === 'info' && (
-              <>
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 text-center">
-                  <p className="text-xs text-amber-700 font-semibold uppercase tracking-wide mb-1">{t.matrix.payStep1Cost}</p>
-                  <p className="text-3xl font-black text-amber-600">${unlockConfig.price.toLocaleString('es-AR')}</p>
-                  <p className="text-xs text-amber-600 mt-0.5">{unlockConfig.currency}</p>
-                </div>
-                <p className="text-xs text-gray-500 text-center mb-4 leading-relaxed">
-                  {t.matrix.payInstructions}
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  Una vez que comience el partido, podrás ver todos los pronósticos.
                 </p>
-                <div className="flex gap-3">
-                  <button onClick={handleClosePendingUnlock}
-                    className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
-                    {t.matrix.cancel}
-                  </button>
-                  {unlockConfig.payment_link ? (
-                    <a
-                      href={unlockConfig.payment_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => setTimeout(() => setPayStep('reference'), 1500)}
-                      className="flex-1 bg-[#009EE3] text-white text-sm font-bold py-3 rounded-xl text-center hover:bg-[#0086c3] transition-colors"
-                    >
-                      {t.matrix.payBtn}
-                    </a>
-                  ) : (
-                    <button onClick={() => setPayStep('reference')}
-                      className="flex-1 t-btn-primary text-sm py-3">
-                      {t.matrix.paidBtn}
-                    </button>
-                  )}
-                </div>
-                {unlockConfig.payment_link && (
-                  <button onClick={() => setPayStep('reference')}
-                    className="w-full mt-2 text-xs text-gray-400 hover:text-gray-600 py-2">
-                    {t.matrix.alreadyPaid}
-                  </button>
-                )}
-              </>
-            )}
-
-            {/* FLUJO PAGO — paso 2 */}
-            {!unlockConfig.free && payStep === 'reference' && (
-              <>
-                <div className="mb-4">
-                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-                    {t.matrix.refTitle}
-                  </label>
-                  <input
-                    type="text"
-                    value={paymentRef}
-                    onChange={(e) => setPaymentRef(e.target.value)}
-                    placeholder={t.matrix.refPlaceholder}
-                    autoFocus
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#009EE3]"
-                  />
-                  <p className="text-xs text-gray-400 mt-1.5">
-                    {t.matrix.refHint}
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={() => setPayStep('info')}
-                    className="flex-1 border-2 border-gray-200 text-gray-600 text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors">
-                    {t.matrix.back}
-                  </button>
-                  <button onClick={handleRequestUnlock} disabled={unlocking || !paymentRef.trim()}
-                    className="flex-1 t-btn-primary text-sm py-3 disabled:opacity-40">
-                    {unlocking ? t.matrix.sending : t.matrix.sendRequest}
-                  </button>
-                </div>
-              </>
-            )}
+                <button
+                  onClick={() => setShowVedaModal(false)}
+                  className="w-full bg-[#001A4B] text-white font-bold py-2.5 rounded-xl text-sm mt-2 hover:bg-[#002870] transition-colors"
+                >
+                  Entendido
+                </button>
+              </div>
+            </div>
           </div>
         </>
       )}
+
     </div>
   )
 }

@@ -1,34 +1,23 @@
-import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useRef, useState } from 'react'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
-import { Modal } from '@/components/ui/Modal'
-import { Sk } from '@/components/ui/Skeleton'
-import type { Planilla } from '@/types'
 import { TEAM_THEMES } from '@/types'
+import { usePushNotifications } from '@/hooks/usePushNotifications'
 
 export function Profile() {
   const { user, updateUser } = useAuthStore()
   const { show } = useToastStore()
   const t = useT()
   const fileRef = useRef<HTMLInputElement>(null)
-  const [planillas, setPlanillas] = useState<Planilla[]>([])
-  const [loading, setLoading] = useState(true)
   const [editName, setEditName] = useState(false)
   const [nombre, setNombre] = useState(user?.nombre || '')
-  const [showNewPlanilla, setShowNewPlanilla] = useState(false)
-  const [newPlanillaName, setNewPlanillaName] = useState('')
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [waNumber, setWaNumber] = useState(user?.whatsapp_number || '')
   const [waConsent, setWaConsent] = useState(user?.whatsapp_consent || false)
   const [savingWa, setSavingWa] = useState(false)
-
-  useEffect(() => {
-    if (!user) return
-    api.get('/planillas').then(({ data }) => setPlanillas(data.data)).finally(() => setLoading(false))
-  }, [user])
+  const push = usePushNotifications()
 
   const handleSaveName = async () => {
     try {
@@ -73,30 +62,6 @@ export function Profile() {
       show(t.profile.errorPhoto, 'error')
     } finally {
       setUploadingPhoto(false)
-    }
-  }
-
-  const handleCreatePlanilla = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      const { data } = await api.post('/planillas', { nombre_planilla: newPlanillaName })
-      setPlanillas([...planillas, data.data])
-      setShowNewPlanilla(false)
-      setNewPlanillaName('')
-      show(t.profile.planillaCreated, 'success')
-    } catch {
-      show(t.profile.errorCreate, 'error')
-    }
-  }
-
-  const handleDeletePlanilla = async (id: string) => {
-    if (!confirm(t.profile.deleteConfirm)) return
-    try {
-      await api.delete(`/planillas/${id}`)
-      setPlanillas(planillas.filter(p => p.id !== id))
-      show(t.profile.planillaDeleted, 'info')
-    } catch {
-      show(t.profile.errorDelete, 'error')
     }
   }
 
@@ -228,71 +193,38 @@ export function Profile() {
         </button>
       </div>
 
-      {/* Planillas */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-[#001A4B]">{t.profile.myPlanillas}</h3>
-          <button onClick={() => setShowNewPlanilla(true)}
-            className="bg-[#FFDF00] text-[#001A4B] text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-yellow-400 transition-colors">
-            {t.bets.new}
-          </button>
+      {/* Push Notifications */}
+      {push.state !== 'unsupported' && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
+          <h3 className="font-bold text-[#001A4B]">🔔 Notificaciones push</h3>
+          <p className="text-xs text-gray-500 leading-relaxed">
+            Recibí alertas en tu dispositivo cuando se publique un resultado, cuando tu partido esté por comenzar o cuando seas el nuevo líder del ranking — incluso con la app cerrada.
+          </p>
+          {push.state === 'denied' && (
+            <p className="text-xs text-red-500 font-medium">
+              Las notificaciones están bloqueadas. Habilitálas desde la configuración del navegador.
+            </p>
+          )}
+          {push.state === 'subscribed' ? (
+            <button
+              onClick={push.unsubscribe}
+              disabled={push.loading}
+              className="w-full border border-gray-200 text-gray-500 text-sm font-semibold py-2.5 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-40"
+            >
+              {push.loading ? '...' : '🔕 Desactivar notificaciones'}
+            </button>
+          ) : (
+            <button
+              onClick={push.subscribe}
+              disabled={push.loading || push.state === 'denied'}
+              className="w-full bg-[#001A4B] text-white text-sm font-bold py-2.5 rounded-xl hover:bg-[#002870] transition-colors disabled:opacity-40"
+            >
+              {push.loading ? '...' : '🔔 Activar notificaciones'}
+            </button>
+          )}
         </div>
-        {loading ? (
-          <div className="space-y-2">
-            {[0, 1, 2].map(i => (
-              <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                <div className="flex-1 space-y-1.5">
-                  <Sk className="h-4 w-36" />
-                  <div className="flex gap-2">
-                    <Sk className="h-3 w-10" />
-                    <Sk className="h-4 w-14 rounded" />
-                  </div>
-                </div>
-                <Sk className="h-5 w-5 rounded ml-2" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {planillas.length === 0 && <p className="text-sm text-gray-400 text-center py-4">{t.profile.noPlanillas}</p>}
-            {planillas.map((p) => (
-              <div key={p.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                <Link to={`/planilla/${p.id}`} className="flex-1 min-w-0 hover:opacity-80">
-                  <p className="text-sm font-semibold text-[#001A4B]">{p.nombre_planilla}</p>
-                  <div className="flex gap-2 mt-0.5">
-                    <span className="text-xs text-gray-400">{p.puntos_totales || 0} {t.ranking.pts}</span>
-                    <span className={`text-xs px-1.5 rounded font-medium ${p.precio_pagado ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600'}`}>
-                      {p.precio_pagado ? t.profile.paid : t.profile.unpaid}
-                    </span>
-                  </div>
-                </Link>
-                <button onClick={() => handleDeletePlanilla(p.id)} className="text-gray-300 hover:text-red-400 transition-colors text-lg ml-2">×</button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      )}
 
-      {/* Modal nueva planilla */}
-      <Modal open={showNewPlanilla} onClose={() => setShowNewPlanilla(false)} title={t.profile.newPlanilla}>
-        <form onSubmit={handleCreatePlanilla} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t.profile.editNamePlaceholder}</label>
-            <input
-              type="text"
-              value={newPlanillaName}
-              onChange={(e) => setNewPlanillaName(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
-              placeholder={t.profile.planillaPlaceholder}
-              required
-            />
-          </div>
-          <button type="submit"
-            className="w-full bg-[#0042A5] text-white font-bold py-2.5 rounded-xl hover:bg-[#003080] transition-colors">
-            {t.profile.createPlanilla}
-          </button>
-        </form>
-      </Modal>
     </div>
   )
 }
