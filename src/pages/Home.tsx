@@ -272,7 +272,11 @@ function NextMatchBanner({ matches, bets, embedded = false }: { matches: Match[]
 
 /* Panel derecho del hero en desktop — muestra próximo partido sin flip clock */
 function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Record<string, Bet> }) {
-  const [now] = useState(Date.now())
+  const [now, setNow] = useState(Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60000)
+    return () => clearInterval(id)
+  }, [])
   const match = matches
     .filter(m => m.estado !== 'finished' && new Date(m.start_time).getTime() > now)
     .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())[0] || null
@@ -427,12 +431,12 @@ export function Home() {
 
   // Polling cada 30s para refrescar resultados automáticamente
   useEffect(() => {
-    const interval = setInterval(() => loadData(), 30000)
+    const interval = setInterval(() => loadData(true), 30000)
     return () => clearInterval(interval)
   }, [])
 
-  const loadData = async () => {
-    setLoading(true)
+  const loadData = async (silent = false) => {
+    if (!silent) setLoading(true)
     try {
       const [matchRes, planillaRes, rankRes] = await Promise.all([
         api.get('/matches?limit=200'),
