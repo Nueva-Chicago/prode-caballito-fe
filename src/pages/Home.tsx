@@ -535,9 +535,9 @@ export function Home() {
           {/* Left: todo el contenido textual */}
           <div className="flex-1 min-w-0">
 
-            {/* Countdown al Mundial — encima del título, compacto (solo días y hs) */}
+            {/* Countdown al Mundial — solo en desktop; en mobile el flip clock del próximo partido es el único countdown */}
             {mundialCd ? (
-              <div className="flex items-end gap-1.5 mb-3">
+              <div className="hidden md:flex items-end gap-1.5 mb-3">
                 <CountdownUnit value={mundialCd.days}  label="días" />
                 <span className="text-white/25 font-black pb-3 text-base leading-none">:</span>
                 <CountdownUnit value={mundialCd.hours} label="hs" />
@@ -545,7 +545,7 @@ export function Home() {
                 <CountdownUnit value={mundialCd.mins}  label="min" />
               </div>
             ) : (
-              <p className="text-white/70 text-sm font-bold mb-3">¡El Mundial empezó! 🎉</p>
+              <p className="hidden md:block text-white/70 text-sm font-bold mb-3">¡El Mundial empezó! 🎉</p>
             )}
 
             {/* Saludo personalizado */}
