@@ -22,6 +22,7 @@ export function Admin() {
   const [resultMatch, setResultMatch] = useState<Match | null>(null)
   const [matchForm, setMatchForm] = useState({
     home_team: '', away_team: '', start_time: '', tournament_id: '', halftime_minutes: '15',
+    sede: '', grupo: '', jornada: '',
   })
   const [resultForm, setResultForm] = useState({ resultado_local: '', resultado_visitante: '' })
   useEffect(() => {
@@ -101,6 +102,9 @@ export function Admin() {
       start_time: m.start_time.slice(0, 16),
       tournament_id: m.tournament_id || '',
       halftime_minutes: String(m.halftime_minutes),
+      sede: m.sede || '',
+      grupo: m.grupo || '',
+      jornada: m.jornada ? String(m.jornada) : '',
     })
     setShowMatchModal(true)
   }
@@ -116,7 +120,7 @@ export function Admin() {
 
   const openNewMatch = (tournamentId = '') => {
     setEditMatch(null)
-    setMatchForm({ home_team: '', away_team: '', start_time: '', tournament_id: tournamentId, halftime_minutes: '15' })
+    setMatchForm({ home_team: '', away_team: '', start_time: '', tournament_id: tournamentId, halftime_minutes: '15', sede: '', grupo: '', jornada: '' })
     setShowMatchModal(true)
   }
 
@@ -197,6 +201,31 @@ export function Admin() {
               <label className="block text-xs font-medium text-gray-600 mb-1">Min. cierre pronóstico</label>
               <input type="number" value={matchForm.halftime_minutes} onChange={(e) => setMatchForm({ ...matchForm, halftime_minutes: e.target.value })}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">📍 Sede</label>
+            <input value={matchForm.sede} onChange={(e) => setMatchForm({ ...matchForm, sede: e.target.value })}
+              placeholder="Ciudad de México" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Grupo</label>
+              <select value={matchForm.grupo} onChange={(e) => setMatchForm({ ...matchForm, grupo: e.target.value })}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]">
+                <option value="">—</option>
+                {['A','B','C','D','E','F','G','H','I','J','K','L'].map(g => <option key={g} value={g}>{g}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Jornada</label>
+              <select value={matchForm.jornada} onChange={(e) => setMatchForm({ ...matchForm, jornada: e.target.value })}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]">
+                <option value="">—</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
             </div>
           </div>
           <button type="submit" className="w-full bg-[#0042A5] text-white font-bold py-2.5 rounded-xl hover:bg-[#003080]">

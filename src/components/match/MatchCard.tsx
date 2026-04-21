@@ -165,7 +165,9 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
       {/* Tournament header */}
       {match.tournament_name && (
         <div className="bg-[#001A4B] text-white text-xs px-4 py-2 text-center font-medium tracking-wide">
-          {match.tournament_name} · {match.tournament_fase}
+          {match.tournament_name}
+          {match.grupo && ` · Grupo ${match.grupo}`}
+          {match.jornada && ` · J${match.jornada}`}
         </div>
       )}
 
@@ -191,9 +193,14 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
       {/* Date/time bar */}
       {!isLive && !isFinished && (
         <div className="flex items-center justify-between gap-1.5 bg-gray-50 border-b border-gray-100 px-4 py-1.5">
-          <span className="text-xs font-semibold text-gray-500">
-            📅 {format(new Date(match.start_time), "EEE d MMM · HH:mm", { locale: dateLocale })} hs
-          </span>
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold text-gray-500">
+              📅 {format(new Date(match.start_time), "EEE d MMM · HH:mm", { locale: dateLocale })} hs
+            </span>
+            {match.sede && (
+              <span className="text-[10px] text-gray-400 leading-tight">📍 {match.sede}</span>
+            )}
+          </div>
           {hasActiveReminder && (
             <span className="flex items-center gap-1 text-xs font-semibold text-[#0042A5]">
               🔔 <span className="font-mono">{formatReminderCountdown(msUntilReminder!)}</span>

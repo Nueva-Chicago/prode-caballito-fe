@@ -35,6 +35,9 @@ export interface Match {
   tournament_id?: string
   tournament_name?: string
   tournament_fase?: string
+  sede?: string
+  grupo?: string
+  jornada?: number
 }
 
 export interface Bet {
