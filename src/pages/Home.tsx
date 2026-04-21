@@ -481,8 +481,13 @@ export function Home() {
   const pendingMatches = matches.filter(m => m.estado !== 'finished')
   const finishedMatches = matches.filter(m => m.estado === 'finished')
 
+  const RELEVANT_WINDOW_MS = 7 * 24 * 3600000
   const totalUnbet = matches
-    .filter(m => m.estado !== 'finished' && !bets[m.id])
+    .filter(m => {
+      if (m.estado === 'finished' || bets[m.id]) return false
+      const cutoff = new Date(m.time_cutoff).getTime()
+      return cutoff > now.getTime() && cutoff - now.getTime() < RELEVANT_WINDOW_MS
+    })
     .length
 
   const closingSoon = matches
