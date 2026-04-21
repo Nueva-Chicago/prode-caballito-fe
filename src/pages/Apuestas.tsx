@@ -338,7 +338,7 @@ export function Apuestas() {
               bet={bets[m.id]}
               planillaId={selectedPlanilla || undefined}
               planillaLocked={selectedPlanillaObj?.precio_pagado}
-              onBetSaved={(b) => setBets({ ...bets, [m.id]: b })}
+              onBetSaved={() => loadBets(selectedPlanilla)}
               onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
               now={now}
             />
@@ -359,7 +359,7 @@ export function Apuestas() {
             bet={bets[m.id]}
             planillaId={selectedPlanilla || undefined}
             planillaLocked={selectedPlanillaObj?.precio_pagado}
-            onBetSaved={(b) => setBets({ ...bets, [m.id]: b })}
+            onBetSaved={() => loadBets(selectedPlanilla)}
             onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
             now={now}
           />
