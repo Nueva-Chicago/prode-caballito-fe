@@ -68,18 +68,19 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
   type ReminderMinutes = typeof REMINDER_MINUTES[number]
   const hasExistingReminder = !!bet?.scheduled_for && new Date(bet.scheduled_for) > new Date()
   const [reminderEnabled, setReminderEnabled] = useState(hasExistingReminder)
+  const initMin = Number(bet?.remind_minutes)
   const [reminderMinutes, setReminderMinutes] = useState<ReminderMinutes>(
-    (REMINDER_MINUTES as readonly number[]).includes(bet?.remind_minutes ?? 0)
-      ? (bet!.remind_minutes as ReminderMinutes)
-      : 15
+    (REMINDER_MINUTES as readonly number[]).includes(initMin) ? (initMin as ReminderMinutes) : 15
   )
 
   // Sync reminder state when bet is refreshed from server (e.g. after save)
   useEffect(() => {
     if (editing) return
-    setReminderEnabled(!!bet?.scheduled_for && new Date(bet.scheduled_for) > new Date())
-    if (bet?.remind_minutes && (REMINDER_MINUTES as readonly number[]).includes(bet.remind_minutes)) {
-      setReminderMinutes(bet.remind_minutes as ReminderMinutes)
+    const hasReminder = !!bet?.scheduled_for && new Date(bet.scheduled_for) > new Date()
+    setReminderEnabled(hasReminder)
+    const savedMin = Number(bet?.remind_minutes)
+    if (savedMin && (REMINDER_MINUTES as readonly number[]).includes(savedMin)) {
+      setReminderMinutes(savedMin as ReminderMinutes)
     }
   }, [bet?.scheduled_for, bet?.remind_minutes, editing])
 
