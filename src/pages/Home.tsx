@@ -302,14 +302,6 @@ const MEDAL = ['🥇', '🥈', '🥉']
 // Orden visual del podio: 2do (izq), 1ro (centro), 3ro (der)
 const PODIUM_ORDER = [1, 0, 2]
 
-function formatCountdown(cutoffMs: number, nowMs: number): string {
-  const diff = cutoffMs - nowMs
-  if (diff <= 0) return '—'
-  const h = Math.floor(diff / 3600000)
-  const m = Math.floor((diff % 3600000) / 60000)
-  if (h > 0) return `${h}h ${m}m`
-  return `${m}m`
-}
 
 export function Home() {
   const { user } = useAuthStore()
@@ -318,7 +310,6 @@ export function Home() {
   const [bets, setBets] = useState<Record<string, Bet>>({})
   const [planilla, setPlanilla] = useState<Planilla | null>(null)
   const [ranking, setRanking] = useState<RankingEntry[]>([])
-  const [tournamentName, setTournamentName] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [now, setNow] = useState(new Date())
   const [showIOSGuide, setShowIOSGuide] = useState(false)
@@ -361,7 +352,6 @@ export function Home() {
       setMatches(matchRes.data.data.matches)
       setRanking(rankRes.data.data.ranking)
       const tours = tourRes.data.data || []
-      if (tours.length > 0) setTournamentName(tours[0].name)
 
       const planillas: Planilla[] = planillaRes.data.data
       if (planillas.length > 0) {
