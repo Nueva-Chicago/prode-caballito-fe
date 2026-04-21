@@ -1,10 +1,31 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useMemo } from 'react'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { TEAM_THEMES } from '@/types'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
+
+const COUNTRY_CODES = [
+  { code: '+54', flag: '🇦🇷', name: 'Argentina' },
+  { code: '+55', flag: '🇧🇷', name: 'Brasil' },
+  { code: '+598', flag: '🇺🇾', name: 'Uruguay' },
+  { code: '+595', flag: '🇵🇾', name: 'Paraguay' },
+  { code: '+56', flag: '🇨🇱', name: 'Chile' },
+  { code: '+591', flag: '🇧🇴', name: 'Bolivia' },
+  { code: '+57', flag: '🇨🇴', name: 'Colombia' },
+  { code: '+58', flag: '🇻🇪', name: 'Venezuela' },
+  { code: '+52', flag: '🇲🇽', name: 'México' },
+  { code: '+34', flag: '🇪🇸', name: 'España' },
+  { code: '+1', flag: '🇺🇸', name: 'EE.UU.' },
+]
+
+function parsePhone(full: string): { code: string; local: string } {
+  if (!full) return { code: '+54', local: '' }
+  const match = COUNTRY_CODES.find(c => full.startsWith(c.code))
+  if (match) return { code: match.code, local: full.slice(match.code.length) }
+  return { code: '+54', local: full.replace(/^\+/, '') }
+}
 
 export function Profile() {
   const { user, updateUser } = useAuthStore()
@@ -14,7 +35,9 @@ export function Profile() {
   const [editName, setEditName] = useState(false)
   const [nombre, setNombre] = useState(user?.nombre || '')
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
-  const [waNumber, setWaNumber] = useState(user?.whatsapp_number || '')
+  const initPhone = useMemo(() => parsePhone(user?.whatsapp_number || ''), [])
+  const [waCountry, setWaCountry] = useState(initPhone.code)
+  const [waLocal, setWaLocal] = useState(initPhone.local)
   const [waConsent, setWaConsent] = useState(user?.whatsapp_consent || false)
   const [savingWa, setSavingWa] = useState(false)
   const push = usePushNotifications()
@@ -25,7 +48,9 @@ export function Profile() {
     api.get(`/users/${user.id}`).then(({ data }) => {
       const u = data.data
       updateUser({ whatsapp_number: u.whatsapp_number, whatsapp_consent: u.whatsapp_consent })
-      setWaNumber(u.whatsapp_number || '')
+      const parsed = parsePhone(u.whatsapp_number || '')
+      setWaCountry(parsed.code)
+      setWaLocal(parsed.local)
       setWaConsent(u.whatsapp_consent || false)
     }).catch(() => { /* silencioso */ })
   }, [user?.id])
@@ -40,6 +65,8 @@ export function Profile() {
       show(t.profile.errorUpdate, 'error')
     }
   }
+
+  const waNumber = waLocal ? `${waCountry}${waLocal}` : ''
 
   const handleSaveWhatsapp = async () => {
     setSavingWa(true)
@@ -62,12 +89,18 @@ export function Profile() {
     if (!file) return
     setUploadingPhoto(true)
     try {
-      const formData = new FormData()
-      formData.append('avatar', file)
-      const { data } = await api.post('/users/upload-avatar', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const reader = new FileReader()
+      const base64 = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve((reader.result as string).split(',')[1])
+        reader.onerror = reject
+        reader.readAsDataURL(file)
       })
-      updateUser({ foto_url: data.data.foto_url })
+      const { data } = await api.post('/users/upload-avatar', {
+        image: base64,
+        fileName: file.name,
+        contentType: file.type,
+      })
+      updateUser({ foto_url: data.data.url })
       show(t.profile.photoUpdated, 'success')
     } catch {
       show(t.profile.errorPhoto, 'error')
@@ -178,14 +211,25 @@ export function Profile() {
       {/* WhatsApp */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
         <h3 className="font-bold text-[#001A4B]">{t.profile.whatsappTitle}</h3>
-        <input
-          type="tel"
-          value={waNumber}
-          onChange={e => setWaNumber(e.target.value.replace(/\D/g, ''))}
-          placeholder={t.profile.whatsappPlaceholder}
-          maxLength={15}
-          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
-        />
+        <div className="flex gap-2">
+          <select
+            value={waCountry}
+            onChange={e => setWaCountry(e.target.value)}
+            className="border border-gray-200 rounded-xl px-2 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5] bg-white"
+          >
+            {COUNTRY_CODES.map(c => (
+              <option key={c.code} value={c.code}>{c.flag} {c.code}</option>
+            ))}
+          </select>
+          <input
+            type="tel"
+            value={waLocal}
+            onChange={e => setWaLocal(e.target.value.replace(/\D/g, ''))}
+            placeholder={t.profile.whatsappPlaceholder}
+            maxLength={12}
+            className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+          />
+        </div>
         <label className="flex items-start gap-3 cursor-pointer">
           <input
             type="checkbox"
