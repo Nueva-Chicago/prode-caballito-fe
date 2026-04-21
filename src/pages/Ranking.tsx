@@ -72,6 +72,13 @@ export function Ranking() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [togglingFav, setTogglingFav] = useState<string | null>(null)
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false)
+  const [favHintDismissed, setFavHintDismissed] = useState(
+    () => localStorage.getItem('prode_fav_hint_v1') === '1'
+  )
+  const dismissFavHint = () => {
+    localStorage.setItem('prode_fav_hint_v1', '1')
+    setFavHintDismissed(true)
+  }
 
   useEffect(() => {
     Promise.allSettled([
@@ -146,6 +153,24 @@ export function Ranking() {
         </button>
       </div>
 
+      {/* Hint de primer uso — solo si no tiene favoritos y no fue descartado */}
+      {!loading && favorites.size === 0 && !favHintDismissed && (
+        <div className="flex items-start gap-3 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3">
+          <span className="text-xl shrink-0 mt-0.5">⭐</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-yellow-900">{t.ranking.favHintTitle}</p>
+            <p className="text-xs text-yellow-700 mt-0.5 leading-relaxed">{t.ranking.favHintDesc}</p>
+          </div>
+          <button
+            onClick={dismissFavHint}
+            className="shrink-0 text-yellow-400 hover:text-yellow-600 transition-colors text-lg leading-none mt-0.5"
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {isLoadingDisplay ? (
         <RankingContentSkeleton />
       ) : (
@@ -175,7 +200,11 @@ export function Ranking() {
           )}
 
           {showOnlyFavorites && displayRanking.length === 0 && (
-            <EmptyState icon="⭐" message={`${t.ranking.noFavorites}. ${t.ranking.noFavoritesDesc}`} />
+            <EmptyState
+              icon="⭐"
+              message={`${t.ranking.noFavorites}. ${t.ranking.noFavoritesDesc}`}
+              action={{ label: t.ranking.favHintCta, onClick: () => setShowOnlyFavorites(false) }}
+            />
           )}
 
           {/* Tabla */}

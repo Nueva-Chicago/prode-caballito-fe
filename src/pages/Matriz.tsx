@@ -383,7 +383,7 @@ export function Matriz() {
                           <button
                             onClick={(e) => handleToggleFavorite(r.planilla_id, e)}
                             disabled={togglingFav === r.planilla_id}
-                            className="shrink-0 text-sm leading-none opacity-60 hover:opacity-100 transition-opacity disabled:opacity-30"
+                            className={`shrink-0 text-sm leading-none transition-opacity disabled:opacity-30 ${favorites.has(r.planilla_id) ? 'opacity-100' : 'opacity-40 hover:opacity-90'}`}
                             title={favorites.has(r.planilla_id) ? t.ranking.unfollow : t.ranking.follow}
                           >
                             {favorites.has(r.planilla_id) ? '⭐' : '☆'}
