@@ -142,6 +142,34 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
   )
 }
 
+function HeroBadge({ tema, theme }: { tema: string; theme: { name: string; pattern?: string; badgeUrl?: string } }) {
+  const [imgError, setImgError] = useState(false)
+  const showImg = !!theme.badgeUrl && !imgError
+  return (
+    <div
+      className="w-14 h-14 md:w-20 md:h-20 rounded-full flex items-center justify-center border-2 border-white/20 shadow-xl overflow-hidden shrink-0"
+      style={{ background: showImg ? 'rgba(255,255,255,0.12)' : (theme.pattern || 'var(--theme-primary)') }}
+    >
+      {showImg
+        ? <img
+            src={theme.badgeUrl}
+            alt={theme.name}
+            className="w-10 h-10 md:w-14 md:h-14 object-contain drop-shadow-lg"
+            onError={() => setImgError(true)}
+          />
+        : tema === 'neutral'
+          ? <span style={{ fontSize: 32, lineHeight: 1 }}>🇦🇷</span>
+          : <span
+              className="text-2xl md:text-3xl font-black text-white drop-shadow"
+              style={{ fontFamily: "'Arial Black', Arial, sans-serif", textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}
+            >
+              {theme.name.split(' ')[0][0]}
+            </span>
+      }
+    </div>
+  )
+}
+
 function NextMatchBanner({ matches, bets, embedded = false }: { matches: Match[]; bets: Record<string, Bet>; embedded?: boolean }) {
   const [now, setNow] = useState(Date.now())
   const ref = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -481,19 +509,8 @@ export function Home() {
               <span className="text-white/60 text-sm font-bold">¡Empezó! 🎉</span>
             )}
 
-            {/* Circle decoration — jersey pattern or flag */}
-            <div
-              className="w-14 h-14 md:w-20 md:h-20 rounded-full flex items-center justify-center border-2 border-white/20 shadow-xl overflow-hidden shrink-0"
-              style={{ background: theme.pattern || 'var(--theme-primary)' }}
-            >
-              {tema === 'neutral'
-                ? <span style={{ fontSize: 32, lineHeight: 1 }}>🇦🇷</span>
-                : <span className="text-2xl md:text-3xl font-black text-white drop-shadow"
-                    style={{ fontFamily: "'Arial Black', Arial, sans-serif", textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-                    {theme.name.split(' ')[0][0]}
-                  </span>
-              }
-            </div>
+            {/* Circle decoration — escudo del club o fallback */}
+            <HeroBadge tema={tema} theme={theme} />
           </div>
         </div>
       </div>

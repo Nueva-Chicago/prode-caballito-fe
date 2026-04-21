@@ -149,9 +149,10 @@ export type PointColor = 'celeste' | 'rojo' | 'verde' | 'amarillo' | 'gris'
 
 export const TEAM_THEMES: Record<string, {
   primary: string; secondary: string; name: string
-  pattern?: string  // CSS background para el preview strip de la camiseta
-  fg?: string       // color de ícono/punto sobre el pattern
-  ring?: string     // color del borde activo
+  pattern?: string   // CSS background para el preview strip de la camiseta
+  fg?: string        // color de ícono/punto sobre el pattern
+  ring?: string      // color del borde activo
+  badgeUrl?: string  // URL del escudo del club (opcional, fallback a inicial)
 }> = {
   // Neutral — azul/amarillo genérico de fútbol
   neutral: {
@@ -162,39 +163,46 @@ export const TEAM_THEMES: Record<string, {
     primary: '#003087', secondary: '#F5C500', name: 'Boca Juniors',
     pattern: 'linear-gradient(180deg, #001A4B 0% 33%, #F5C500 33% 67%, #001A4B 67% 100%)',
     fg: '#F5C500', ring: '#F5C500',
+    badgeUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Escudo_del_Club_Atl%C3%A9tico_Boca_Juniors.svg/250px-Escudo_del_Club_Atl%C3%A9tico_Boca_Juniors.svg.png',
   },
   // River Plate — banda diagonal roja sobre blanco ("La Banda")
   river: {
     primary: '#C8102E', secondary: '#FFFFFF', name: 'River Plate',
     pattern: 'linear-gradient(135deg, #FFFFFF 30%, #C8102E 30%, #C8102E 70%, #FFFFFF 70%)',
     fg: '#C8102E', ring: '#C8102E',
+    badgeUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Club_Atl%C3%A9tico_River_Plate_logo.svg/250px-Club_Atl%C3%A9tico_River_Plate_logo.svg.png',
   },
   // Independiente — rojo oscuro/carmín puro ("El Rojo")
   independiente: {
     primary: '#8B0000', secondary: '#FFFFFF', name: 'Independiente',
     ring: '#8B0000',
+    badgeUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Escudo_del_Club_Atl%C3%A9tico_Independiente.svg/250px-Escudo_del_Club_Atl%C3%A9tico_Independiente.svg.png',
   },
   // Racing Club — celeste cielo + blanco ("La Academia")
   racing: {
     primary: '#4BA6D1', secondary: '#FFFFFF', name: 'Racing Club',
     ring: '#4BA6D1',
+    badgeUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Escudo_de_Racing_Club_%282014%29.svg/250px-Escudo_de_Racing_Club_%282014%29.svg.png',
   },
   // San Lorenzo — franjas verticales azul y rojo ("El Ciclón")
   sanlorenzo: {
     primary: '#0033A0', secondary: '#CC0000', name: 'San Lorenzo',
     pattern: 'repeating-linear-gradient(90deg, #0033A0 0px, #0033A0 12px, #CC0000 12px, #CC0000 24px)',
     fg: '#FFFFFF', ring: '#CC0000',
+    badgeUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Sanlorenzo_almagro_logo2026.png/250px-Sanlorenzo_almagro_logo2026.png',
   },
   // Estudiantes de La Plata — franjas finas rojo/blanco ("Pincharratas")
   estudiantes: {
     primary: '#9E001A', secondary: '#FFFFFF', name: 'Estudiantes',
     pattern: 'repeating-linear-gradient(90deg, #9E001A 0px, #9E001A 5px, #FFFFFF 5px, #FFFFFF 10px)',
     fg: '#9E001A', ring: '#9E001A',
+    badgeUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Estudiantes_de_la_Plata_crest_%282025%29.svg/250px-Estudiantes_de_la_Plata_crest_%282025%29.svg.png',
   },
   // Huracán — diagonal negro y rojo ("El Globo")
   huracan: {
     primary: '#1A1A1A', secondary: '#FFFFFF', name: 'Huracán',
     pattern: 'repeating-linear-gradient(45deg, #1A1A1A 0px, #1A1A1A 8px, #D42B2B 8px, #D42B2B 16px)',
     fg: '#FFFFFF', ring: '#D42B2B',
+    badgeUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Emblema_oficial_del_Club_Atl%C3%A9tico_Hurac%C3%A1n.svg/250px-Emblema_oficial_del_Club_Atl%C3%A9tico_Hurac%C3%A1n.svg.png',
   },
 }

@@ -1,0 +1,47 @@
+-- Seed team_badges con escudos de selecciones del Mundial 2026
+-- Fuente: Wikimedia Commons (licencias libres)
+-- Ejecutar en la DB de producción:
+--   psql $DATABASE_URL -f seed_team_badges.sql
+
+INSERT INTO team_badges (team_name, badge_url) VALUES
+  ('ARGENTINA',       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_Argentina.svg/200px-Flag_of_Argentina.svg.png'),
+  ('BRASIL',          'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/200px-Flag_of_Brazil.svg.png'),
+  ('URUGUAY',         'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Flag_of_Uruguay.svg/200px-Flag_of_Uruguay.svg.png'),
+  ('COLOMBIA',        'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Colombia.svg/200px-Flag_of_Colombia.svg.png'),
+  ('CHILE',           'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Flag_of_Chile.svg/200px-Flag_of_Chile.svg.png'),
+  ('PERU',            'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Flag_of_Peru.svg/200px-Flag_of_Peru.svg.png'),
+  ('ECUADOR',         'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Flag_of_Ecuador.svg/200px-Flag_of_Ecuador.svg.png'),
+  ('PARAGUAY',        'https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Flag_of_Paraguay.svg/200px-Flag_of_Paraguay.svg.png'),
+  ('BOLIVIA',         'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Flag_of_Bolivia.svg/200px-Flag_of_Bolivia.svg.png'),
+  ('VENEZUELA',       'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Flag_of_Venezuela.svg/200px-Flag_of_Venezuela.svg.png'),
+  ('MEXICO',          'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Flag_of_Mexico.svg/200px-Flag_of_Mexico.svg.png'),
+  ('ESTADOS UNIDOS',  'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/200px-Flag_of_the_United_States.svg.png'),
+  ('CANADA',          'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Flag_of_Canada_%28Pantone%29.svg/200px-Flag_of_Canada_%28Pantone%29.svg.png'),
+  ('COSTA RICA',      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Flag_of_Costa_Rica.svg/200px-Flag_of_Costa_Rica.svg.png'),
+  ('PANAMA',          'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Flag_of_Panama.svg/200px-Flag_of_Panama.svg.png'),
+  ('HONDURAS',        'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Flag_of_Honduras.svg/200px-Flag_of_Honduras.svg.png'),
+  ('JAMAICA',         'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Flag_of_Jamaica.svg/200px-Flag_of_Jamaica.svg.png'),
+  ('FRANCIA',         'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_France.svg/200px-Flag_of_France.svg.png'),
+  ('ALEMANIA',        'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flag_of_Germany.svg/200px-Flag_of_Germany.svg.png'),
+  ('ESPAÑA',          'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/200px-Flag_of_Spain.svg.png'),
+  ('PORTUGAL',        'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_Portugal.svg/200px-Flag_of_Portugal.svg.png'),
+  ('INGLATERRA',      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Flag_of_England.svg/200px-Flag_of_England.svg.png'),
+  ('PAÍSES BAJOS',    'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Flag_of_the_Netherlands.svg/200px-Flag_of_the_Netherlands.svg.png'),
+  ('BÉLGICA',         'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Flag_of_Belgium.svg/200px-Flag_of_Belgium.svg.png'),
+  ('CROACIA',         'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Flag_of_Croatia.svg/200px-Flag_of_Croatia.svg.png'),
+  ('SUIZA',           'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Flag_of_Switzerland.svg/200px-Flag_of_Switzerland.svg.png'),
+  ('MARRUECOS',       'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Flag_of_Morocco.svg/200px-Flag_of_Morocco.svg.png'),
+  ('SENEGAL',         'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Flag_of_Senegal.svg/200px-Flag_of_Senegal.svg.png'),
+  ('NIGERIA',         'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Flag_of_Nigeria.svg/200px-Flag_of_Nigeria.svg.png'),
+  ('CAMERÚN',         'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Flag_of_Cameroon.svg/200px-Flag_of_Cameroon.svg.png'),
+  ('GHANA',           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Flag_of_Ghana.svg/200px-Flag_of_Ghana.svg.png'),
+  ('SUDÁFRICA',       'https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Flag_of_South_Africa.svg/200px-Flag_of_South_Africa.svg.png'),
+  ('COSTA DE MARFIL', 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Flag_of_C%C3%B4te_d%27Ivoire.svg/200px-Flag_of_C%C3%B4te_d%27Ivoire.svg.png'),
+  ('JAPÓN',           'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_Japan.svg/200px-Flag_of_Japan.svg.png'),
+  ('COREA DEL SUR',   'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/200px-Flag_of_South_Korea.svg.png'),
+  ('AUSTRALIA',       'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Flag_of_Australia_%28converted%29.svg/200px-Flag_of_Australia_%28converted%29.svg.png'),
+  ('IRAN',            'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Flag_of_Iran.svg/200px-Flag_of_Iran.svg.png'),
+  ('ARABIA SAUDITA',  'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Flag_of_Saudi_Arabia.svg/200px-Flag_of_Saudi_Arabia.svg.png'),
+  ('QATAR',           'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Flag_of_Qatar.svg/200px-Flag_of_Qatar.svg.png'),
+  ('NUEVA ZELANDA',   'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Flag_of_New_Zealand.svg/200px-Flag_of_New_Zealand.svg.png')
+ON CONFLICT (team_name) DO UPDATE SET badge_url = EXCLUDED.badge_url, updated_at = NOW();
