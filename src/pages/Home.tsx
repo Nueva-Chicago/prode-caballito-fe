@@ -343,7 +343,7 @@ export function Home() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [matchRes, planillaRes, rankRes, tourRes] = await Promise.all([
+      const [matchRes, planillaRes, rankRes] = await Promise.all([
         api.get('/matches?limit=200'),
         api.get('/planillas'),
         api.get('/ranking?limit=50'),

@@ -132,7 +132,6 @@ export function Register() {
       // Upload photo if selected
       if (photoFile && data.data?.token) {
         try {
-          const reader = new FileReader()
           const base64 = await compressImage(photoFile, 600, 0.82)
           await api.post('/users/upload-avatar', {
             image: base64,
