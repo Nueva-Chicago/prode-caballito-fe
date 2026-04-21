@@ -149,15 +149,30 @@ export function Apuestas() {
 
   const pendingMatches = matches.filter(m => m.estado !== 'finished')
 
-  const filtered = matches.filter((m) => {
-    if (filter === 'pendientes' && m.estado === 'finished') return false
-    if (filter === 'finalizados' && m.estado !== 'finished') return false
-    if (search) {
-      const q = search.toLowerCase()
-      return m.home_team.toLowerCase().includes(q) || m.away_team.toLowerCase().includes(q)
-    }
-    return true
-  })
+  const filtered = matches
+    .filter((m) => {
+      if (filter === 'pendientes' && m.estado === 'finished') return false
+      if (filter === 'finalizados' && m.estado !== 'finished') return false
+      if (search) {
+        const q = search.toLowerCase()
+        return m.home_team.toLowerCase().includes(q) || m.away_team.toLowerCase().includes(q)
+      }
+      return true
+    })
+    .sort((a, b) => {
+      // Partidos terminados siempre al fondo (ya tienen resultado)
+      if (a.estado === 'finished' && b.estado !== 'finished') return 1
+      if (a.estado !== 'finished' && b.estado === 'finished') return -1
+      // Entre pendientes: sin apuesta primero, con apuesta después
+      if (a.estado !== 'finished' && b.estado !== 'finished') {
+        const aBet = !!bets[a.id]
+        const bBet = !!bets[b.id]
+        if (!aBet && bBet) return -1
+        if (aBet && !bBet) return 1
+      }
+      // Dentro de cada grupo: orden por fecha de inicio
+      return new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+    })
 
   const progress = {
     done: Object.keys(bets).filter(mid => matches.find(m => m.id === mid)).length,
