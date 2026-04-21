@@ -11,7 +11,6 @@ import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
 import { teamFlag } from '@/utils/teamFlags'
-import { TEAM_THEMES } from '@/types'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 /* ── Flip clock display ──────────────────────────────────────────── */
@@ -122,62 +121,6 @@ function getGreeting(now: Date): string {
   return 'Buenas noches'
 }
 
-/* ── Countdown al Mundial ────────────────────────────────────────── */
-const MUNDIAL_START = new Date('2026-06-11T19:00:00Z') // México vs Sudáfrica
-
-function getMundialCountdown() {
-  const diff = MUNDIAL_START.getTime() - Date.now()
-  if (diff <= 0) return null
-  const totalSecs = Math.floor(diff / 1000)
-  return {
-    days:  Math.floor(totalSecs / 86400),
-    hours: Math.floor((totalSecs % 86400) / 3600),
-    mins:  Math.floor((totalSecs % 3600) / 60),
-    secs:  totalSecs % 60,
-  }
-}
-
-function CountdownUnit({ value, label }: { value: number; label: string }) {
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <div
-        className="text-2xl md:text-3xl font-black tabular-nums rounded-lg px-2.5 py-1.5 min-w-[48px] md:min-w-[56px] text-center leading-none"
-        style={{ background: 'rgba(0,0,0,0.35)', color: 'var(--theme-secondary)', fontFamily: "'Arial Black', Arial, sans-serif" }}
-      >
-        {pad2(value)}
-      </div>
-      <span className="text-[8px] font-black text-white/45 tracking-widest uppercase">{label}</span>
-    </div>
-  )
-}
-
-function HeroBadge({ tema, theme }: { tema: string; theme: { name: string; pattern?: string; badgeUrl?: string } }) {
-  const [imgError, setImgError] = useState(false)
-  const showImg = !!theme.badgeUrl && !imgError
-  return (
-    <div
-      className="w-20 h-20 md:w-28 md:h-28 rounded-full flex items-center justify-center border-2 border-white/20 shadow-xl overflow-hidden shrink-0"
-      style={{ background: showImg ? 'rgba(255,255,255,0.10)' : (theme.pattern || 'var(--theme-primary)') }}
-    >
-      {showImg
-        ? <img
-            src={theme.badgeUrl}
-            alt={theme.name}
-            className="w-14 h-14 md:w-22 md:h-22 object-contain drop-shadow-xl"
-            onError={() => setImgError(true)}
-          />
-        : tema === 'neutral'
-          ? <span style={{ fontSize: 40, lineHeight: 1 }}>🇦🇷</span>
-          : <span
-              className="text-4xl md:text-5xl font-black text-white drop-shadow"
-              style={{ fontFamily: "'Arial Black', Arial, sans-serif", textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}
-            >
-              {theme.name.split(' ')[0][0]}
-            </span>
-      }
-    </div>
-  )
-}
 
 function NextMatchBanner({ matches, bets, embedded = false }: { matches: Match[]; bets: Record<string, Bet>; embedded?: boolean }) {
   const [now, setNow] = useState(Date.now())
@@ -294,11 +237,6 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
 
   const hasBet = !!bets[match.id]
   const dateStr = format(new Date(match.start_time), "EEE d MMM · HH:mm", { locale: esLocale })
-  const diffMs = Math.max(0, new Date(match.start_time).getTime() - now)
-  const diffDays = Math.floor(diffMs / 86400000)
-  const diffHours = Math.floor((diffMs % 86400000) / 3600000)
-  const diffMins = Math.floor((diffMs % 3600000) / 60000)
-
   return (
     <div className="hidden md:flex flex-col justify-center px-6 py-5 md:flex-[2] border-l border-gray-100 bg-white gap-4">
 
@@ -465,8 +403,6 @@ function HomeSkeleton() {
 }
 
 const MEDAL = ['🥇', '🥈', '🥉']
-// Orden visual del podio: 2do (izq), 1ro (centro), 3ro (der)
-const PODIUM_ORDER = [1, 0, 2]
 
 
 export function Home() {
@@ -481,23 +417,12 @@ export function Home() {
   const [now, setNow] = useState(new Date())
   const [showIOSGuide, setShowIOSGuide] = useState(false)
   const { state: pwaState, install: pwaInstall } = usePWAInstall()
-  const { addToast } = useToastStore()
-  const [mundialCd, setMundialCd] = useState(getMundialCountdown)
-
-  // Tema del equipo elegido por el usuario
-  const tema = user?.tema_equipo || 'neutral'
-  const theme = TEAM_THEMES[tema] || TEAM_THEMES.neutral
+  const { show: showToast } = useToastStore()
 
   // Reloj para el countdown (cada minuto)
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 60000)
     return () => clearInterval(interval)
-  }, [])
-
-  // Countdown al Mundial (cada segundo)
-  useEffect(() => {
-    const id = setInterval(() => setMundialCd(getMundialCountdown()), 1000)
-    return () => clearInterval(id)
   }, [])
 
   useEffect(() => { loadData() }, [])
@@ -533,7 +458,7 @@ export function Home() {
     } catch (e) {
       console.error(e)
       if (silent) {
-        addToast(t.home.refreshError, 'warning')
+        showToast(t.home.refreshError, 'warning')
       } else {
         setLoadError(true)
       }
