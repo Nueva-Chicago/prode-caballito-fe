@@ -279,7 +279,7 @@ function NextMatchBanner({ matches, bets, embedded = false }: { matches: Match[]
   )
 }
 
-/* Panel derecho del hero en desktop — tarjeta blanca con flags grandes */
+/* Panel derecho del hero en desktop — tarjeta blanca con countdown + flags */
 function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Record<string, Bet> }) {
   const [now, setNow] = useState(Date.now())
   useEffect(() => {
@@ -294,13 +294,35 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
 
   const hasBet = !!bets[match.id]
   const dateStr = format(new Date(match.start_time), "EEE d MMM · HH:mm", { locale: esLocale })
-  const diffMs = new Date(match.start_time).getTime() - now
+  const diffMs = Math.max(0, new Date(match.start_time).getTime() - now)
   const diffDays = Math.floor(diffMs / 86400000)
   const diffHours = Math.floor((diffMs % 86400000) / 3600000)
-  const timeLabel = diffDays > 0 ? `en ${diffDays}d ${diffHours}h` : `en ${diffHours}h`
+  const diffMins = Math.floor((diffMs % 3600000) / 60000)
 
   return (
-    <div className="hidden md:flex flex-col justify-center px-6 py-6 md:flex-[2] border-l border-gray-100 bg-white gap-5">
+    <div className="hidden md:flex flex-col justify-center px-6 py-5 md:flex-[2] border-l border-gray-100 bg-white gap-4">
+
+      {/* Countdown */}
+      <div className="text-center">
+        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">
+          FALTA PARA EL PRÓXIMO PARTIDO
+        </p>
+        <div className="flex items-end justify-center gap-1.5">
+          {[{ v: diffDays, l: 'DÍAS' }, { v: diffHours, l: 'HS' }, { v: diffMins, l: 'MIN' }].map(({ v, l }, i) => (
+            <>
+              {i > 0 && <span key={`sep-${i}`} className="text-gray-300 font-black pb-4 text-sm">:</span>}
+              <div key={l} className="flex flex-col items-center gap-1">
+                <div className="text-2xl font-black tabular-nums rounded-lg px-2 py-1 min-w-[44px] text-center leading-none"
+                  style={{ background: '#001A4B', color: '#FFDF00', fontFamily: "'Arial Black', Arial, sans-serif" }}>
+                  {pad2(v)}
+                </div>
+                <span className="text-[8px] font-black text-gray-400 tracking-widest">{l}</span>
+              </div>
+            </>
+          ))}
+        </div>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">⚡ Próximo partido</p>
@@ -324,7 +346,7 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
 
       {/* Date */}
       <p className="text-center text-[11px] text-gray-400">
-        📅 {dateStr} hs · <span className="font-semibold text-gray-600">{timeLabel}</span>
+        📅 {dateStr} hs
       </p>
 
       {/* Bet or CTA */}
@@ -577,24 +599,6 @@ export function Home() {
         />
 
         <div className="relative px-5 py-5">
-
-          {/* Countdown al Mundial */}
-          {mundialCd ? (
-            <div className="mb-4">
-              <p className="text-[9px] font-black text-white/40 tracking-widest uppercase mb-2">
-                FALTA PARA EL PRÓXIMO PARTIDO
-              </p>
-              <div className="flex items-end gap-1.5">
-                <CountdownUnit value={mundialCd.days}  label="días" />
-                <span className="text-white/25 font-black pb-3 text-base leading-none">:</span>
-                <CountdownUnit value={mundialCd.hours} label="hs" />
-                <span className="text-white/25 font-black pb-3 text-base leading-none">:</span>
-                <CountdownUnit value={mundialCd.mins}  label="min" />
-              </div>
-            </div>
-          ) : (
-            <p className="text-white/70 text-sm font-bold mb-4">¡El Mundial empezó! 🎉</p>
-          )}
 
           {/* Badge */}
           <div className="inline-flex items-center gap-2 mb-3"
