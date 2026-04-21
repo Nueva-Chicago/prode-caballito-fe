@@ -7,31 +7,73 @@ import { useT } from '@/hooks/useT'
 import { Spinner } from '@/components/ui/Spinner'
 import type { Message } from '@/types'
 
-interface UserPreview { id: string; nombre: string; foto_url?: string; unread?: number }
+interface Conversation {
+  id: string
+  nombre: string
+  foto_url?: string
+  lastMessage?: string
+  lastTime?: string
+  unread: number
+}
+
+function formatLastTime(iso: string): string {
+  const d = new Date(iso)
+  const now = new Date()
+  const diffMs = now.getTime() - d.getTime()
+  const diffDays = Math.floor(diffMs / 86400000)
+  if (diffDays === 0) return d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+  if (diffDays === 1) return 'Ayer'
+  if (diffDays < 7) return d.toLocaleDateString('es-AR', { weekday: 'short' })
+  return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })
+}
 
 export function Messages() {
   const { userId } = useParams()
   const { user } = useAuthStore()
   const { show } = useToastStore()
   const t = useT()
-  const [users, setUsers] = useState<UserPreview[]>([])
+  const [conversations, setConversations] = useState<Conversation[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
-  const selectedUser = users.find(u => u.id === userId)
+  const selectedUser = conversations.find(c => c.id === userId)
 
   useEffect(() => {
-    api.get('/messages/users').then(({ data }) => setUsers(data.data || []))
+    Promise.all([
+      api.get('/messages/users'),
+      api.get('/messages/conversations').catch(() => ({ data: { data: [] } })),
+    ]).then(([usersRes, convRes]) => {
+      const allUsers: { id: string; nombre: string; foto_url?: string }[] = usersRes.data.data || []
+      const convMap = new Map<string, { lastMessage: string; lastTime: string; unread: number }>()
+      for (const c of (convRes.data.data || [])) {
+        convMap.set(c.other_user_id, {
+          lastMessage: c.last_message,
+          lastTime: c.last_time,
+          unread: Number(c.unread_count) || 0,
+        })
+      }
+      // Usuarios con conversación primero (por last_time desc), luego el resto
+      const withConv = allUsers
+        .filter(u => convMap.has(u.id))
+        .map(u => ({ ...u, ...convMap.get(u.id)!, }))
+        .sort((a, b) => new Date(b.lastTime).getTime() - new Date(a.lastTime).getTime())
+      const withoutConv = allUsers
+        .filter(u => !convMap.has(u.id))
+        .map(u => ({ ...u, unread: 0 }))
+      setConversations([...withConv, ...withoutConv])
+    })
       .catch(() => show(t.messages.errorLoad, 'error'))
       .finally(() => setLoading(false))
   }, [])
 
+  // Marcar como leído al abrir conversación
   useEffect(() => {
     if (!userId) return
     api.get(`/messages/${userId}`).then(({ data }) => {
-      setMessages(data.data || [])
+      setMessages(data.data?.messages ?? data.data ?? [])
+      setConversations(prev => prev.map(c => c.id === userId ? { ...c, unread: 0 } : c))
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
     })
   }, [userId])
@@ -42,8 +84,15 @@ export function Messages() {
     setSending(true)
     try {
       const { data } = await api.post(`/messages/${userId}`, { content: text.trim() })
-      setMessages([...messages, data.data])
+      const newMsg = data.data
+      setMessages(prev => [...prev, newMsg])
       setText('')
+      // Actualizar preview en el sidebar
+      setConversations(prev => prev.map(c =>
+        c.id === userId
+          ? { ...c, lastMessage: newMsg.content, lastTime: newMsg.created_at }
+          : c
+      ))
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
     } catch {
       show(t.messages.errorSend, 'error')
@@ -62,24 +111,38 @@ export function Messages() {
           <h2 className="font-bold text-[#001A4B]">{t.messages.title}</h2>
         </div>
         <div className="flex-1 overflow-y-auto">
-          {users.length === 0 && (
+          {conversations.length === 0 && (
             <p className="text-sm text-gray-400 text-center py-8">{t.messages.noConversations}</p>
           )}
-          {users.map((u) => (
+          {conversations.map((c) => (
             <Link
-              key={u.id}
-              to={`/messages/${u.id}`}
-              className={`flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors ${userId === u.id ? 'bg-blue-50' : ''}`}
+              key={c.id}
+              to={`/messages/${c.id}`}
+              className={`flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors ${userId === c.id ? 'bg-blue-50' : ''}`}
             >
               <div className="w-9 h-9 rounded-full bg-[#0042A5] flex items-center justify-center text-white font-bold text-sm shrink-0">
-                {u.nombre[0].toUpperCase()}
+                {c.nombre[0].toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[#001A4B] truncate">{u.nombre}</p>
+                <div className="flex items-center justify-between gap-1">
+                  <p className={`text-sm truncate ${c.unread > 0 ? 'font-bold text-[#001A4B]' : 'font-semibold text-[#001A4B]'}`}>
+                    {c.nombre}
+                  </p>
+                  {c.lastTime && (
+                    <span className="text-[10px] text-gray-400 shrink-0">{formatLastTime(c.lastTime)}</span>
+                  )}
+                </div>
+                {c.lastMessage ? (
+                  <p className={`text-xs truncate mt-0.5 ${c.unread > 0 ? 'font-semibold text-[#001A4B]' : 'text-gray-400'}`}>
+                    {c.lastMessage}
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-300 mt-0.5 italic">Sin mensajes aún</p>
+                )}
               </div>
-              {u.unread && u.unread > 0 && (
+              {c.unread > 0 && (
                 <span className="bg-[#0042A5] text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0">
-                  {u.unread}
+                  {c.unread}
                 </span>
               )}
             </Link>
