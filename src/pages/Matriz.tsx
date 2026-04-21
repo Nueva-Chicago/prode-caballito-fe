@@ -298,19 +298,31 @@ export function Matriz() {
                   </th>
                   <th className="px-2 py-2 text-center font-semibold w-14 bg-[#001A4B]">{t.ranking.pts}</th>
                   {allMatches.map((m) => (
-                    <th key={m.id} className="px-1 py-2 text-center font-medium min-w-[60px] bg-[#001A4B]">
-                      {teamFlag(m.home_team)
-                        ? <div className="text-base leading-none">{teamFlag(m.home_team)}</div>
-                        : <div className="truncate max-w-[55px]">{m.home_team.substring(0,3).toUpperCase()}</div>
-                      }
-                      <div className="text-[10px] text-white/60">vs</div>
-                      {teamFlag(m.away_team)
-                        ? <div className="text-base leading-none">{teamFlag(m.away_team)}</div>
-                        : <div className="truncate max-w-[55px]">{m.away_team.substring(0,3).toUpperCase()}</div>
-                      }
-                      {m.estado === 'finished' && (
-                        <div className="text-[#FFDF00] font-bold text-[11px]">{m.resultado_local}-{m.resultado_visitante}</div>
-                      )}
+                    <th
+                      key={m.id}
+                      className="px-1 py-2 text-center font-medium min-w-[60px] bg-[#001A4B] cursor-default"
+                      title={`${m.home_team} vs ${m.away_team}${m.estado === 'finished' ? ` · ${m.resultado_local}-${m.resultado_visitante}` : ''}`}
+                    >
+                      <div className="flex flex-col items-center gap-0.5">
+                        <div className="text-base leading-none">
+                          {teamFlag(m.home_team) || m.home_team.substring(0,3).toUpperCase()}
+                        </div>
+                        <div className="text-[8px] text-white/45 leading-none font-semibold tracking-wide uppercase">
+                          {m.home_team.substring(0,3)}
+                        </div>
+                        <div className="text-[9px] text-white/50 leading-none">vs</div>
+                        <div className="text-base leading-none">
+                          {teamFlag(m.away_team) || m.away_team.substring(0,3).toUpperCase()}
+                        </div>
+                        <div className="text-[8px] text-white/45 leading-none font-semibold tracking-wide uppercase">
+                          {m.away_team.substring(0,3)}
+                        </div>
+                        {m.estado === 'finished' && (
+                          <div className="text-[#FFDF00] font-bold text-[10px] leading-none mt-0.5">
+                            {m.resultado_local}-{m.resultado_visitante}
+                          </div>
+                        )}
+                      </div>
                     </th>
                   ))}
                 </tr>
