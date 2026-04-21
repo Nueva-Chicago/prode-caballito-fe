@@ -436,9 +436,13 @@ export function Home() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
 
-      {/* ── 1. HERO MUNDIAL ─────────────────────────────────────── */}
+      {/* ── 1+2. HERO + PRÓXIMO PARTIDO ─────────────────────────── */}
+      {/* Desktop: side by side in one block. Mobile: hero card solo */}
+      <div className="md:flex md:rounded-2xl md:overflow-hidden md:shadow-xl">
+
+      {/* Hero */}
       <div
-        className="rounded-2xl text-white overflow-hidden relative"
+        className="rounded-2xl md:rounded-none text-white overflow-hidden relative md:flex-[3]"
         style={{
           background: `linear-gradient(135deg, var(--theme-nav-bg) 0%, var(--theme-primary) 65%, var(--theme-nav-bg) 100%)`,
           minHeight: 180,
@@ -515,6 +519,16 @@ export function Home() {
         </div>
       </div>
 
+      {/* Próximo partido — panel derecho (desktop only, embedded en el mismo block) */}
+      <div
+        className="hidden md:flex flex-col justify-center px-6 py-5 md:flex-[2] border-l border-white/10"
+        style={{ background: 'linear-gradient(135deg, #0a0f1e 0%, #001A4B 60%, #0a2060 100%)' }}
+      >
+        <NextMatchBanner matches={matches} bets={bets} embedded />
+      </div>
+
+      </div>{/* fin md:flex wrapper */}
+
       {/* Modal guía iOS */}
       {showIOSGuide && (
         <>
@@ -558,8 +572,10 @@ export function Home() {
         </>
       )}
 
-      {/* ── 2. PRÓXIMO PARTIDO ──────────────────────────────────── */}
-      <NextMatchBanner matches={matches} bets={bets} />
+      {/* ── 2. PRÓXIMO PARTIDO (mobile) ─────────────────────────── */}
+      <div className="md:hidden">
+        <NextMatchBanner matches={matches} bets={bets} />
+      </div>
 
       {/* ── 3. CTA PRONÓSTICOS PENDIENTES ───────────────────────── */}
       {totalUnbet > 0 && (
