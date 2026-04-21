@@ -256,19 +256,24 @@ export function Matriz() {
     }
   }
 
-  useEffect(() => {
-    Promise.all([
+  const loadMatrizData = useCallback(async () => {
+    const [mRes, rRes, bRes, favRes] = await Promise.all([
       api.get('/matches?limit=200'),
       api.get('/ranking?limit=200&include_unpaid=true'),
       api.get('/bets/all-for-matrix'),
       api.get('/ranking/favorites').catch(() => ({ data: { data: [] } })),
-    ]).then(([mRes, rRes, bRes, favRes]) => {
-      setMatches(mRes.data.data.matches)
-      setRanking(rRes.data.data.ranking)
-      setBets(bRes.data.data)
-      setFavorites(new Set(favRes.data.data || []))
-    }).finally(() => setLoading(false))
+    ])
+    setMatches(mRes.data.data.matches)
+    setRanking(rRes.data.data.ranking)
+    setBets(bRes.data.data)
+    setFavorites(new Set(favRes.data.data || []))
   }, [])
+
+  useEffect(() => {
+    loadMatrizData().finally(() => setLoading(false))
+    const interval = setInterval(loadMatrizData, 30000)
+    return () => clearInterval(interval)
+  }, [loadMatrizData])
 
   const handleToggleFavorite = useCallback(async (planillaId: string, e: React.MouseEvent) => {
     e.stopPropagation()

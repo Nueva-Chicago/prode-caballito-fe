@@ -24,7 +24,11 @@ export function Admin() {
     home_team: '', away_team: '', start_time: '', tournament_id: '', halftime_minutes: '15',
   })
   const [resultForm, setResultForm] = useState({ resultado_local: '', resultado_visitante: '' })
-  useEffect(() => { loadData() }, [])
+  useEffect(() => {
+    loadData()
+    const interval = setInterval(loadData, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   const loadData = async () => {
     setLoading(true)
@@ -740,29 +744,34 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
   const [planillaTournamentFilter, setPlanillaTournamentFilter] = useState<string>('all')
   const [allPlanillas, setAllPlanillas] = useState<Record<string, unknown>[] | null>(null)
 
-  useEffect(() => {
+  const loadTabData = useCallback(async () => {
     if (tab === 'usuarios') {
-      Promise.allSettled([
+      const [uRes, urRes] = await Promise.allSettled([
         api.get('/users'),
         api.get('/bets/unlock-requests'),
-      ]).then(([uRes, urRes]) => {
-        if (uRes.status === 'fulfilled') setData(uRes.value.data.data.users || [])
-        else show('Error al cargar usuarios', 'error')
-        if (urRes.status === 'fulfilled') {
-          const counts: Record<string, number> = {}
-          for (const r of (urRes.value.data.data || [])) {
-            const uid = String(r.requester_user_id)
-            counts[uid] = (counts[uid] || 0) + 1
-          }
-          setUnlockCounts(counts)
+      ])
+      if (uRes.status === 'fulfilled') setData(uRes.value.data.data.users || [])
+      else show('Error al cargar usuarios', 'error')
+      if (urRes.status === 'fulfilled') {
+        const counts: Record<string, number> = {}
+        for (const r of (urRes.value.data.data || [])) {
+          const uid = String(r.requester_user_id)
+          counts[uid] = (counts[uid] || 0) + 1
         }
-      }).finally(() => setLoading(false))
+        setUnlockCounts(counts)
+      }
     } else {
-      api.get('/planillas/admin/all').then(({ data: d }) => {
-        setData(d.data)
-      }).catch(() => show('Error al cargar', 'error')).finally(() => setLoading(false))
+      const { data: d } = await api.get('/planillas/admin/all').catch(() => { show('Error al cargar', 'error'); return { data: { data: [] } } })
+      setData(d.data)
     }
-  }, [tab])
+  }, [tab, show])
+
+  useEffect(() => {
+    setLoading(true)
+    loadTabData().finally(() => setLoading(false))
+    const interval = setInterval(loadTabData, 30000)
+    return () => clearInterval(interval)
+  }, [loadTabData])
 
   const handleUserClick = useCallback(async (uid: string) => {
     if (expandedUserId === uid) { setExpandedUserId(null); return }
