@@ -419,7 +419,7 @@ export function Matriz() {
                           <td key={m.id} className="px-1 py-1.5 text-center">
                             <span
                               onClick={(e) => handleBadgeClick(e, m.id, rowKey, b, m, res)}
-                              title={`${m.home_team} vs ${m.away_team}: ${b.home}-${b.away} · ${t.matrix.popLabels[res.color]}`}
+                              title={`${m.home_team} vs ${m.away_team}: ${b.home}-${b.away} · ${t.match.popLabels[res.color]}`}
                               className={`inline-block px-1.5 py-0.5 rounded font-bold text-[11px] cursor-pointer select-none transition-all
                                 ${POINT_COLORS[res.color]}
                                 ${isActive ? 'ring-2 ring-offset-1 ring-gray-400 scale-110' : 'hover:scale-105 hover:shadow-md'}
