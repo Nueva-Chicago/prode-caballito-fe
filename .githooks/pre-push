@@ -1,0 +1,9 @@
+#!/bin/sh
+echo "🔍 Chequeando TypeScript antes de pushear..."
+npx tsc --noEmit
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ TypeScript falló. Corregí los errores antes de pushear."
+  exit 1
+fi
+echo "✅ TypeScript OK"
