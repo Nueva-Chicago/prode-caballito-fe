@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
 import { es as esLocale } from 'date-fns/locale'
 import { ptBR } from 'date-fns/locale'
@@ -73,6 +73,15 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
       ? (bet!.remind_minutes as ReminderMinutes)
       : 15
   )
+
+  // Sync reminder state when bet is refreshed from server (e.g. after save)
+  useEffect(() => {
+    if (editing) return
+    setReminderEnabled(!!bet?.scheduled_for && new Date(bet.scheduled_for) > new Date())
+    if (bet?.remind_minutes && (REMINDER_MINUTES as readonly number[]).includes(bet.remind_minutes)) {
+      setReminderMinutes(bet.remind_minutes as ReminderMinutes)
+    }
+  }, [bet?.scheduled_for, bet?.remind_minutes, editing])
 
   // Team names in user's language
   const homeTeam = (lang === 'pt' && match.home_team_pt) ? match.home_team_pt : match.home_team
