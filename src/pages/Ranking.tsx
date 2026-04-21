@@ -74,7 +74,7 @@ export function Ranking() {
 
   useEffect(() => {
     Promise.allSettled([
-      api.get('/ranking?limit=200'),
+      api.get('/ranking?limit=500'),
       api.get('/ranking/favorites').catch(() => ({ data: { data: [] } })),
     ]).then(([rRes, fRes]) => {
       if (rRes.status === 'fulfilled') setRanking(rRes.value.data.data.ranking || [])
