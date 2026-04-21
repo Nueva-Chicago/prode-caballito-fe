@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title data-i18n-meta="title">Prode Caballito | Mundial 2026 – Jugá el prode oficial</title>
   <meta name="description" data-i18n-meta="desc" content="El Mundial 2026 llega a USA, Canadá y México. Predecí todos los partidos, competí con amigos y seguí el ranking en tiempo real. Gratis." />
-  <link rel="canonical" href="https://prodecaballito.com/landing/mundial.html" />
+  <link rel="canonical" href="https://prodecaballito.com/landing-mundial.html" />
   <meta name="robots" content="index, follow" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://prodecaballito.com/landing/mundial.html" />
+  <meta property="og:url" content="https://prodecaballito.com/landing-mundial.html" />
   <meta property="og:image" content="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -93,6 +93,26 @@
     .cal-tag { display: inline-block; margin-top: 0.5rem; background: rgba(255,223,0,0.18); color: #854d0e; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 99px; }
     .cal-tag.live { background: rgba(0,26,75,0.1); color: #001A4B; }
 
+    /* RANKING MOCKUP */
+    .ranking-bg { background: #001A4B; padding: 5rem 1.5rem; }
+    .ranking-bg .section-label { color: #FFDF00; }
+    .ranking-bg .section-title { color: #fff; }
+    .ranking-bg .section-sub { color: rgba(255,255,255,0.55); }
+    .ranking-table { max-width: 560px; margin: 0 auto 2rem; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+    .ranking-header { display: grid; grid-template-columns: 2.5rem 1fr 5rem 4.5rem; gap: 0.5rem; padding: 0.75rem 1.25rem; background: rgba(255,255,255,0.06); font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.08em; }
+    .ranking-row { display: grid; grid-template-columns: 2.5rem 1fr 5rem 4.5rem; gap: 0.5rem; padding: 0.85rem 1.25rem; border-top: 1px solid rgba(255,255,255,0.06); align-items: center; transition: background 0.15s; }
+    .ranking-row:hover { background: rgba(255,255,255,0.04); }
+    .ranking-row.leader { background: rgba(255,223,0,0.08); border-top: none; }
+    .rank-pos { font-size: 0.85rem; font-weight: 800; color: rgba(255,255,255,0.4); }
+    .rank-pos.first { color: #FFDF00; font-size: 1rem; }
+    .rank-name { font-size: 0.9rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem; }
+    .rank-badge { background: #FFDF00; color: #001A4B; font-size: 0.6rem; font-weight: 900; padding: 0.15rem 0.45rem; border-radius: 99px; }
+    .rank-exact { font-size: 0.82rem; color: rgba(255,255,255,0.45); text-align: center; }
+    .rank-pts { font-size: 0.95rem; font-weight: 900; color: #FFDF00; text-align: right; }
+    .ranking-cta { text-align: center; }
+    .ranking-cta a { color: rgba(255,255,255,0.5); font-size: 0.9rem; font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 2px; transition: color 0.15s, border-color 0.15s; }
+    .ranking-cta a:hover { color: #FFDF00; border-color: #FFDF00; }
+
     /* URGENCY */
     .urgency-bg { background: linear-gradient(135deg, #001A4B, #002B7F); padding: 5rem 1.5rem; text-align: center; }
     .urgency-inner { max-width: 620px; margin: 0 auto; }
@@ -120,8 +140,8 @@
     <div class="nav-inner">
       <a href="https://prodecaballito.com" class="nav-logo"><span>⚽</span> PRODE Caballito</a>
       <div class="nav-links">
-        <a href="/landing/premios.html" data-i18n="nav.premios">Premios</a>
-        <a href="/landing/amigos.html" data-i18n="nav.amigos">Invitá amigos</a>
+        <a href="/landing-premios.html" data-i18n="nav.premios">Premios</a>
+        <a href="/landing-amigos.html" data-i18n="nav.amigos">Invitá amigos</a>
         <a href="https://prodecaballito.com/login" data-i18n="nav.login">Iniciar sesión</a>
       </div>
       <div class="nav-right">
@@ -255,6 +275,54 @@
     </div>
   </section>
 
+  <!-- RANKING MOCKUP -->
+  <section class="ranking-bg">
+    <p class="section-label" data-i18n="rank.label">🏆 Ranking en vivo</p>
+    <h2 class="section-title" data-i18n="rank.title">Competí con todos. Subí al ranking.</h2>
+    <p class="section-sub" data-i18n="rank.sub">El ranking se actualiza en tiempo real con cada resultado. ¿Podés llegar al #1?</p>
+    <div class="ranking-table">
+      <div class="ranking-header">
+        <span data-i18n="rank.pos">#</span>
+        <span data-i18n="rank.player">Jugador</span>
+        <span style="text-align:center" data-i18n="rank.exact">Exactos</span>
+        <span style="text-align:right" data-i18n="rank.pts">Pts</span>
+      </div>
+      <div class="ranking-row leader">
+        <span class="rank-pos first">👑</span>
+        <span class="rank-name">Mauro G. <span class="rank-badge" data-i18n="rank.leader">LÍDER</span></span>
+        <span class="rank-exact">12</span>
+        <span class="rank-pts">287</span>
+      </div>
+      <div class="ranking-row">
+        <span class="rank-pos">2</span>
+        <span class="rank-name">Valentina R.</span>
+        <span class="rank-exact">9</span>
+        <span class="rank-pts">241</span>
+      </div>
+      <div class="ranking-row">
+        <span class="rank-pos">3</span>
+        <span class="rank-name">Diego F.</span>
+        <span class="rank-exact">8</span>
+        <span class="rank-pts">219</span>
+      </div>
+      <div class="ranking-row">
+        <span class="rank-pos">4</span>
+        <span class="rank-name">Ana C.</span>
+        <span class="rank-exact">7</span>
+        <span class="rank-pts">198</span>
+      </div>
+      <div class="ranking-row">
+        <span class="rank-pos">5</span>
+        <span class="rank-name">Carlos M.</span>
+        <span class="rank-exact">6</span>
+        <span class="rank-pts">176</span>
+      </div>
+    </div>
+    <div class="ranking-cta">
+      <a href="https://prodecaballito.com/register" data-i18n="rank.cta">¿Podés superarlos? Jugá gratis →</a>
+    </div>
+  </section>
+
   <!-- URGENCY CTA -->
   <section class="urgency-bg">
     <div class="urgency-inner">
@@ -275,8 +343,8 @@
       <div class="footer-logo"><span>⚽</span> PRODE Caballito</div>
       <nav class="footer-links">
         <a href="https://prodecaballito.com" data-i18n="footer.home">Inicio</a>
-        <a href="/landing/premios.html" data-i18n="footer.premios">Premios</a>
-        <a href="/landing/amigos.html" data-i18n="footer.amigos">Invitá amigos</a>
+        <a href="/landing-premios.html" data-i18n="footer.premios">Premios</a>
+        <a href="/landing-amigos.html" data-i18n="footer.amigos">Invitá amigos</a>
         <a href="https://prodecaballito.com/register" data-i18n="footer.register">Registrarse</a>
       </nav>
       <p class="footer-copy" data-i18n="footer.copy">© 2026 Prode Caballito · Hecho con ⚽ en Buenos Aires</p>
@@ -305,6 +373,8 @@
         'cal2.date':'11 junio 2026','cal2.title':'Inicio de la Fase de Grupos','cal2.desc':'Arranca el partido inaugural. Después no podés modificar esos pronósticos.','cal2.tag':'🗓 Anotate',
         'cal3.date':'2 julio 2026','cal3.title':'Octavos de Final','cal3.desc':'Empieza el mata-mata. Los pronósticos de eliminación directa valen más.','cal3.tag':'🔥 Alta tensión',
         'cal4.date':'19 julio 2026','cal4.title':'La Gran Final','cal4.desc':'El partido más importante. El que define todo el torneo y el ganador del prode.','cal4.tag':'🏆 El cierre',
+        'rank.label':'🏆 Ranking en vivo','rank.title':'Competí con todos. Subí al ranking.','rank.sub':'El ranking se actualiza en tiempo real con cada resultado. ¿Podés llegar al #1?',
+        'rank.pos':'#','rank.player':'Jugador','rank.exact':'Exactos','rank.pts':'Pts','rank.leader':'LÍDER','rank.cta':'¿Podés superarlos? Jugá gratis →',
         'cta.title':'El mundial arranca pronto.<br><em>No llegues tarde.</em>','cta.sub':'Cuanto antes te registrás, más partidos podés predecir desde el inicio. Los pronósticos se cierran con cada partido.',
         'cta.p1':'⚡ 104 partidos','cta.p2':'🏆 Ranking en vivo','cta.p3':'✓ 100% gratis','cta.p4':'✓ Sin app','cta.btn':'🏆 Quiero jugar gratis ahora',
         'footer.home':'Inicio','footer.premios':'Premios','footer.amigos':'Invitá amigos','footer.register':'Registrarse','footer.copy':'© 2026 Prode Caballito · Hecho con ⚽ en Buenos Aires',
@@ -329,6 +399,8 @@
         'cal2.date':'11 junho 2026','cal2.title':'Início da Fase de Grupos','cal2.desc':'Começa o jogo inaugural. Depois não pode mais modificar esses palpites.','cal2.tag':'🗓 Anote',
         'cal3.date':'2 julho 2026','cal3.title':'Oitavas de Final','cal3.desc':'Começa o mata-mata. Os palpites de eliminação direta valem mais.','cal3.tag':'🔥 Alta tensão',
         'cal4.date':'19 julho 2026','cal4.title':'A Grande Final','cal4.desc':'O jogo mais importante. O que define o torneio e o vencedor do bolão.','cal4.tag':'🏆 O encerramento',
+        'rank.label':'🏆 Ranking ao vivo','rank.title':'Compita com todos. Suba no ranking.','rank.sub':'O ranking é atualizado em tempo real com cada resultado. Você consegue chegar ao #1?',
+        'rank.pos':'#','rank.player':'Jogador','rank.exact':'Exatos','rank.pts':'Pts','rank.leader':'LÍDER','rank.cta':'Você consegue superá-los? Jogue grátis →',
         'cta.title':'A copa começa em breve.<br><em>Não chegue tarde.</em>','cta.sub':'Quanto antes você se cadastra, mais jogos pode prever desde o início. Os palpites fecham com cada jogo.',
         'cta.p1':'⚡ 104 jogos','cta.p2':'🏆 Ranking ao vivo','cta.p3':'✓ 100% grátis','cta.p4':'✓ Sem app','cta.btn':'🏆 Quero jogar grátis agora',
         'footer.home':'Início','footer.premios':'Prêmios','footer.amigos':'Convide amigos','footer.register':'Cadastrar-se','footer.copy':'© 2026 Prode Caballito · Feito com ⚽ em Buenos Aires',
@@ -353,6 +425,8 @@
         'cal2.date':'June 11, 2026','cal2.title':'Group Stage kicks off','cal2.desc':'The opening match starts. After that you can\'t change those predictions.','cal2.tag':'🗓 Mark your calendar',
         'cal3.date':'July 2, 2026','cal3.title':'Round of 32','cal3.desc':'Knockout stage begins. Elimination predictions are worth more.','cal3.tag':'🔥 High stakes',
         'cal4.date':'July 19, 2026','cal4.title':'The Grand Final','cal4.desc':'The most important match. The one that decides the tournament and the predictor winner.','cal4.tag':'🏆 The finale',
+        'rank.label':'🏆 Live rankings','rank.title':'Compete with everyone. Climb the standings.','rank.sub':'The ranking updates in real time with every result. Can you reach #1?',
+        'rank.pos':'#','rank.player':'Player','rank.exact':'Exact','rank.pts':'Pts','rank.leader':'LEADER','rank.cta':'Can you beat them? Play free →',
         'cta.title':'The World Cup starts soon.<br><em>Don\'t be late.</em>','cta.sub':'The earlier you sign up, the more matches you can predict from the start. Predictions close with each match.',
         'cta.p1':'⚡ 104 matches','cta.p2':'🏆 Live rankings','cta.p3':'✓ 100% free','cta.p4':'✓ No app','cta.btn':'🏆 Play for free now',
         'footer.home':'Home','footer.premios':'Prizes','footer.amigos':'Invite friends','footer.register':'Register','footer.copy':'© 2026 Prode Caballito · Made with ⚽ in Buenos Aires',
