@@ -66,8 +66,13 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
   const [editing, setEditing] = useState(false)
   const REMINDER_MINUTES = [5, 10, 15, 30, 60] as const
   type ReminderMinutes = typeof REMINDER_MINUTES[number]
-  const [reminderEnabled, setReminderEnabled] = useState(false)
-  const [reminderMinutes, setReminderMinutes] = useState<ReminderMinutes>(15)
+  const hasExistingReminder = !!bet?.scheduled_for && new Date(bet.scheduled_for) > new Date()
+  const [reminderEnabled, setReminderEnabled] = useState(hasExistingReminder)
+  const [reminderMinutes, setReminderMinutes] = useState<ReminderMinutes>(
+    (REMINDER_MINUTES as readonly number[]).includes(bet?.remind_minutes ?? 0)
+      ? (bet!.remind_minutes as ReminderMinutes)
+      : 15
+  )
 
   // Team names in user's language
   const homeTeam = (lang === 'pt' && match.home_team_pt) ? match.home_team_pt : match.home_team
