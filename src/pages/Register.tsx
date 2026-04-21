@@ -54,7 +54,7 @@ const TEAMS = [
 export function Register() {
   const navigate = useNavigate()
   const { show } = useToastStore()
-  const { setAuth } = useAuthStore()
+  const { setAuth, updateUser } = useAuthStore()
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [step, setStep] = useState<Step>('form')
@@ -129,25 +129,31 @@ export function Register() {
         whatsapp_number,
       })
 
-      // Upload photo if selected
+      // Auto-login primero para que el store tenga el usuario
+      if (data.data?.token && data.data?.user) {
+        setAuth(data.data.user, data.data.token, data.data.refreshToken)
+      }
+
+      // Upload photo if selected — después del login para poder actualizar el store
       if (photoFile && data.data?.token) {
         try {
           const base64 = await compressImage(photoFile, 600, 0.82)
-          await api.post('/users/upload-avatar', {
+          const photoRes = await api.post('/users/upload-avatar', {
             image: base64,
             fileName: photoFile.name.replace(/\.[^.]+$/, '.jpg'),
             contentType: 'image/jpeg',
           }, {
             headers: { Authorization: `Bearer ${data.data.token}` }
           })
+          if (photoRes.data?.data?.url) {
+            updateUser({ foto_url: photoRes.data.data.url })
+          }
         } catch {
           // Photo upload fails silently — user can retry from profile
         }
       }
 
-      // Auto-login with returned tokens
       if (data.data?.token && data.data?.user) {
-        setAuth(data.data.user, data.data.token, data.data.refreshToken)
         show('¡Bienvenido a ProdeCaballito!', 'success')
         navigate('/')
       } else {
