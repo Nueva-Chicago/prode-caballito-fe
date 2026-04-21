@@ -132,12 +132,12 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center gap-1">
       <div
-        className="text-3xl md:text-5xl font-black tabular-nums rounded-xl px-3 py-2 min-w-[62px] md:min-w-[80px] text-center leading-none"
+        className="text-2xl md:text-3xl font-black tabular-nums rounded-lg px-2.5 py-1.5 min-w-[48px] md:min-w-[56px] text-center leading-none"
         style={{ background: 'rgba(0,0,0,0.35)', color: 'var(--theme-secondary)', fontFamily: "'Arial Black', Arial, sans-serif" }}
       >
         {pad2(value)}
       </div>
-      <span className="text-[9px] font-black text-white/50 tracking-widest uppercase">{label}</span>
+      <span className="text-[8px] font-black text-white/45 tracking-widest uppercase">{label}</span>
     </div>
   )
 }
@@ -147,20 +147,20 @@ function HeroBadge({ tema, theme }: { tema: string; theme: { name: string; patte
   const showImg = !!theme.badgeUrl && !imgError
   return (
     <div
-      className="w-28 h-28 md:w-44 md:h-44 rounded-full flex items-center justify-center border-2 border-white/20 shadow-2xl overflow-hidden shrink-0"
+      className="w-20 h-20 md:w-28 md:h-28 rounded-full flex items-center justify-center border-2 border-white/20 shadow-xl overflow-hidden shrink-0"
       style={{ background: showImg ? 'rgba(255,255,255,0.10)' : (theme.pattern || 'var(--theme-primary)') }}
     >
       {showImg
         ? <img
             src={theme.badgeUrl}
             alt={theme.name}
-            className="w-20 h-20 md:w-36 md:h-36 object-contain drop-shadow-xl"
+            className="w-14 h-14 md:w-22 md:h-22 object-contain drop-shadow-xl"
             onError={() => setImgError(true)}
           />
         : tema === 'neutral'
-          ? <span style={{ fontSize: 56, lineHeight: 1 }}>🇦🇷</span>
+          ? <span style={{ fontSize: 40, lineHeight: 1 }}>🇦🇷</span>
           : <span
-              className="text-5xl md:text-7xl font-black text-white drop-shadow"
+              className="text-4xl md:text-5xl font-black text-white drop-shadow"
               style={{ fontFamily: "'Arial Black', Arial, sans-serif", textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}
             >
               {theme.name.split(' ')[0][0]}
@@ -266,6 +266,69 @@ function NextMatchBanner({ matches, bets, embedded = false }: { matches: Match[]
       border: '1px solid rgba(255,255,255,0.1)',
     }}>
       {content}
+    </div>
+  )
+}
+
+/* Panel derecho del hero en desktop — muestra próximo partido sin flip clock */
+function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Record<string, Bet> }) {
+  const [now] = useState(Date.now())
+  const match = matches
+    .filter(m => m.estado !== 'finished' && new Date(m.start_time).getTime() > now)
+    .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())[0] || null
+
+  if (!match) return null
+
+  const hasBet = !!bets[match.id]
+  const dateStr = format(new Date(match.start_time), "EEE d MMM · HH:mm", { locale: esLocale })
+  const diffMs = new Date(match.start_time).getTime() - now
+  const diffDays = Math.floor(diffMs / 86400000)
+  const diffHours = Math.floor((diffMs % 86400000) / 3600000)
+  const timeLabel = diffDays > 0 ? `en ${diffDays}d ${diffHours}h` : `en ${diffHours}h`
+
+  return (
+    <div
+      className="hidden md:flex flex-col justify-center px-6 py-6 md:flex-[2] border-l border-white/10 gap-4"
+      style={{ background: 'linear-gradient(135deg, #0a0f1e 0%, #001A4B 60%, #0a2060 100%)' }}
+    >
+      <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+        ⚡ Próximo partido
+      </p>
+
+      <div>
+        <p style={{ margin: '0 0 4px', fontSize: 17, fontWeight: 900, color: '#FFFFFF', lineHeight: 1.2 }}>
+          {match.home_team} <span style={{ color: 'rgba(255,255,255,0.40)' }}>vs</span> {match.away_team}
+        </p>
+        <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.40)', fontWeight: 500 }}>
+          📅 {dateStr} hs · <span style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 700 }}>{timeLabel}</span>
+        </p>
+      </div>
+
+      {hasBet ? (
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6, alignSelf: 'flex-start',
+          background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.3)',
+          borderRadius: 10, padding: '6px 12px',
+          fontSize: 14, fontWeight: 900, color: '#FFFFFF',
+        }}>
+          <span style={{ fontSize: 11, color: '#4ade80', fontWeight: 700 }}>✓</span>
+          <span>{teamFlag(match.home_team) || '🏳'}</span>
+          <span style={{ color: '#4ade80' }}>{bets[match.id].goles_local}</span>
+          <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>–</span>
+          <span style={{ color: '#4ade80' }}>{bets[match.id].goles_visitante}</span>
+          <span>{teamFlag(match.away_team) || '🏳'}</span>
+        </span>
+      ) : (
+        <Link to="/apuestas" style={{
+          display: 'inline-flex', alignSelf: 'flex-start',
+          alignItems: 'center', gap: 6,
+          background: '#FFCC00', color: '#001A4B',
+          fontSize: 12, fontWeight: 800, padding: '8px 16px',
+          borderRadius: 10, textDecoration: 'none',
+        }}>
+          🎯 Apostar ahora
+        </Link>
+      )}
     </div>
   )
 }
@@ -457,23 +520,33 @@ export function Home() {
           />
         )}
 
-        <div className="relative px-5 py-5 flex items-center gap-4 md:gap-8">
-          {/* Left: headline + CTA */}
+        <div className="relative px-5 py-5 flex items-center gap-5">
+          {/* Left: todo el contenido textual */}
           <div className="flex-1 min-w-0">
+
+            {/* Countdown al Mundial — encima del título, compacto (solo días y hs) */}
+            {mundialCd ? (
+              <div className="flex items-end gap-1.5 mb-3">
+                <CountdownUnit value={mundialCd.days}  label="días" />
+                <span className="text-white/25 font-black pb-3 text-base leading-none">:</span>
+                <CountdownUnit value={mundialCd.hours} label="hs" />
+                <span className="text-white/25 font-black pb-3 text-base leading-none">:</span>
+                <CountdownUnit value={mundialCd.mins}  label="min" />
+              </div>
+            ) : (
+              <p className="text-white/70 text-sm font-bold mb-3">¡El Mundial empezó! 🎉</p>
+            )}
+
             {/* Badge PRONÓSTICOS EXCLUSIVOS */}
-            <div className="inline-flex items-center gap-1.5 border border-green-500/40 bg-green-500/15 text-green-400 text-[9px] font-black px-2 py-0.5 rounded-full mb-2.5 tracking-wide uppercase">
+            <div className="inline-flex items-center gap-1.5 border border-green-500/40 bg-green-500/15 text-green-400 text-[9px] font-black px-2 py-0.5 rounded-full mb-2 tracking-wide uppercase">
               <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shrink-0" />
               Pronósticos exclusivos
             </div>
 
-            <h1 className="font-black text-white leading-tight mb-2.5"
-              style={{ fontSize: 'clamp(17px, 4.5vw, 26px)', lineHeight: 1.15, fontFamily: "'Arial Black', Arial, sans-serif" }}>
+            <h1 className="font-black text-white leading-tight mb-3"
+              style={{ fontSize: 'clamp(18px, 3.5vw, 28px)', lineHeight: 1.1, fontFamily: "'Arial Black', Arial, sans-serif" }}>
               EL MUNDIAL<br />SE JUEGA<br />ACÁ TAMBIÉN
             </h1>
-
-            <p className="text-white/55 text-[11px] mb-3 leading-snug hidden sm:block">
-              Arrancá, apostá y competí con tus amigos.<br />El Mundial 2026 te espera.
-            </p>
 
             <Link
               to="/apuestas"
@@ -483,50 +556,29 @@ export function Home() {
               EMPIEZA TU PRODE ⚽
             </Link>
 
-            <p className="text-white/30 text-[9px] tracking-widest mt-2 uppercase hidden sm:block">
-              Jueves, 11 de Junio 2026
+            <p className="text-white/25 text-[9px] tracking-widest mt-2 uppercase">
+              Jueves, 11 Jun 2026
             </p>
 
             {pwaState.type !== 'installed' && pwaState.type !== 'unavailable' && (
               <button
                 onClick={() => pwaState.type === 'ios' ? setShowIOSGuide(true) : pwaInstall()}
-                className="block text-white/25 text-[9px] mt-1 hover:text-white/50 transition-colors"
+                className="block text-white/20 text-[9px] mt-1 hover:text-white/45 transition-colors"
               >
                 📲 {t.home.installApp}
               </button>
             )}
           </div>
 
-          {/* Right: countdown + decoration */}
-          <div className="shrink-0 flex flex-col items-center gap-3">
-            {/* Countdown */}
-            {mundialCd ? (
-              <div className="flex items-end gap-1">
-                <CountdownUnit value={mundialCd.days}  label="días" />
-                <span className="text-white/30 font-black pb-4 text-lg">:</span>
-                <CountdownUnit value={mundialCd.hours} label="hs" />
-                <span className="text-white/30 font-black pb-4 text-lg">:</span>
-                <CountdownUnit value={mundialCd.mins}  label="min" />
-                <span className="text-white/30 font-black pb-4 text-lg">:</span>
-                <CountdownUnit value={mundialCd.secs}  label="seg" />
-              </div>
-            ) : (
-              <span className="text-white/60 text-sm font-bold">¡Empezó! 🎉</span>
-            )}
-
-            {/* Circle decoration — escudo del club o fallback */}
+          {/* Right: solo el escudo del club */}
+          <div className="shrink-0">
             <HeroBadge tema={tema} theme={theme} />
           </div>
         </div>
       </div>
 
-      {/* Próximo partido — panel derecho (desktop only, embedded en el mismo block) */}
-      <div
-        className="hidden md:flex flex-col justify-center px-6 py-5 md:flex-[2] border-l border-white/10"
-        style={{ background: 'linear-gradient(135deg, #0a0f1e 0%, #001A4B 60%, #0a2060 100%)' }}
-      >
-        <NextMatchBanner matches={matches} bets={bets} embedded />
-      </div>
+      {/* Próximo partido — panel derecho desktop (sin countdown duplicado) */}
+      <NextMatchDesktopPanel matches={matches} bets={bets} />
 
       </div>{/* fin md:flex wrapper */}
 
