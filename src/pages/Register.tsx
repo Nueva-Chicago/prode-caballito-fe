@@ -173,19 +173,53 @@ export function Register() {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] px-8 py-5 text-center">
           <h1 className="text-white font-bold text-xl">Crear cuenta</h1>
-          <div className="flex justify-center gap-2 mt-3">
-            {(['form', 'verify', 'complete'] as Step[]).map((s, i) => (
-              <div key={s} className={`w-2 h-2 rounded-full transition-colors ${
-                step === 'complete' || (step === 'verify' && i <= 1) || (step === 'form' && i === 0)
-                  ? 'bg-[#FFDF00]' : 'bg-white/30'
-              }`} />
-            ))}
-          </div>
+
+          {/* Stepper con etiquetas */}
+          {(() => {
+            const STEPS = [
+              { key: 'form',     label: 'Cuenta' },
+              { key: 'verify',   label: 'Email' },
+              { key: 'complete', label: 'Perfil' },
+            ] as const
+            const currentIdx = STEPS.findIndex(s => s.key === step)
+            return (
+              <div className="flex items-center justify-center mt-4 gap-0">
+                {STEPS.map((s, i) => {
+                  const done    = i < currentIdx
+                  const active  = i === currentIdx
+                  return (
+                    <div key={s.key} className="flex items-center">
+                      {/* Línea izquierda */}
+                      {i > 0 && (
+                        <div className={`w-10 h-px transition-colors ${i <= currentIdx ? 'bg-[#FFDF00]' : 'bg-white/25'}`} />
+                      )}
+                      {/* Círculo + label */}
+                      <div className="flex flex-col items-center gap-1">
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
+                          done   ? 'bg-[#FFDF00] text-[#001A4B]' :
+                          active ? 'bg-[#FFDF00] text-[#001A4B] ring-2 ring-white/40 ring-offset-1 ring-offset-transparent' :
+                                   'bg-white/20 text-white/50'
+                        }`}>
+                          {done ? '✓' : i + 1}
+                        </div>
+                        <span className={`text-[9px] font-semibold tracking-wide uppercase transition-colors ${
+                          active || done ? 'text-[#FFDF00]' : 'text-white/35'
+                        }`}>
+                          {s.label}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })()}
         </div>
 
         <div className="p-8">
           {step === 'form' && (
             <form onSubmit={handleRegister} className="space-y-4">
+              <p className="text-sm text-gray-500 text-center mb-2">Ingresá tus datos para crear tu cuenta</p>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
                 <input type="text" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })}
