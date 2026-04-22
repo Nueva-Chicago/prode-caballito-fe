@@ -11,6 +11,7 @@ import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
 import { teamFlag, teamAbbr } from '@/utils/teamFlags'
+import { LeaderHome } from '@/pages/LeaderHome'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 /* ── Flip clock display ──────────────────────────────────────────── */
@@ -489,6 +490,23 @@ export function Home() {
 
 
   if (loading) return <HomeSkeleton />
+
+  // ── Home exclusiva para el líder (#1) ──────────────────────────────────────
+  if (myEntry && myEntry.position === 1) {
+    return (
+      <LeaderHome
+        matches={matches}
+        bets={bets}
+        onBetSaved={refreshBets}
+        onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
+        ranking={ranking}
+        myEntry={myEntry}
+        planilla={planilla}
+        totalUnbet={totalUnbet}
+        urgentUnbet={urgentUnbet}
+      />
+    )
+  }
 
   if (loadError) return (
     <div className="max-w-4xl mx-auto px-4 py-20 flex flex-col items-center gap-4 text-center">
