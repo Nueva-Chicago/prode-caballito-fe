@@ -54,10 +54,12 @@ export function Profile() {
   const { user, updateUser } = useAuthStore()
   const { show } = useToastStore()
   const t = useT()
-  const fileRef = useRef<HTMLInputElement>(null)
+  const fileRef   = useRef<HTMLInputElement>(null)
+  const cameraRef = useRef<HTMLInputElement>(null)
   const [editName, setEditName] = useState(false)
   const [nombre, setNombre] = useState(user?.nombre || '')
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [showPhotoMenu, setShowPhotoMenu] = useState(false)
   const initPhone = useMemo(() => parsePhone(user?.whatsapp_number || ''), [])
   const [waCountry, setWaCountry] = useState(initPhone.code)
   const [waLocal, setWaLocal] = useState(initPhone.local)
@@ -146,17 +148,50 @@ export function Profile() {
       {/* Foto y nombre */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center gap-5">
-          <div className="relative cursor-pointer" onClick={() => fileRef.current?.click()}>
-            {user.foto_url
-              ? <img src={user.foto_url} alt="" className="w-20 h-20 rounded-full object-cover border-4 border-[#0042A5]/20" />
-              : <div className="w-20 h-20 rounded-full bg-[#0042A5] flex items-center justify-center text-3xl text-white font-bold">
-                  {user.nombre[0].toUpperCase()}
+          <div className="relative">
+            {/* Avatar */}
+            <button
+              type="button"
+              onClick={() => setShowPhotoMenu(v => !v)}
+              className="relative block focus:outline-none"
+            >
+              {user.foto_url
+                ? <img src={user.foto_url} alt="" className="w-20 h-20 rounded-full object-cover border-4 border-[#0042A5]/20" />
+                : <div className="w-20 h-20 rounded-full bg-[#0042A5] flex items-center justify-center text-3xl text-white font-bold">
+                    {user.nombre[0].toUpperCase()}
+                  </div>
+              }
+              <div className="absolute bottom-0 right-0 bg-[#FFDF00] rounded-full p-1 shadow text-sm leading-none">
+                {uploadingPhoto ? '⏳' : '✏️'}
+              </div>
+            </button>
+
+            {/* Inputs ocultos */}
+            <input ref={fileRef}   type="file" accept="image/*"                  className="hidden" onChange={handlePhotoUpload} />
+            <input ref={cameraRef} type="file" accept="image/*" capture="user"   className="hidden" onChange={handlePhotoUpload} />
+
+            {/* Action sheet */}
+            {showPhotoMenu && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowPhotoMenu(false)} />
+                <div className="absolute left-0 top-24 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden w-52">
+                  <button
+                    type="button"
+                    onClick={() => { setShowPhotoMenu(false); cameraRef.current?.click() }}
+                    className="flex items-center gap-3 w-full px-4 py-3.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100"
+                  >
+                    <span className="text-xl">📸</span> Tomar una foto
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowPhotoMenu(false); fileRef.current?.click() }}
+                    className="flex items-center gap-3 w-full px-4 py-3.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="text-xl">🖼️</span> Elegir de la galería
+                  </button>
                 </div>
-            }
-            <div className="absolute bottom-0 right-0 bg-[#FFDF00] rounded-full p-1 shadow text-sm">
-              {uploadingPhoto ? '⏳' : '📷'}
-            </div>
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+              </>
+            )}
           </div>
           <div className="flex-1 min-w-0">
             {editName ? (
