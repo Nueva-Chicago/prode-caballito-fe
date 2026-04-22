@@ -334,7 +334,13 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
             ) : bet ? (
               <>
                 <button
-                  onClick={() => { setEditing(true); setScore(`${bet.goles_local}-${bet.goles_visitante}`); setReminderEnabled(false) }}
+                  onClick={() => {
+                    setEditing(true)
+                    setScore(`${bet.goles_local}-${bet.goles_visitante}`)
+                    const saved = Number(bet.remind_minutes)
+                    setReminderMinutes((REMINDER_MINUTES as readonly number[]).includes(saved) ? saved as ReminderMinutes : 30)
+                    setReminderEnabled(true)
+                  }}
                   className="text-xs text-blue-600 hover:underline"
                 >
                   {t.match.edit}
@@ -343,7 +349,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
               </>
             ) : (
               <button
-                onClick={() => { setEditing(true); setReminderEnabled(false) }}
+                onClick={() => { setEditing(true); setReminderEnabled(true); setReminderMinutes(30) }}
                 className="t-btn-cta text-xs px-4 py-2"
               >
                 {t.match.bet}
