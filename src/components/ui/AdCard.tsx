@@ -62,21 +62,32 @@ export function AdCard() {
           flexShrink: 0,
           width: 44, height: 44,
           borderRadius: 12,
-          background: 'rgba(255,255,255,0.14)',
+          background: ad.logoUrl ? 'transparent' : 'rgba(255,255,255,0.14)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           gap: 2,
+          overflow: 'hidden',
         }}>
-          <span style={{ fontSize: 20, lineHeight: 1 }}>{ad.logoEmoji}</span>
-          <span style={{
-            fontSize: 7, fontWeight: 900,
-            color: ad.dimColor,
-            letterSpacing: '0.04em',
-          }}>
-            {ad.logoText.split(' ')[0]}
-          </span>
+          {ad.logoUrl ? (
+            <img
+              src={ad.logoUrl}
+              alt={ad.logoText}
+              style={{ width: 44, height: 44, objectFit: 'contain' }}
+            />
+          ) : (
+            <>
+              <span style={{ fontSize: 20, lineHeight: 1 }}>{ad.logoEmoji}</span>
+              <span style={{
+                fontSize: 7, fontWeight: 900,
+                color: ad.dimColor,
+                letterSpacing: '0.04em',
+              }}>
+                {ad.logoText.split(' ')[0]}
+              </span>
+            </>
+          )}
         </div>
 
         {/* Copy */}

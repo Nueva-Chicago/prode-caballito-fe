@@ -5,6 +5,8 @@ export interface Ad {
   id: string
   logoEmoji: string
   logoText: string
+  /** Si se provee, se muestra una imagen en lugar del emoji */
+  logoUrl?: string
   headline: string
   subline?: string
   ctaText: string
@@ -18,6 +20,21 @@ export interface Ad {
 }
 
 export const ADS: Ad[] = [
+  {
+    id: 'nueva-chicago-2026',
+    logoEmoji: '⚽',
+    logoText: 'NUEVA CHICAGO',
+    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg/500px-Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg.png',
+    headline: 'El Torito de Mataderos',
+    subline: 'Club Atlético Nueva Chicago — ¡Arriba los verdinegros!',
+    ctaText: 'CONOCÉ EL CLUB →',
+    ctaUrl: 'https://canuevachicago.com.ar',
+    bg: 'linear-gradient(100deg, #071A07 0%, #005C28 55%, #0A1A0A 100%)',
+    ctaBg: '#FFFFFF',
+    ctaColor: '#005020',
+    textColor: '#FFFFFF',
+    dimColor: 'rgba(255,255,255,0.5)',
+  },
   {
     id: 'betsson-arg-2026',
     logoEmoji: '🎯',

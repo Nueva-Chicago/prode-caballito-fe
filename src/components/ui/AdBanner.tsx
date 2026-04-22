@@ -62,26 +62,37 @@ export function AdBanner() {
           PATROCINADO
         </span>
 
-        {/* Logo / emoji */}
+        {/* Logo */}
         <div style={{
           flexShrink: 0,
           width: 36, height: 36,
           borderRadius: 10,
-          background: 'rgba(255,255,255,0.12)',
+          background: ad.logoUrl ? 'transparent' : 'rgba(255,255,255,0.12)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           gap: 1,
           marginTop: 8,
+          overflow: 'hidden',
         }}>
-          <span style={{ fontSize: 16, lineHeight: 1 }}>{ad.logoEmoji}</span>
-          <span style={{
-            fontSize: 6, fontWeight: 900,
-            color: ad.dimColor, letterSpacing: '0.04em',
-          }}>
-            {ad.logoText.split(' ')[0]}
-          </span>
+          {ad.logoUrl ? (
+            <img
+              src={ad.logoUrl}
+              alt={ad.logoText}
+              style={{ width: 36, height: 36, objectFit: 'contain' }}
+            />
+          ) : (
+            <>
+              <span style={{ fontSize: 16, lineHeight: 1 }}>{ad.logoEmoji}</span>
+              <span style={{
+                fontSize: 6, fontWeight: 900,
+                color: ad.dimColor, letterSpacing: '0.04em',
+              }}>
+                {ad.logoText.split(' ')[0]}
+              </span>
+            </>
+          )}
         </div>
 
         {/* Copy */}
