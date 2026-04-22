@@ -142,3 +142,78 @@ const FLAGS: Record<string, string> = {
 export function teamFlag(name: string): string {
   return FLAGS[name.toUpperCase().trim()] ?? ''
 }
+
+// ─── Abreviaciones FIFA 3 letras ─────────────────────────────────────────────
+
+const ABBR: Record<string, string> = {
+  // Sudamérica
+  'ARGENTINA': 'ARG', 'BRASIL': 'BRA', 'BRAZIL': 'BRA',
+  'URUGUAY': 'URU', 'COLOMBIA': 'COL', 'CHILE': 'CHI',
+  'PERU': 'PER', 'PERÚ': 'PER', 'BOLIVIA': 'BOL',
+  'PARAGUAY': 'PAR', 'VENEZUELA': 'VEN', 'ECUADOR': 'ECU',
+
+  // Europa
+  'FRANCE': 'FRA', 'FRANCIA': 'FRA',
+  'ALEMANIA': 'GER', 'GERMANY': 'GER',
+  'ESPAÑA': 'ESP', 'SPAIN': 'ESP',
+  'PORTUGAL': 'POR', 'ITALIA': 'ITA', 'ITALY': 'ITA',
+  'INGLATERRA': 'ENG', 'ENGLAND': 'ENG',
+  'GALES': 'WAL', 'WALES': 'WAL',
+  'ESCOCIA': 'SCO', 'SCOTLAND': 'SCO',
+  'PAÍSES BAJOS': 'NED', 'PAISES BAJOS': 'NED', 'NETHERLANDS': 'NED', 'HOLANDA': 'NED',
+  'BÉLGICA': 'BEL', 'BELGICA': 'BEL', 'BELGIUM': 'BEL',
+  'CROACIA': 'CRO', 'CROATIA': 'CRO',
+  'SUIZA': 'SUI', 'SWITZERLAND': 'SUI',
+  'DINAMARCA': 'DEN', 'DENMARK': 'DEN',
+  'POLONIA': 'POL', 'POLAND': 'POL',
+  'SERBIA': 'SRB', 'AUSTRIA': 'AUT',
+  'SUECIA': 'SWE', 'SWEDEN': 'SWE',
+  'NORUEGA': 'NOR', 'NORWAY': 'NOR',
+  'TURQUÍA': 'TUR', 'TURQUIA': 'TUR', 'TURKEY': 'TUR',
+  'UCRANIA': 'UKR', 'UKRAINE': 'UKR',
+  'GRECIA': 'GRE', 'GREECE': 'GRE',
+  'ALBANIA': 'ALB', 'ESLOVENIA': 'SVN', 'SLOVENIA': 'SVN',
+  'ESLOVAQUIA': 'SVK', 'SLOVAKIA': 'SVK',
+  'RUMANIA': 'ROU', 'ROMANIA': 'ROU',
+  'HUNGRÍA': 'HUN', 'HUNGRIA': 'HUN', 'HUNGARY': 'HUN',
+  'REPÚBLICA CHECA': 'CZE', 'REPUBLICA CHECA': 'CZE', 'CZECH REPUBLIC': 'CZE',
+  'BOSNIA HERZEGOVINA': 'BIH', 'BOSNIA Y HERZEGOVINA': 'BIH',
+
+  // CONCACAF
+  'ESTADOS UNIDOS': 'USA', 'USA': 'USA',
+  'CANADÁ': 'CAN', 'CANADA': 'CAN',
+  'MEXICO': 'MEX', 'MÉXICO': 'MEX',
+  'COSTA RICA': 'CRC', 'JAMAICA': 'JAM',
+  'PANAMÁ': 'PAN', 'PANAMA': 'PAN',
+  'HONDURAS': 'HON', 'HAITÍ': 'HAI', 'HAITI': 'HAI',
+  'CURAZAO': 'CUW', 'CURACAO': 'CUW',
+
+  // África
+  'SENEGAL': 'SEN', 'MARRUECOS': 'MAR', 'MOROCCO': 'MAR',
+  'GHANA': 'GHA', 'CAMERÚN': 'CMR', 'CAMERUN': 'CMR',
+  'TÚNEZ': 'TUN', 'TUNEZ': 'TUN', 'TUNISIA': 'TUN',
+  'NIGERIA': 'NGA', 'EGIPTO': 'EGY', 'EGYPT': 'EGY',
+  'COSTA DE MARFIL': 'CIV', 'IVORY COAST': 'CIV',
+  'ARGELIA': 'ALG', 'ALGERIA': 'ALG',
+  'SUDÁFRICA': 'RSA', 'SUDAFRICA': 'RSA', 'SOUTH AFRICA': 'RSA',
+  'CABO VERDE': 'CPV', 'CAPE VERDE': 'CPV',
+  'CONGO': 'COD', 'DR CONGO': 'COD', 'RD CONGO': 'COD',
+
+  // Asia / Medio Oriente
+  'IRAN': 'IRN', 'IRÁN': 'IRN',
+  'ARABIA SAUDITA': 'KSA', 'SAUDI ARABIA': 'KSA',
+  'QATAR': 'QAT', 'CATAR': 'QAT',
+  'JAPÓN': 'JPN', 'JAPON': 'JPN', 'JAPAN': 'JPN',
+  'COREA DEL SUR': 'KOR', 'SOUTH KOREA': 'KOR', 'KOREA': 'KOR',
+  'AUSTRALIA': 'AUS',
+  'IRAQ': 'IRQ', 'IRAK': 'IRQ',
+  'JORDANIA': 'JOR', 'JORDAN': 'JOR',
+  'UZBEKISTÁN': 'UZB', 'UZBEKISTAN': 'UZB',
+  'NUEVA ZELANDA': 'NZL', 'NEW ZEALAND': 'NZL',
+}
+
+/** Devuelve la abreviación FIFA de 3 letras, o las primeras 3 del nombre si no está en el listado */
+export function teamAbbr(name: string): string {
+  const key = name.toUpperCase().trim()
+  return ABBR[key] ?? name.trim().slice(0, 3).toUpperCase()
+}

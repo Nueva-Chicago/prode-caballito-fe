@@ -10,7 +10,7 @@ import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
-import { teamFlag } from '@/utils/teamFlags'
+import { teamFlag, teamAbbr } from '@/utils/teamFlags'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 /* ── Flip clock display ──────────────────────────────────────────── */
@@ -178,9 +178,11 @@ function NextMatchBanner({ matches, bets, embedded = false }: { matches: Match[]
               fontSize: 12, fontWeight: 900, color: '#FFFFFF', fontVariantNumeric: 'tabular-nums',
             }}>
               <span style={{ fontSize: 10, color: '#4ade80', fontWeight: 700 }}>✓</span>
+              <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.55)', fontWeight: 700, letterSpacing: '0.03em' }}>{teamAbbr(match.home_team)}</span>
               <span style={{ color: '#4ade80' }}>{bets[match.id].goles_local}</span>
               <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>–</span>
               <span style={{ color: '#4ade80' }}>{bets[match.id].goles_visitante}</span>
+              <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.55)', fontWeight: 700, letterSpacing: '0.03em' }}>{teamAbbr(match.away_team)}</span>
             </span>
           )}
         </div>
@@ -296,10 +298,12 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
       {/* Bet or CTA */}
       {hasBet ? (
         <div>
-          <div className="flex items-center justify-center gap-3 bg-green-50 border border-green-100 rounded-xl py-3">
+          <div className="flex items-center justify-center gap-2 bg-green-50 border border-green-100 rounded-xl py-3">
+            <span className="text-[10px] font-bold text-gray-400 tracking-wide">{teamAbbr(match.home_team)}</span>
             <span className="font-black text-2xl text-green-600">{bets[match.id].goles_local}</span>
             <span className="text-gray-300 font-bold text-xl">—</span>
             <span className="font-black text-2xl text-green-600">{bets[match.id].goles_visitante}</span>
+            <span className="text-[10px] font-bold text-gray-400 tracking-wide">{teamAbbr(match.away_team)}</span>
           </div>
           <p className="text-center text-[10px] text-gray-400 mt-2 uppercase tracking-wider font-bold">
             TU PRONÓSTICO ✏️
