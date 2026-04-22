@@ -205,4 +205,11 @@ export const TEAM_THEMES: Record<string, {
     fg: '#FFFFFF', ring: '#D42B2B',
     badgeUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Emblema_oficial_del_Club_Atl%C3%A9tico_Hurac%C3%A1n.svg/250px-Emblema_oficial_del_Club_Atl%C3%A9tico_Hurac%C3%A1n.svg.png',
   },
+  // Argentina — celeste + blanco (La Albiceleste)
+  // on-primary = #1A1A1A auto-computado: celeste #75AADB + blanco = 2.6:1 (falla WCAG)
+  argentina: {
+    primary: '#75AADB', secondary: '#FFFFFF', name: 'Argentina',
+    pattern: 'repeating-linear-gradient(90deg, #FFFFFF 0px, #FFFFFF 20px, #75AADB 20px, #75AADB 40px)',
+    fg: '#75AADB', ring: '#75AADB',
+  },
 }

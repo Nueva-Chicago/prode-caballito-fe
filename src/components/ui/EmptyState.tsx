@@ -16,14 +16,14 @@ export function EmptyState({ icon, message, action, className = '' }: EmptyState
         action.to
           ? <Link
               to={action.to}
-              className="mt-1 px-4 py-2 rounded-lg text-xs font-bold text-white transition-all hover:brightness-110 active:scale-95"
+              className="mt-1 px-4 py-2 rounded-lg text-xs font-bold t-text-on-primary transition-all hover:brightness-110 active:scale-95"
               style={{ background: 'var(--theme-primary)' }}
             >
               {action.label}
             </Link>
           : <button
               onClick={action.onClick}
-              className="mt-1 px-4 py-2 rounded-lg text-xs font-bold text-white transition-all hover:brightness-110 active:scale-95"
+              className="mt-1 px-4 py-2 rounded-lg text-xs font-bold t-text-on-primary transition-all hover:brightness-110 active:scale-95"
               style={{ background: 'var(--theme-primary)' }}
             >
               {action.label}

@@ -84,13 +84,34 @@
   --theme-on-primary:  #ffffff;
 }
 
+/* Argentina — celeste + blanco (La Albiceleste) */
+[data-theme="argentina"] {
+  --theme-nav-bg:      #2B5F9E;
+  --theme-nav-bg-2:    #1E4E8A;
+  --theme-primary:     #75AADB;
+  --theme-secondary:   #FFFFFF;
+  --theme-accent-text: #1E4E8A;
+  /* on-primary = dark — celeste is light, white text fails WCAG (2.6:1).
+     CSS fallback; applyTheme() auto-computes and overrides at runtime. */
+  --theme-on-primary:  #1A1A1A;
+  --theme-on-secondary: #1A1A1A;
+}
+
+/* Racing Club — celeste claro (La Academia)
+   CSS fallback for on-primary. JS (applyTheme) overrides to #1A1A1A
+   because #4BA6D1 + white = 2.6:1 → WCAG fail. */
+[data-theme="racing"] {
+  --theme-on-primary: #1A1A1A;
+}
+
 /* ── PAGE-LEVEL THEME VARIABLES ─────────────────────────────────── */
 /* Equipos claros: fondo gris suave, cards blancas                   */
 :root,
 [data-theme="neutral"],
 [data-theme="river"],
 [data-theme="racing"],
-[data-theme="estudiantes"] {
+[data-theme="estudiantes"],
+[data-theme="argentina"] {
   --theme-page-bg:         #F1F4F9;
   --theme-page-surface:    #FFFFFF;
   --theme-page-border:     #E5E7EB;
@@ -136,11 +157,13 @@
 .t-bg-secondary { background-color: var(--theme-secondary) !important; }
 
 /* Texto */
-.t-text-primary   { color: var(--theme-primary) !important; }
-.t-text-nav       { color: var(--theme-nav-bg) !important; }
-.t-text-secondary { color: var(--theme-secondary) !important; }
-.t-text-accent    { color: var(--theme-accent-text) !important; }
-.t-text-on-primary{ color: var(--theme-on-primary) !important; }
+.t-text-primary      { color: var(--theme-primary) !important; }
+.t-text-nav          { color: var(--theme-nav-bg) !important; }
+.t-text-secondary    { color: var(--theme-secondary) !important; }
+.t-text-accent       { color: var(--theme-accent-text) !important; }
+/* Texto sobre role-color backgrounds — auto-computed por applyTheme() */
+.t-text-on-primary   { color: var(--theme-on-primary, #ffffff) !important; }
+.t-text-on-secondary { color: var(--theme-on-secondary, #1a1a1a) !important; }
 
 /* Borde */
 .t-border-primary { border-color: var(--theme-primary) !important; }
@@ -150,20 +173,22 @@
   background: linear-gradient(135deg, var(--theme-nav-bg), var(--theme-primary)) !important;
 }
 
-/* Botón CTA primario (amarillo/secondary) */
+/* Botón CTA — usa secondary como bg.
+   --theme-on-secondary auto-computado por applyTheme() para garantizar contraste. */
 .t-btn-cta {
   background-color: var(--theme-secondary);
-  color: var(--theme-accent-text);
+  color: var(--theme-on-secondary, #1a1a1a);
   font-weight: 700;
   border-radius: 0.75rem;
   transition: filter 0.15s;
 }
 .t-btn-cta:hover { filter: brightness(0.9); }
 
-/* Botón primario lleno */
+/* Botón primario lleno.
+   --theme-on-primary auto-computado — no hardcodear text-white sobre este. */
 .t-btn-primary {
   background-color: var(--theme-primary);
-  color: var(--theme-on-primary);
+  color: var(--theme-on-primary, #ffffff);
   font-weight: 700;
   border-radius: 0.75rem;
   transition: filter 0.15s;

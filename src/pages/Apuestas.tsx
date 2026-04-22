@@ -214,7 +214,7 @@ export function Apuestas() {
         )}
         <button
           onClick={() => setShowNewPlanilla(true)}
-          className="shrink-0 w-10 h-10 rounded-xl t-bg-primary text-white font-bold text-lg flex items-center justify-center hover:opacity-90 transition-opacity"
+          className="shrink-0 w-10 h-10 rounded-xl t-bg-primary t-text-on-primary font-bold text-lg flex items-center justify-center hover:opacity-90 transition-opacity"
           title={t.bets.newPlanilla}
         >
           +
