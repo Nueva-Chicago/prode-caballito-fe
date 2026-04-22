@@ -3,6 +3,7 @@ export const es = {
     home: 'Inicio', bets: 'Pronósticos', matrix: 'Matriz',
     ranking: 'Ranking', tournaments: 'Torneos', messages: 'Mensajes',
     rules: 'Reglas',
+    prizes: 'Premios',
     admin: 'Admin', logout: 'Salir', logoutMobile: 'Cerrar sesión',
     switchLang: 'Cambiar a Português', fixture: 'Fixture',
   },

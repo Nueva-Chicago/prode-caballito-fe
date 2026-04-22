@@ -13,12 +13,13 @@ export function Navbar() {
   const [switchingLang, setSwitchingLang] = useState(false)
 
   const navLinks = [
-    { to: '/',             label: t.nav.home,    icon: '🏠' },
-    { to: '/apuestas',     label: t.nav.bets,    icon: '⚽' },
-    { to: '/matriz',       label: t.nav.matrix,  icon: '📊' },
-    { to: '/ranking',      label: t.nav.ranking, icon: '🏆' },
-    { to: '/fixture',      label: t.nav.fixture, icon: '🗓️' },
-    { to: '/reglamento',   label: t.nav.rules,   icon: '📖' },
+    { to: '/',                          label: t.nav.home,    icon: '🏠' },
+    { to: '/apuestas',                  label: t.nav.bets,    icon: '⚽' },
+    { to: '/matriz',                    label: t.nav.matrix,  icon: '📊' },
+    { to: '/ranking',                   label: t.nav.ranking, icon: '🏆' },
+    { to: '/fixture',                   label: t.nav.fixture, icon: '🗓️' },
+    { to: '/reglamento',                label: t.nav.rules,   icon: '📖' },
+    { to: '/landing-premios.html',      label: t.nav.prizes,  icon: '🎁', external: true },
   ]
 
   const adminLinks = [
@@ -63,7 +64,17 @@ export function Navbar() {
 
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-1">
-          {navLinks.map((l) => (
+          {navLinks.map((l) => l.external ? (
+            <a
+              key={l.to}
+              href={l.to}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10"
+            >
+              {l.icon} {l.label}
+            </a>
+          ) : (
             <Link
               key={l.to}
               to={l.to}
@@ -143,7 +154,13 @@ export function Navbar() {
           className="md:hidden border-t border-white/10 px-4 py-3 flex flex-col gap-1"
           style={{ background: 'var(--theme-nav-bg-2)' }}
         >
-          {navLinks.map((l) => (
+          {navLinks.map((l) => l.external ? (
+            <a key={l.to} href={l.to} target="_blank" rel="noopener noreferrer"
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-sm">
+              <span>{l.icon}</span>{l.label}
+            </a>
+          ) : (
             <Link key={l.to} to={l.to} onClick={() => setMenuOpen(false)}
               className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-sm">
               <span>{l.icon}</span>{l.label}
@@ -176,7 +193,7 @@ export function Navbar() {
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-t border-gray-200 flex"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {[...navLinks, ...(isAdmin() ? adminLinks : [])].map((l) => (
+        {[...navLinks.filter(l => !l.external), ...(isAdmin() ? adminLinks : [])].map((l) => (
           <Link
             key={l.to}
             to={l.to}

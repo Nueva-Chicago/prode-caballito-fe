@@ -771,6 +771,37 @@ export function Home() {
         </Link>
       </div>
 
+      {/* ── Banner Premios Nueva Chicago ──────────────────────── */}
+      <a
+        href="/landing-premios.html"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block rounded-2xl overflow-hidden"
+        style={{
+          background: 'linear-gradient(110deg, #002A10 0%, #005C28 55%, #001A08 100%)',
+          border: '1px solid rgba(0,166,80,0.35)',
+        }}
+      >
+        <div className="flex items-center gap-4 px-4 py-4">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg/500px-Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg.png"
+            alt="Nueva Chicago"
+            className="w-12 h-12 object-contain shrink-0"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold tracking-widest uppercase text-green-400/80 mb-0.5">🏆 Premios reales</p>
+            <p className="text-white font-black text-sm leading-tight">Ganá el Prode y llevate<br/>más de $600.000 en premios</p>
+            <p className="text-white/50 text-[11px] mt-0.5">Pileta · Entradas · Ropa · Camiseta firmada</p>
+          </div>
+          <div
+            className="shrink-0 text-xs font-black px-3 py-2 rounded-xl whitespace-nowrap"
+            style={{ background: '#00A650', color: '#fff' }}
+          >
+            Ver premios →
+          </div>
+        </div>
+      </a>
+
       {/* ── 3. RANKING ACTUAL ─────────────────────────────────── */}
       {top3.length > 0 && (
         <div className="t-surface rounded-2xl border t-border-page shadow-sm overflow-hidden">
