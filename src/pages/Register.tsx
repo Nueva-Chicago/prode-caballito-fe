@@ -55,9 +55,7 @@ export function Register() {
   const navigate = useNavigate()
   const { show } = useToastStore()
   const { setAuth, updateUser } = useAuthStore()
-  const fileRef   = useRef<HTMLInputElement>(null)
-  const cameraRef = useRef<HTMLInputElement>(null)
-  const [showPhotoMenu, setShowPhotoMenu] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   const [step, setStep] = useState<Step>('form')
   const [loading, setLoading] = useState(false)
@@ -302,48 +300,20 @@ export function Register() {
 
               {/* Foto de perfil */}
               <div className="flex flex-col items-center gap-2">
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setShowPhotoMenu(v => !v)}
-                    className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-dashed border-gray-300 hover:border-[#0042A5] transition-colors bg-gray-50 flex items-center justify-center"
-                  >
-                    {photoPreview
-                      ? <img src={photoPreview} alt="" className="w-full h-full object-cover" />
-                      : <span className="text-3xl">📷</span>
-                    }
-                    {photoPreview && (
-                      <div className="absolute bottom-0 right-0 bg-[#FFDF00] rounded-full p-1 shadow text-xs leading-none">✏️</div>
-                    )}
-                  </button>
-
-                  {/* Inputs ocultos */}
-                  <input ref={fileRef}   type="file" accept="image/*"                className="hidden" onChange={handlePhotoSelect} />
-                  <input ref={cameraRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handlePhotoSelect} />
-
-                  {/* Action sheet */}
-                  {showPhotoMenu && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setShowPhotoMenu(false)} />
-                      <div className="absolute left-1/2 -translate-x-1/2 top-24 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden w-52">
-                        <button
-                          type="button"
-                          onClick={() => { setShowPhotoMenu(false); cameraRef.current?.click() }}
-                          className="flex items-center gap-3 w-full px-4 py-3.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100"
-                        >
-                          <span className="text-xl">📸</span> Tomar una foto
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => { setShowPhotoMenu(false); fileRef.current?.click() }}
-                          className="flex items-center gap-3 w-full px-4 py-3.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                          <span className="text-xl">🖼️</span> Elegir de la galería
-                        </button>
-                      </div>
-                    </>
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-dashed border-gray-300 hover:border-[#0042A5] transition-colors bg-gray-50 flex items-center justify-center"
+                >
+                  {photoPreview
+                    ? <img src={photoPreview} alt="" className="w-full h-full object-cover" />
+                    : <span className="text-3xl">📷</span>
+                  }
+                  {photoPreview && (
+                    <div className="absolute bottom-0 right-0 bg-[#FFDF00] rounded-full p-1 shadow text-xs leading-none">✏️</div>
                   )}
-                </div>
+                </button>
+                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoSelect} />
                 <span className="text-xs text-gray-400">Foto de perfil (opcional)</span>
               </div>
 
