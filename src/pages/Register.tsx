@@ -68,6 +68,7 @@ export function Register() {
   const [localPhone, setLocalPhone] = useState('')
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [waConsent, setWaConsent] = useState(true)
   const [notifStatus, setNotifStatus] = useState<'idle' | 'requesting' | 'granted' | 'denied' | 'dismissed'>('idle')
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -128,6 +129,7 @@ export function Register() {
         userId,
         tema_equipo: tema,
         whatsapp_number,
+        whatsapp_consent: waConsent,
       })
 
       // Auto-login primero para que el store tenga el usuario
@@ -334,7 +336,15 @@ export function Register() {
                     className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
                   />
                 </div>
-                <p className="text-xs text-gray-400 mt-1">Opcional. Para recibir notificaciones por WhatsApp.</p>
+                <label className="flex items-start gap-2.5 cursor-pointer mt-2">
+                  <input
+                    type="checkbox"
+                    checked={waConsent}
+                    onChange={e => setWaConsent(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 accent-[#0042A5] shrink-0"
+                  />
+                  <span className="text-xs text-gray-500 leading-relaxed">Acepto que mi número sea visible para otros jugadores en la Matriz</span>
+                </label>
               </div>
 
               {/* Equipo favorito */}
