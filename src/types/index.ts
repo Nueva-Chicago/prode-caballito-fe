@@ -212,4 +212,11 @@ export const TEAM_THEMES: Record<string, {
     pattern: 'repeating-linear-gradient(90deg, #FFFFFF 0px, #FFFFFF 20px, #75AADB 20px, #75AADB 40px)',
     fg: '#75AADB', ring: '#75AADB',
   },
+  // Nueva Chicago — verde oscuro + negro ("El Torito de Mataderos")
+  'nueva-chicago': {
+    primary: '#005C28', secondary: '#000000', name: 'Nueva Chicago',
+    pattern: 'repeating-linear-gradient(90deg, #005C28 0px, #005C28 12px, #000000 12px, #000000 24px)',
+    fg: '#FFFFFF', ring: '#00A650',
+    badgeUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg/500px-Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg.png',
+  },
 }

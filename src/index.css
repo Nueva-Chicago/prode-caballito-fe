@@ -104,6 +104,16 @@
   --theme-on-primary: #1A1A1A;
 }
 
+/* Nueva Chicago — verde selva + negro ("El Torito de Mataderos") */
+[data-theme="nueva-chicago"] {
+  --theme-nav-bg:      #002E12;
+  --theme-nav-bg-2:    #001A0A;
+  --theme-primary:     #005C28;
+  --theme-secondary:   #000000;
+  --theme-accent-text: #FFFFFF;
+  --theme-on-primary:  #ffffff;
+}
+
 /* ── PAGE-LEVEL THEME VARIABLES ─────────────────────────────────── */
 /* Equipos claros: fondo gris suave, cards blancas                   */
 :root,
@@ -147,6 +157,13 @@
   --theme-page-border:     rgba(255,255,255,0.09);
   --theme-page-text:       #F5F5F5;
   --theme-page-text-muted: rgba(245,245,245,0.50);
+}
+[data-theme="nueva-chicago"] {
+  --theme-page-bg:         #001A0A;
+  --theme-page-surface:    rgba(255,255,255,0.055);
+  --theme-page-border:     rgba(255,255,255,0.09);
+  --theme-page-text:       #E8F5EE;
+  --theme-page-text-muted: rgba(232,245,238,0.50);
 }
 
 /* ── THEME UTILITIES ────────────────────────────────────────────── */
