@@ -4,7 +4,7 @@ import { api } from '@/api/client'
 import { useToastStore } from '@/store/toastStore'
 import { useAuthStore } from '@/store/authStore'
 
-type Step = 'form' | 'verify' | 'complete'
+type Step = 'form' | 'verify' | 'complete' | 'notify'
 
 function compressImage(file: File, maxPx: number, quality: number): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -68,6 +68,7 @@ export function Register() {
   const [localPhone, setLocalPhone] = useState('')
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [notifStatus, setNotifStatus] = useState<'idle' | 'requesting' | 'granted' | 'denied' | 'dismissed'>('idle')
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -155,7 +156,12 @@ export function Register() {
 
       if (data.data?.token && data.data?.user) {
         show('¡Bienvenido a ProdeCaballito!', 'success')
-        navigate('/')
+        // Si el navegador soporta notificaciones y aún no se respondió → paso notify
+        if ('Notification' in window && Notification.permission === 'default') {
+          setStep('notify')
+        } else {
+          navigate('/')
+        }
       } else {
         show('¡Registro completado! Iniciá sesión', 'success')
         navigate('/login')
@@ -167,6 +173,21 @@ export function Register() {
       setLoading(false)
     }
   }
+
+  const handleAllowNotifications = async () => {
+    setNotifStatus('requesting')
+    try {
+      const result = await Notification.requestPermission()
+      setNotifStatus(result === 'granted' ? 'granted' : 'denied')
+      // Breve pausa para mostrar el estado antes de navegar
+      setTimeout(() => navigate('/'), result === 'granted' ? 1400 : 800)
+    } catch {
+      setNotifStatus('dismissed')
+      setTimeout(() => navigate('/'), 600)
+    }
+  }
+
+  const handleSkipNotifications = () => navigate('/')
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#001A4B] to-[#0042A5] flex items-center justify-center p-4">
@@ -180,6 +201,7 @@ export function Register() {
               { key: 'form',     label: 'Cuenta' },
               { key: 'verify',   label: 'Email' },
               { key: 'complete', label: 'Perfil' },
+              { key: 'notify',   label: 'Avisos' },
             ] as const
             const currentIdx = STEPS.findIndex(s => s.key === step)
             return (
@@ -333,6 +355,76 @@ export function Register() {
                 {loading ? 'Guardando...' : '🎉 ¡Completar registro!'}
               </button>
             </form>
+          )}
+
+          {step === 'notify' && (
+            <div className="flex flex-col items-center text-center gap-5">
+
+              {/* Ícono */}
+              <div className="w-20 h-20 rounded-full bg-[#001A4B]/8 flex items-center justify-center text-5xl">
+                {notifStatus === 'granted'  ? '✅' :
+                 notifStatus === 'denied'   ? '🔕' :
+                                             '🔔'}
+              </div>
+
+              {/* Título y descripción */}
+              {notifStatus === 'idle' || notifStatus === 'requesting' ? (
+                <>
+                  <div>
+                    <h2 className="text-lg font-bold text-[#001A4B] mb-1">Activá las notificaciones</h2>
+                    <p className="text-sm text-gray-500 leading-relaxed">
+                      Avisamos cuando cierran los pronósticos, se publican resultados y alguien te supera en el ranking.
+                    </p>
+                  </div>
+
+                  <ul className="w-full text-left space-y-2.5">
+                    {[
+                      { icon: '⏰', text: 'Recordatorios antes del cierre de apuestas' },
+                      { icon: '⚽', text: 'Resultados publicados al instante' },
+                      { icon: '📊', text: 'Alertas de ranking cuando alguien te alcanza' },
+                    ].map(({ icon, text }) => (
+                      <li key={text} className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3">
+                        <span className="text-xl shrink-0">{icon}</span>
+                        <span className="text-sm text-gray-700 font-medium">{text}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="w-full space-y-3 pt-1">
+                    <button
+                      onClick={handleAllowNotifications}
+                      disabled={notifStatus === 'requesting'}
+                      className="w-full bg-[#001A4B] text-white font-bold py-3.5 rounded-xl hover:bg-[#002870] disabled:opacity-60 transition-colors text-sm"
+                    >
+                      {notifStatus === 'requesting' ? 'Esperando permiso...' : 'Activar notificaciones'}
+                    </button>
+                    <button
+                      onClick={handleSkipNotifications}
+                      className="w-full text-sm text-gray-400 hover:text-gray-600 py-1 transition-colors"
+                    >
+                      Ahora no
+                    </button>
+                  </div>
+                </>
+              ) : notifStatus === 'granted' ? (
+                <>
+                  <div>
+                    <h2 className="text-lg font-bold text-[#001A4B] mb-1">¡Todo listo!</h2>
+                    <p className="text-sm text-gray-500">Notificaciones activadas. Ingresando al Prode...</p>
+                  </div>
+                  <div className="w-8 h-8 border-3 border-[#0042A5] border-t-transparent rounded-full animate-spin" />
+                </>
+              ) : (
+                <>
+                  <div>
+                    <h2 className="text-lg font-bold text-[#001A4B] mb-1">Sin notificaciones</h2>
+                    <p className="text-sm text-gray-500">Podés activarlas en cualquier momento desde el perfil.</p>
+                  </div>
+                  <div className="w-8 h-8 border-3 border-gray-300 border-t-transparent rounded-full animate-spin" />
+                </>
+              )}
+
+            </div>
           )}
         </div>
       </div>
