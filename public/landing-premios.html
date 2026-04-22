@@ -169,109 +169,157 @@
     .prizes-section { background: #060e06; }
     .prizes-section .section-title { color: #fff; }
 
-    .prize-list { display: flex; flex-direction: column; gap: 1.5rem; max-width: 860px; margin: 0 auto; }
+    .prize-list { display: flex; flex-direction: column; gap: 2rem; max-width: 900px; margin: 0 auto; }
 
     .prize-card {
       position: relative; border-radius: 24px; overflow: hidden;
       border: 1px solid rgba(0,166,80,0.2);
-      background: rgba(255,255,255,0.04);
-      display: grid; grid-template-columns: auto 1fr;
-      align-items: stretch; transition: transform 0.2s, border-color 0.2s;
+      background: #0d1a0e;
+      display: grid; grid-template-columns: 300px 1fr;
+      align-items: stretch; transition: transform 0.22s, border-color 0.22s, box-shadow 0.22s;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
     }
-    .prize-card:hover { transform: translateY(-3px); border-color: rgba(0,166,80,0.5); }
+    .prize-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0,166,80,0.55);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
 
-    /* Número grande del premio */
-    .prize-num-col {
+    /* Imagen lateral */
+    .prize-img-col {
+      position: relative; overflow: hidden; min-height: 220px;
+    }
+    .prize-img-col img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block; transition: transform 0.5s ease;
+      filter: brightness(0.82) saturate(1.1);
+    }
+    .prize-card:hover .prize-img-col img { transform: scale(1.05); }
+    /* Gradiente derecho para fundirse con el texto */
+    .prize-img-col::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 50%, #0d1a0e 100%);
+      pointer-events: none;
+    }
+    /* Badge de número superpuesto en la imagen */
+    .prize-img-num {
+      position: absolute; top: 14px; left: 14px; z-index: 2;
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(0,0,0,0.65); backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.15);
       display: flex; align-items: center; justify-content: center;
-      padding: 0 1.5rem;
-      min-width: 90px;
-    }
-    .prize-num {
-      font-size: 4rem; font-weight: 900; line-height: 1;
-      color: rgba(255,255,255,0.06); letter-spacing: -0.04em;
-      font-variant-numeric: tabular-nums;
-      user-select: none;
+      font-size: 0.85rem; font-weight: 900; color: #fff;
     }
 
-    .prize-body { padding: 1.75rem 1.75rem 1.75rem 0; }
+    .prize-body { padding: 1.75rem 1.75rem 1.75rem 1.25rem; display: flex; flex-direction: column; justify-content: center; }
 
     .prize-tag {
       display: inline-flex; align-items: center; gap: 0.4rem;
-      font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 0.25rem 0.75rem; border-radius: 99px; margin-bottom: 0.85rem;
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.25rem 0.75rem; border-radius: 99px; margin-bottom: 0.85rem; width: fit-content;
     }
 
-    .prize-icon { font-size: 2.2rem; margin-bottom: 0.6rem; display: block; }
-    .prize-title { font-size: 1.45rem; font-weight: 900; color: #fff; margin-bottom: 0.5rem; line-height: 1.2; }
-    .prize-desc { font-size: 0.92rem; color: rgba(255,255,255,0.55); line-height: 1.65; margin-bottom: 1rem; }
+    .prize-title { font-size: 1.35rem; font-weight: 900; color: #fff; margin-bottom: 0.5rem; line-height: 1.2; }
+    .prize-desc { font-size: 0.88rem; color: rgba(255,255,255,0.5); line-height: 1.65; margin-bottom: 1rem; }
 
-    .prize-value-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .prize-value-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
     .prize-value {
       display: inline-flex; align-items: center; gap: 0.3rem;
-      background: rgba(255,223,0,0.08); border: 1px solid rgba(255,223,0,0.2);
+      background: rgba(255,223,0,0.1); border: 1px solid rgba(255,223,0,0.25);
       color: #FFDF00; font-size: 0.78rem; font-weight: 800;
       padding: 0.3rem 0.75rem; border-radius: 99px;
     }
     .prize-value::before { content: '💰 '; }
     .prize-detail-pill {
       display: inline-flex; align-items: center; gap: 0.3rem;
-      background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5);
-      font-size: 0.75rem; font-weight: 600;
-      padding: 0.3rem 0.75rem; border-radius: 99px;
+      background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.45);
+      font-size: 0.72rem; font-weight: 600;
+      padding: 0.3rem 0.7rem; border-radius: 99px;
     }
 
     /* Accent colors per card */
-    .prize-card-1 { border-color: rgba(0,166,80,0.35); background: linear-gradient(135deg, rgba(0,60,20,0.5) 0%, rgba(0,0,0,0) 100%); }
-    .prize-card-1 .prize-tag { background: rgba(0,166,80,0.2); color: #4ade80; border: 1px solid rgba(0,166,80,0.3); }
-    .prize-card-1 .prize-num { color: rgba(0,166,80,0.15); }
+    .prize-card-1 { border-color: rgba(56,189,248,0.3); }
+    .prize-card-1 .prize-tag { background: rgba(56,189,248,0.15); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.25); }
+    .prize-card-1 .prize-img-num { color: #7dd3fc; }
 
-    .prize-card-2 { border-color: rgba(255,223,0,0.25); background: linear-gradient(135deg, rgba(50,40,0,0.5) 0%, rgba(0,0,0,0) 100%); }
+    .prize-card-2 { border-color: rgba(255,223,0,0.25); }
     .prize-card-2 .prize-tag { background: rgba(255,223,0,0.12); color: #FFDF00; border: 1px solid rgba(255,223,0,0.25); }
-    .prize-card-2 .prize-num { color: rgba(255,223,0,0.08); }
+    .prize-card-2 .prize-img-num { color: #FFDF00; }
 
-    .prize-card-3 { border-color: rgba(0,166,80,0.3); background: linear-gradient(135deg, rgba(0,40,15,0.5) 0%, rgba(0,0,0,0) 100%); }
-    .prize-card-3 .prize-tag { background: rgba(0,166,80,0.15); color: #6ee7b7; border: 1px solid rgba(0,166,80,0.25); }
-    .prize-card-3 .prize-num { color: rgba(0,166,80,0.12); }
+    .prize-card-3 { border-color: rgba(0,166,80,0.3); }
+    .prize-card-3 .prize-tag { background: rgba(0,166,80,0.15); color: #4ade80; border: 1px solid rgba(0,166,80,0.25); }
+    .prize-card-3 .prize-img-num { color: #4ade80; }
 
-    .prize-card-4 { border-color: rgba(167,139,250,0.2); background: linear-gradient(135deg, rgba(30,10,60,0.5) 0%, rgba(0,0,0,0) 100%); }
+    .prize-card-4 { border-color: rgba(167,139,250,0.2); }
     .prize-card-4 .prize-tag { background: rgba(167,139,250,0.12); color: #c4b5fd; border: 1px solid rgba(167,139,250,0.2); }
-    .prize-card-4 .prize-num { color: rgba(167,139,250,0.08); }
+    .prize-card-4 .prize-img-num { color: #c4b5fd; }
 
-    .prize-card-5 { border-color: rgba(56,189,248,0.2); background: linear-gradient(135deg, rgba(0,30,60,0.5) 0%, rgba(0,0,0,0) 100%); }
-    .prize-card-5 .prize-tag { background: rgba(56,189,248,0.12); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.2); }
-    .prize-card-5 .prize-num { color: rgba(56,189,248,0.08); }
+    .prize-card-5 { border-color: rgba(0,166,80,0.25); }
+    .prize-card-5 .prize-tag { background: rgba(0,166,80,0.12); color: #6ee7b7; border: 1px solid rgba(0,166,80,0.2); }
+    .prize-card-5 .prize-img-num { color: #6ee7b7; }
 
-    @media (max-width: 480px) {
-      .prize-num-col { min-width: 60px; padding: 0 0.75rem; }
-      .prize-num { font-size: 2.5rem; }
-      .prize-body { padding: 1.25rem 1.25rem 1.25rem 0; }
+    @media (max-width: 640px) {
+      .prize-card { grid-template-columns: 1fr; }
+      .prize-img-col { min-height: 200px; max-height: 220px; }
+      .prize-img-col::after {
+        background: linear-gradient(180deg, transparent 50%, #0d1a0e 100%);
+      }
+      .prize-body { padding: 1.25rem; }
       .prize-title { font-size: 1.15rem; }
     }
 
     /* ── PILETA FEATURE ──────────────────────── */
     .pileta-feature {
-      background: linear-gradient(135deg, #00142A 0%, #001F0A 100%);
-      border: 1px solid rgba(56,189,248,0.25);
-      border-radius: 28px;
-      padding: 3.5rem 2rem;
-      text-align: center;
-      max-width: 860px; margin: 2rem auto 0;
-      position: relative; overflow: hidden;
+      background: #0d1a0e;
+      border: 1px solid rgba(56,189,248,0.3);
+      border-radius: 24px;
+      overflow: hidden;
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
     }
-    .pileta-feature::before {
+    .pileta-feature-img {
+      position: relative; min-height: 280px; overflow: hidden;
+    }
+    .pileta-feature-img img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: brightness(0.75) saturate(1.2);
+    }
+    .pileta-feature-img::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 40%, #0d1a0e 100%);
+    }
+    .pileta-feature-text {
+      padding: 2.5rem 2rem; display: flex; flex-direction: column; justify-content: center;
+      position: relative;
+    }
+    .pileta-feature-text::before {
       content: '';
       position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(56,189,248,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 40% at 80% 100%, rgba(0,166,80,0.1) 0%, transparent 60%);
+      background: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(56,189,248,0.08) 0%, transparent 70%);
       pointer-events: none;
     }
-    .pileta-emoji { font-size: 4rem; margin-bottom: 1rem; display: block; }
-    .pileta-feature h3 { font-size: 1.7rem; font-weight: 900; color: #fff; margin-bottom: 0.75rem; }
+    .pileta-feature h3 { font-size: 1.5rem; font-weight: 900; color: #fff; margin-bottom: 0.75rem; line-height: 1.2; }
     .pileta-feature h3 em { font-style: normal; color: #7dd3fc; }
-    .pileta-feature p { color: rgba(255,255,255,0.55); font-size: 0.95rem; line-height: 1.65; max-width: 480px; margin: 0 auto 1.5rem; }
-    .pileta-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
+    .pileta-feature p { color: rgba(255,255,255,0.5); font-size: 0.88rem; line-height: 1.65; margin-bottom: 1.25rem; }
+    .pileta-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
     .pileta-chip {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.2);
+      color: #7dd3fc; font-size: 0.75rem; font-weight: 700;
+      padding: 0.35rem 0.8rem; border-radius: 99px;
+    }
+    @media (max-width: 640px) {
+      .pileta-feature { grid-template-columns: 1fr; }
+      .pileta-feature-img { min-height: 200px; }
+      .pileta-feature-img::after {
+        background: linear-gradient(180deg, transparent 40%, #0d1a0e 100%);
+      }
+      .pileta-feature-text { padding: 1.5rem; }
+    }
+
+    /* ── (kept for compat) ───────────────────── */
+    .pileta-chip-old {
       display: inline-flex; align-items: center; gap: 0.35rem;
       background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.2);
       color: #7dd3fc; font-size: 0.78rem; font-weight: 700;
@@ -475,35 +523,43 @@
 
         <!-- Premio 1: Temporada de pileta -->
         <div class="prize-card prize-card-1">
-          <div class="prize-num-col"><span class="prize-num">01</span></div>
+          <div class="prize-img-col">
+            <span class="prize-img-num">01</span>
+            <img
+              src="https://images.pexels.com/photos/1549121/pexels-photo-1549121.jpeg?auto=compress&cs=tinysrgb&w=600&h=500&fit=crop"
+              alt="Pileta del club" loading="lazy" />
+          </div>
           <div class="prize-body">
             <span class="prize-tag">☀️ Premio estrella</span>
-            <span class="prize-icon">🏊</span>
             <h3 class="prize-title">Temporada de pileta completa</h3>
             <p class="prize-desc">
-              Acceso libre al <strong style="color:rgba(255,255,255,0.8)">natatorio del club</strong> durante toda la temporada de verano 2026/2027. Vos y un invitado. Tres meses de pileta, vestuarios y las instalaciones del Torito sin límite de visitas.
+              Acceso libre al <strong style="color:rgba(255,255,255,0.8)">natatorio del club</strong> durante toda la temporada de verano 2026/2027. Vos y un invitado. Tres meses de pileta sin límite de visitas.
               <br><br>
-              <em style="color:rgba(74,222,128,0.7)">Ideal para este verano caliente — un lujo que el barrio sabe apreciar.</em>
+              <em style="color:#7dd3fc">Ideal para el verano — un lujo que el barrio sabe apreciar.</em>
             </p>
             <div class="prize-value-row">
               <span class="prize-value">Valor $120.000</span>
-              <span class="prize-detail-pill">📅 Dic 2026 – Mar 2027</span>
-              <span class="prize-detail-pill">👥 2 personas</span>
+              <span class="prize-detail-pill">📅 Dic – Mar</span>
+              <span class="prize-detail-pill">👥 Vos + 1</span>
             </div>
           </div>
         </div>
 
         <!-- Premio 2: 2 entradas de local para todo el año -->
         <div class="prize-card prize-card-2">
-          <div class="prize-num-col"><span class="prize-num">02</span></div>
+          <div class="prize-img-col">
+            <span class="prize-img-num">02</span>
+            <img
+              src="https://images.pexels.com/photos/3991976/pexels-photo-3991976.jpeg?auto=compress&cs=tinysrgb&w=600&h=500&fit=crop"
+              alt="Estadio de fútbol" loading="lazy" />
+          </div>
           <div class="prize-body">
             <span class="prize-tag">🎟️ Experiencia VIP</span>
-            <span class="prize-icon">🏟️</span>
             <h3 class="prize-title">2 entradas de local para toda la temporada</h3>
             <p class="prize-desc">
-              Dos abonos para <strong style="color:rgba(255,255,255,0.8)">todos los partidos de local</strong> de Nueva Chicago en la temporada 2026. Sentate en la misma cancha, partido tras partido, con tu compañero elegido.
+              Dos abonos para <strong style="color:rgba(255,255,255,0.8)">todos los partidos de local</strong> de Nueva Chicago en 2026. Partido tras partido, con quien vos elijas.
               <br><br>
-              <em style="color:rgba(255,223,0,0.7)">Alrededor de 18 partidos de local. Eso es Nueva Chicago de cerca, todo el año.</em>
+              <em style="color:#FFDF00">~18 partidos de local. Nueva Chicago de cerca, todo el año.</em>
             </p>
             <div class="prize-value-row">
               <span class="prize-value">Valor $200.000</span>
@@ -515,15 +571,19 @@
 
         <!-- Premio 3: Equipo de ropa completo -->
         <div class="prize-card prize-card-3">
-          <div class="prize-num-col"><span class="prize-num">03</span></div>
+          <div class="prize-img-col">
+            <span class="prize-img-num">03</span>
+            <img
+              src="https://images.pexels.com/photos/4440574/pexels-photo-4440574.jpeg?auto=compress&cs=tinysrgb&w=600&h=500&fit=crop"
+              alt="Equipo de ropa deportiva" loading="lazy" />
+          </div>
           <div class="prize-body">
             <span class="prize-tag">🧥 Indumentaria</span>
-            <span class="prize-icon">👕</span>
             <h3 class="prize-title">Equipo de ropa completo oficial</h3>
             <p class="prize-desc">
-              La producción completa de <strong style="color:rgba(255,255,255,0.8)">indumentaria oficial de Nueva Chicago</strong>: camiseta titular, pantalón, medias, buzo y bolso del club. Todo con tu nombre y número si querés.
+              Camiseta titular, pantalón, medias, buzo y bolso del club. Todo <strong style="color:rgba(255,255,255,0.8)">indumentaria oficial de Nueva Chicago</strong>. Con tu nombre y número si querés.
               <br><br>
-              <em style="color:rgba(110,231,183,0.7)">Salí a la calle verde y negro, de la cabeza a los pies.</em>
+              <em style="color:#4ade80">Verde y negro de la cabeza a los pies.</em>
             </p>
             <div class="prize-value-row">
               <span class="prize-value">Valor $85.000</span>
@@ -535,15 +595,19 @@
 
         <!-- Premio 4: Camiseta firmada -->
         <div class="prize-card prize-card-4">
-          <div class="prize-num-col"><span class="prize-num">04</span></div>
+          <div class="prize-img-col">
+            <span class="prize-img-num">04</span>
+            <img
+              src="https://images.pexels.com/photos/1490973/pexels-photo-1490973.jpeg?auto=compress&cs=tinysrgb&w=600&h=500&fit=crop"
+              alt="Camiseta de fútbol" loading="lazy" />
+          </div>
           <div class="prize-body">
             <span class="prize-tag">✍️ Pieza de colección</span>
-            <span class="prize-icon">🖊️</span>
             <h3 class="prize-title">Camiseta firmada por el plantel</h3>
             <p class="prize-desc">
-              Una camiseta oficial de Nueva Chicago con los <strong style="color:rgba(255,255,255,0.8)">autógrafos de todos los jugadores del plantel</strong>. Enmarcada en caja de colección. Una pieza única que no se consigue en ningún kiosco.
+              Camiseta oficial con los <strong style="color:rgba(255,255,255,0.8)">autógrafos de todos los jugadores</strong>. Enmarcada en caja de colección. Una pieza única que no se consigue en ningún kiosco.
               <br><br>
-              <em style="color:rgba(196,181,253,0.7)">La pared del living nunca tuvo tan buen gusto.</em>
+              <em style="color:#c4b5fd">La pared del living nunca tuvo tan buen gusto.</em>
             </p>
             <div class="prize-value-row">
               <span class="prize-value">Valor $150.000</span>
@@ -555,36 +619,47 @@
 
         <!-- Premio 5: 2 pelotas -->
         <div class="prize-card prize-card-5">
-          <div class="prize-num-col"><span class="prize-num">05</span></div>
+          <div class="prize-img-col">
+            <span class="prize-img-num">05</span>
+            <img
+              src="https://images.pexels.com/photos/29873486/pexels-photo-29873486.jpeg?auto=compress&cs=tinysrgb&w=600&h=500&fit=crop"
+              alt="Pelota de fútbol" loading="lazy" />
+          </div>
           <div class="prize-body">
             <span class="prize-tag">⚽ Clásico</span>
-            <span class="prize-icon">⚽</span>
             <h3 class="prize-title">2 pelotas reglamentarias</h3>
             <p class="prize-desc">
-              Dos pelotas <strong style="color:rgba(255,255,255,0.8)">reglamentarias de fútbol</strong> con el escudo del club. Una para guardarla, una para salir a patear con los pibes. No hay mejor excusa para armar el partido.
+              Dos pelotas <strong style="color:rgba(255,255,255,0.8)">reglamentarias con el escudo del club</strong>. Una para guardarla. Una para salir a patear con los pibes.
               <br><br>
-              <em style="color:rgba(125,211,252,0.7)">Porque el fútbol se juega, no solo se ve.</em>
+              <em style="color:#6ee7b7">Porque el fútbol se juega, no solo se ve.</em>
             </p>
             <div class="prize-value-row">
               <span class="prize-value">Valor $60.000</span>
-              <span class="prize-detail-pill">⚽ x2 pelotas</span>
+              <span class="prize-detail-pill">⚽ x2</span>
               <span class="prize-detail-pill">🏷️ Con escudo</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Pileta feature card especial -->
+      <!-- Feature card pileta con foto -->
       <div class="pileta-feature">
-        <span class="pileta-emoji">🌊</span>
-        <h3>La pileta del barrio,<br><em>todo el verano para vos</em></h3>
-        <p>Nueva Chicago tiene una de las mejores instalaciones del barrio. Ganar el Prode significa abrir las puertas del natatorio para que lo uses durante toda la temporada caliente. Eso no se compra en cualquier lado.</p>
-        <div class="pileta-chips">
-          <span class="pileta-chip">🌡️ Temporada completa</span>
-          <span class="pileta-chip">💧 Acceso libre</span>
-          <span class="pileta-chip">🏊 Natatorio del club</span>
-          <span class="pileta-chip">👥 Vos + 1 invitado</span>
-          <span class="pileta-chip">📅 Dic 2026 – Mar 2027</span>
+        <div class="pileta-feature-img">
+          <img
+            src="https://images.pexels.com/photos/261327/pexels-photo-261327.jpeg?auto=compress&cs=tinysrgb&w=700&h=500&fit=crop"
+            alt="Pileta en verano" loading="lazy" />
+        </div>
+        <div class="pileta-feature-text">
+          <span class="prize-tag" style="background:rgba(56,189,248,0.15);color:#7dd3fc;border:1px solid rgba(56,189,248,0.25);margin-bottom:1rem">🏊 El premio estrella</span>
+          <h3>La pileta del barrio,<br><em>todo el verano para vos</em></h3>
+          <p>Nueva Chicago tiene una de las mejores instalaciones del barrio. Ganar el Prode significa abrir las puertas del natatorio para toda la temporada caliente. Eso no se compra en cualquier lado.</p>
+          <div class="pileta-chips">
+            <span class="pileta-chip">🌡️ Temporada completa</span>
+            <span class="pileta-chip">💧 Acceso libre</span>
+            <span class="pileta-chip">🏊 Natatorio del club</span>
+            <span class="pileta-chip">👥 Vos + 1</span>
+            <span class="pileta-chip">📅 Dic – Mar 2027</span>
+          </div>
         </div>
       </div>
 
