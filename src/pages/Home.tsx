@@ -178,11 +178,9 @@ function NextMatchBanner({ matches, bets, embedded = false }: { matches: Match[]
               fontSize: 12, fontWeight: 900, color: '#FFFFFF', fontVariantNumeric: 'tabular-nums',
             }}>
               <span style={{ fontSize: 10, color: '#4ade80', fontWeight: 700 }}>✓</span>
-              <span>{teamFlag(match.home_team) || '🏳'}</span>
               <span style={{ color: '#4ade80' }}>{bets[match.id].goles_local}</span>
               <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>–</span>
               <span style={{ color: '#4ade80' }}>{bets[match.id].goles_visitante}</span>
-              <span>{teamFlag(match.away_team) || '🏳'}</span>
             </span>
           )}
         </div>
