@@ -334,7 +334,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
             ) : bet ? (
               <>
                 <button
-                  onClick={() => { setEditing(true); setScore(`${bet.goles_local}-${bet.goles_visitante}`) }}
+                  onClick={() => { setEditing(true); setScore(`${bet.goles_local}-${bet.goles_visitante}`); setReminderEnabled(false) }}
                   className="text-xs text-blue-600 hover:underline"
                 >
                   {t.match.edit}
@@ -343,7 +343,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
               </>
             ) : (
               <button
-                onClick={() => setEditing(true)}
+                onClick={() => { setEditing(true); setReminderEnabled(false) }}
                 className="t-btn-cta text-xs px-4 py-2"
               >
                 {t.match.bet}
