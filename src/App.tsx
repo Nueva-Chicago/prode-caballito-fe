@@ -5,6 +5,7 @@ import { useTeamBadgesStore } from '@/store/teamBadgesStore'
 import { applyTheme } from '@/utils/theme'
 import { Navbar } from '@/components/layout/Navbar'
 import { ToastContainer } from '@/components/ui/Toast'
+import { AdBanner } from '@/components/ui/AdBanner'
 import { Login } from '@/pages/Login'
 import { Register } from '@/pages/Register'
 import { Home } from '@/pages/Home'
@@ -35,6 +36,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen t-text-page transition-colors duration-300" style={{ background: 'var(--theme-page-bg)' }}>
       <Navbar />
+      <AdBanner />
       <main className="pb-14 md:pb-0">{children}</main>
     </div>
   )

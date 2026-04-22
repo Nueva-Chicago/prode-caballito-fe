@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { AdCard } from '@/components/ui/AdCard'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
@@ -183,6 +184,7 @@ export function Ranking() {
         <>
           {/* Mi posición */}
           {myEntry && !showOnlyFavorites && (
+            <>
             <div
               onClick={() => setSelected(myEntry)}
               className="t-gradient-hero rounded-xl p-4 text-white flex items-center gap-4 cursor-pointer hover:opacity-90 transition-opacity"
@@ -203,6 +205,8 @@ export function Ranking() {
                 <p className="text-white/60 text-xs">{t.ranking.points}</p>
               </div>
             </div>
+            <AdCard />
+            </>
           )}
 
           {showOnlyFavorites && displayRanking.length === 0 && (

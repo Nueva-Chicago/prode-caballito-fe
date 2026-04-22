@@ -1,9 +1,10 @@
-import { useEffect, useState, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo, useRef, Fragment } from 'react'
 import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { AdCard } from '@/components/ui/AdCard'
 import { useToastStore } from '@/store/toastStore'
 import { teamFlag } from '@/utils/teamFlags'
 
@@ -368,17 +369,19 @@ export function Apuestas() {
         {filtered.length === 0 && (
           <EmptyState icon="⚽" message={t.bets.noMatches} />
         )}
-        {filtered.map((m) => (
-          <MatchCard
-            key={m.id}
-            match={m}
-            bet={bets[m.id]}
-            planillaId={selectedPlanilla || undefined}
-            planillaLocked={selectedPlanillaObj?.precio_pagado}
-            onBetSaved={() => loadBets(selectedPlanilla)}
-            onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
-            now={now}
-          />
+        {filtered.map((m, i) => (
+          <Fragment key={m.id}>
+            {i === 2 && <AdCard />}
+            <MatchCard
+              match={m}
+              bet={bets[m.id]}
+              planillaId={selectedPlanilla || undefined}
+              planillaLocked={selectedPlanillaObj?.precio_pagado}
+              onBetSaved={() => loadBets(selectedPlanilla)}
+              onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
+              now={now}
+            />
+          </Fragment>
         ))}
       </div>
     </div>
