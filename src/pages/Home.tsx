@@ -297,11 +297,9 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
       {hasBet ? (
         <div>
           <div className="flex items-center justify-center gap-3 bg-green-50 border border-green-100 rounded-xl py-3">
-            <span className="text-xl">{teamFlag(match.home_team) || '🏳'}</span>
             <span className="font-black text-2xl text-green-600">{bets[match.id].goles_local}</span>
             <span className="text-gray-300 font-bold text-xl">—</span>
             <span className="font-black text-2xl text-green-600">{bets[match.id].goles_visitante}</span>
-            <span className="text-xl">{teamFlag(match.away_team) || '🏳'}</span>
           </div>
           <p className="text-center text-[10px] text-gray-400 mt-2 uppercase tracking-wider font-bold">
             TU PRONÓSTICO ✏️
