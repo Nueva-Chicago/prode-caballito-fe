@@ -6,6 +6,7 @@ import { applyTheme } from '@/utils/theme'
 import { Navbar } from '@/components/layout/Navbar'
 import { ToastContainer } from '@/components/ui/Toast'
 import { AdBanner } from '@/components/ui/AdBanner'
+import { GoogleAdUnit } from '@/components/ui/GoogleAdUnit'
 import { Login } from '@/pages/Login'
 import { Register } from '@/pages/Register'
 import { Home } from '@/pages/Home'
@@ -32,11 +33,12 @@ function RequireAdmin({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
-function AppLayout({ children }: { children: React.ReactNode }) {
+function AppLayout({ children, showAd = true }: { children: React.ReactNode, showAd?: boolean }) {
   return (
     <div className="min-h-screen t-text-page transition-colors duration-300" style={{ background: 'var(--theme-page-bg)' }}>
       <Navbar />
       <AdBanner />
+      {showAd && <GoogleAdUnit slot="XXXXXXXXXX" />}
       <main className="pb-14 md:pb-0">{children}</main>
     </div>
   )
@@ -62,7 +64,7 @@ export default function App() {
 
         {/* Privadas */}
         <Route path="/" element={
-          <RequireAuth><AppLayout><Home /></AppLayout></RequireAuth>
+          <RequireAuth><AppLayout showAd={false}><Home /></AppLayout></RequireAuth>
         } />
         <Route path="/apuestas" element={
           <RequireAuth><AppLayout><Apuestas /></AppLayout></RequireAuth>
