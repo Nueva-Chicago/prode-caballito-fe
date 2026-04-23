@@ -33,12 +33,12 @@ function RequireAdmin({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
-function AppLayout({ children, showAd = true }: { children: React.ReactNode, showAd?: boolean }) {
+function AppLayout({ children, adSlot = '4113004001' }: { children: React.ReactNode, adSlot?: string | null }) {
   return (
     <div className="min-h-screen t-text-page transition-colors duration-300" style={{ background: 'var(--theme-page-bg)' }}>
       <Navbar />
       <AdBanner />
-      {showAd && <GoogleAdUnit slot="4113004001" />}
+      {adSlot && <GoogleAdUnit slot={adSlot} />}
       <main className="pb-14 md:pb-0">{children}</main>
     </div>
   )
@@ -64,16 +64,16 @@ export default function App() {
 
         {/* Privadas */}
         <Route path="/" element={
-          <RequireAuth><AppLayout showAd={false}><Home /></AppLayout></RequireAuth>
+          <RequireAuth><AppLayout adSlot={null}><Home /></AppLayout></RequireAuth>
         } />
         <Route path="/apuestas" element={
-          <RequireAuth><AppLayout><Apuestas /></AppLayout></RequireAuth>
+          <RequireAuth><AppLayout adSlot="4004171291"><Apuestas /></AppLayout></RequireAuth>
         } />
         <Route path="/matriz" element={
           <RequireAuth><AppLayout><Matriz /></AppLayout></RequireAuth>
         } />
         <Route path="/ranking" element={
-          <RequireAuth><AppLayout><Ranking /></AppLayout></RequireAuth>
+          <RequireAuth><AppLayout adSlot="1540216524"><Ranking /></AppLayout></RequireAuth>
         } />
         <Route path="/profile" element={
           <RequireAuth><AppLayout><Profile /></AppLayout></RequireAuth>
