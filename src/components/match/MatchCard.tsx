@@ -208,6 +208,16 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
           )}
         </div>
       )}
+      {isFinished && (
+        <div className="flex items-center justify-between gap-1.5 t-surface border-b t-border-page px-4 py-1.5" style={{ background: 'color-mix(in srgb, var(--theme-page-surface) 60%, var(--theme-page-bg))' }}>
+          <span className="text-xs t-text-muted">
+            📅 {format(new Date(match.start_time), "EEE d MMM · HH:mm", { locale: dateLocale })} hs
+          </span>
+          <span className="text-xs font-semibold bg-gray-100 text-gray-500 px-2.5 py-0.5 rounded-full">
+            {t.match.finished}
+          </span>
+        </div>
+      )}
 
       {/* Body: 3-column */}
       <div className="px-4 pt-5 pb-0 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
@@ -239,8 +249,10 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
                 <span className="text-[11px] text-green-500 font-semibold">{match.halftime_minutes}'</span>
               )}
             </>
+          ) : isFinished ? (
+            <span className="text-[11px] font-bold t-text-nav opacity-40 uppercase tracking-widest">FIN</span>
           ) : (
-            <span className="text-xs t-text-muted font-medium">{isFinished ? t.match.vs : 'VS'}</span>
+            <span className="text-xs t-text-muted font-medium">VS</span>
           )}
         </div>
 
@@ -295,11 +307,13 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
         {/* Left: pronóstico — solo muestra pill en partidos terminados (puntaje) o cuando no hay apuesta */}
         <div className="flex items-center gap-2">
           {editing ? null : isFinished && bet && pointResult ? (
-            <span className={`text-sm font-bold px-2.5 py-1 rounded-full ${POINT_COLORS[pointResult.color]}`}>
-              {bet.goles_local}-{bet.goles_visitante}
-              <span className="ml-1 opacity-80">· {pointResult.puntos}pts</span>
-            </span>
-          ) : !isFinished && !bet && !editing ? (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs t-text-muted">{t.match.yourBet}:</span>
+              <span className={`text-sm font-bold px-2.5 py-1 rounded-full ${POINT_COLORS[pointResult.color]}`}>
+                {t.match.popIcons[pointResult.color]} {bet.goles_local}-{bet.goles_visitante} · {pointResult.puntos}pts
+              </span>
+            </div>
+          ) : !bet && !editing ? (
             <span className="text-xs t-text-muted italic">{t.match.noBet}</span>
           ) : null}
           {editing && (

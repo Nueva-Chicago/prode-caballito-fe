@@ -50,7 +50,7 @@ export const es = {
     refreshError: 'Error al actualizar datos',
   },
   match: {
-    vs: 'VS', live: 'EN VIVO', closed: 'Cerrado', locked: 'Planilla cerrada', bonus: 'BONUS +1', closesIn: 'Cierra en',
+    vs: 'VS', live: 'EN VIVO', finished: 'Terminado', closed: 'Cerrado', locked: 'Planilla cerrada', bonus: 'BONUS +1', closesIn: 'Cierra en',
     noBet: 'Sin pronóstico', bet: '🎯 Apostar', edit: 'Editar', cancel: 'Cancelar',
     invalidFormat: 'Formato inválido. Usá: 2-1',
     saved: 'Pronóstico guardado ✓', deleted: 'Pronóstico eliminado',

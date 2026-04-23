@@ -52,7 +52,7 @@ export const pt: T = {
     refreshError: 'Erro ao atualizar dados',
   },
   match: {
-    vs: 'VS', live: 'AO VIVO', closed: 'Fechado', locked: 'Planilha fechada', bonus: 'BÔNUS +1', closesIn: 'Fecha em',
+    vs: 'VS', live: 'AO VIVO', finished: 'Encerrado', closed: 'Fechado', locked: 'Planilha fechada', bonus: 'BÔNUS +1', closesIn: 'Fecha em',
     noBet: 'Sem prognóstico', bet: '🎯 Apostar', edit: 'Editar', cancel: 'Cancelar',
     invalidFormat: 'Formato inválido. Use: 2-1',
     saved: 'Prognóstico salvo ✓', deleted: 'Prognóstico removido',
