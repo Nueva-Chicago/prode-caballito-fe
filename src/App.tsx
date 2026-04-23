@@ -38,7 +38,7 @@ function AppLayout({ children, showAd = true }: { children: React.ReactNode, sho
     <div className="min-h-screen t-text-page transition-colors duration-300" style={{ background: 'var(--theme-page-bg)' }}>
       <Navbar />
       <AdBanner />
-      {showAd && <GoogleAdUnit slot="XXXXXXXXXX" />}
+      {showAd && <GoogleAdUnit slot="4113004001" />}
       <main className="pb-14 md:pb-0">{children}</main>
     </div>
   )
