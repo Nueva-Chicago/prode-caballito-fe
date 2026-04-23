@@ -4,27 +4,10 @@
  * Aparece en todas las páginas autenticadas (incluido desde AppLayout).
  * Se descarta por sesión (sessionStorage). Anima entrada y salida.
  */
-import { useState } from 'react'
 import { getSessionAd } from '@/config/ads'
-
-const DISMISS_KEY = 'prode_banner_dismissed'
 
 export function AdBanner() {
   const ad = getSessionAd()
-  const [visible, setVisible] = useState(
-    () => sessionStorage.getItem(DISMISS_KEY) !== '1'
-  )
-  const [closing, setClosing] = useState(false)
-
-  if (!visible) return null
-
-  const handleDismiss = () => {
-    setClosing(true)
-    setTimeout(() => {
-      sessionStorage.setItem(DISMISS_KEY, '1')
-      setVisible(false)
-    }, 280)
-  }
 
   return (
     <div
@@ -32,9 +15,6 @@ export function AdBanner() {
         background: ad.bg,
         width: '100%',
         overflow: 'hidden',
-        maxHeight: closing ? 0 : 56,
-        opacity: closing ? 0 : 1,
-        transition: 'max-height 0.28s ease, opacity 0.22s ease',
       }}
     >
       <div style={{
@@ -148,32 +128,6 @@ export function AdBanner() {
         >
           {ad.ctaText}
         </a>
-
-        {/* Cerrar */}
-        <button
-          onClick={handleDismiss}
-          aria-label="Cerrar publicidad"
-          style={{
-            flexShrink: 0,
-            width: 24, height: 24,
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.12)',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: ad.dimColor,
-            fontSize: 14,
-            lineHeight: 1,
-            marginTop: 8,
-            transition: 'background 0.15s',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.22)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
-        >
-          ×
-        </button>
 
       </div>
     </div>
