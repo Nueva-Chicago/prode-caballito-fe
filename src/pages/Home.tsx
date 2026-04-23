@@ -773,7 +773,7 @@ export function Home() {
 
       {/* ── Banner Premios Nueva Chicago ──────────────────────── */}
       <a
-        href="/landing-premios.html"
+        href="/premios.html"
         target="_blank"
         rel="noopener noreferrer"
         className="block rounded-2xl overflow-hidden"
