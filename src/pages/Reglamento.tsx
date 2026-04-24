@@ -131,11 +131,11 @@ export function Reglamento() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3">
         <h2 className="font-bold text-[#001A4B] text-base">Participación</h2>
         <ul className="space-y-2 text-sm text-gray-600">
-          <li className="flex items-start gap-2"><span className="shrink-0">🎫</span> Cada planilla tiene un valor de <strong>$20.000</strong>.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">📋</span> Podés participar con <strong>la cantidad de planillas que quieras</strong>, cada una compite por separado.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">💰</span> El total acumulado va para <strong>un único ganador</strong> (el que sume más puntos).</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">⏰</span> El pago debe realizarse antes del inicio del primer partido.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">👁️</span> Minutos antes del inicio del primer partido, todos tendrán acceso a la planilla general con todos los pronósticos de todos los participantes.</li>
+          <li className="flex items-start gap-2"><span className="shrink-0">🎫</span><span>Cada planilla tiene un valor de <strong>$20.000</strong>.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">📋</span><span>Podés participar con <strong>la cantidad de planillas que quieras</strong>, cada una compite por separado.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">💰</span><span>El total acumulado va para <strong>un único ganador</strong> (el que sume más puntos).</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">⏰</span><span>El pago debe realizarse antes del inicio del primer partido.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">👁️</span><span>Minutos antes del inicio del primer partido, todos tendrán acceso a la planilla general con todos los pronósticos de todos los participantes.</span></li>
         </ul>
       </div>
 
