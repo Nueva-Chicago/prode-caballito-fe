@@ -24,6 +24,10 @@ if (typeof document !== 'undefined' && !document.getElementById('flip-anim')) {
       from { transform: perspective(280px) rotateX(-82deg); }
       to   { transform: perspective(280px) rotateX(0deg); }
     }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
   `
   document.head.appendChild(s)
 }
@@ -382,6 +386,70 @@ function HomeSkeleton() {
 
 const MEDAL = ['🥇', '🥈', '🥉']
 
+interface WinnerEntry {
+  image_url: string
+  matchday_label?: string
+  updated_at?: string
+}
+
+function WinnersCarousel({ winners }: { winners: WinnerEntry[] }) {
+  const [idx, setIdx] = useState(0)
+
+  useEffect(() => {
+    if (winners.length <= 1) return
+    const t = setInterval(() => setIdx(i => (i + 1) % winners.length), 5000)
+    return () => clearInterval(t)
+  }, [winners.length])
+
+  const prev = () => setIdx(i => (i - 1 + winners.length) % winners.length)
+  const next = () => setIdx(i => (i + 1) % winners.length)
+  const w = winners[idx]
+
+  return (
+    <div className="rounded-2xl overflow-hidden shadow-md -mx-4 md:mx-0" style={{ background: '#001A4B' }}>
+      <div className="flex items-center justify-between px-4 py-2.5">
+        <p className="text-xs font-bold text-white uppercase tracking-widest">🏆 Ganadores de las Fechas</p>
+        {winners.length > 1 && (
+          <div className="flex items-center gap-1">
+            <button onClick={prev} className="text-white/50 hover:text-white w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors text-xl">‹</button>
+            <button onClick={next} className="text-white/50 hover:text-white w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors text-xl">›</button>
+          </div>
+        )}
+      </div>
+
+      <div style={{ height: 300, overflow: 'hidden' }}>
+        <img
+          key={idx}
+          src={w.image_url}
+          alt={w.matchday_label ?? 'Ganador'}
+          className="w-full h-full object-cover"
+          style={{ display: 'block', animation: 'fadeIn .35s ease' }}
+        />
+      </div>
+
+      <div className="flex items-center justify-between px-4 py-2.5">
+        <p className="text-white font-bold text-sm">{w.matchday_label ?? 'Ganador de la Fecha'}</p>
+        {winners.length > 1 && (
+          <div className="flex gap-1.5 items-center">
+            {winners.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIdx(i)}
+                style={{
+                  width: i === idx ? 16 : 6, height: 6,
+                  borderRadius: 99, border: 'none', cursor: 'pointer',
+                  background: i === idx ? '#FFDF00' : 'rgba(255,255,255,0.3)',
+                  transition: 'all .3s',
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 
 export function Home() {
   const { user } = useAuthStore()
@@ -394,6 +462,7 @@ export function Home() {
   const [loadError, setLoadError] = useState(false)
   const [now, setNow] = useState(new Date())
   const [showIOSGuide, setShowIOSGuide] = useState(false)
+  const [winners, setWinners] = useState<WinnerEntry[]>([])
   const { state: pwaState, install: pwaInstall } = usePWAInstall()
   const { show: showToast } = useToastStore()
 
@@ -414,14 +483,18 @@ export function Home() {
   const loadData = async (silent = false) => {
     if (!silent) setLoading(true)
     try {
-      const [matchRes, planillaRes, rankRes] = await Promise.all([
+      const [matchRes, planillaRes, rankRes, , winnersRes] = await Promise.all([
         api.get('/matches?limit=200'),
         api.get('/planillas'),
         api.get('/ranking?limit=50'),
         api.get('/tournaments').catch(() => ({ data: { data: [] } })),
+        api.get('/config/ganadores_fechas').catch(() => null),
       ])
       setMatches(matchRes.data.data.matches)
       setRanking(rankRes.data.data.ranking)
+      if (winnersRes?.data?.data?.value) {
+        try { setWinners(JSON.parse(winnersRes.data.data.value)) } catch {}
+      }
       if (!silent) setLoadError(false)
 
       const planillas: Planilla[] = planillaRes.data.data
@@ -787,6 +860,9 @@ export function Home() {
           )}
         </Link>
       </div>
+
+      {/* ── CAROUSEL GANADORES ────────────────────────────────── */}
+      {winners.length > 0 && <WinnersCarousel winners={winners} />}
 
       {/* ── Banner Premios Nueva Chicago ──────────────────────── */}
       <a
