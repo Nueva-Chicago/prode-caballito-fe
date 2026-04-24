@@ -162,7 +162,7 @@ export function Register() {
         if ('Notification' in window && Notification.permission === 'default') {
           setStep('notify')
         } else {
-          navigate('/')
+          navigate('/apuestas')
         }
       } else {
         show('¡Registro completado! Iniciá sesión', 'success')
@@ -182,14 +182,14 @@ export function Register() {
       const result = await Notification.requestPermission()
       setNotifStatus(result === 'granted' ? 'granted' : 'denied')
       // Breve pausa para mostrar el estado antes de navegar
-      setTimeout(() => navigate('/'), result === 'granted' ? 1400 : 800)
+      setTimeout(() => navigate('/apuestas'), result === 'granted' ? 1400 : 800)
     } catch {
       setNotifStatus('dismissed')
-      setTimeout(() => navigate('/'), 600)
+      setTimeout(() => navigate('/apuestas'), 600)
     }
   }
 
-  const handleSkipNotifications = () => navigate('/')
+  const handleSkipNotifications = () => navigate('/apuestas')
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#001A4B] to-[#0042A5] flex items-center justify-center p-4">
