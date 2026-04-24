@@ -110,6 +110,16 @@ export function Ranking() {
     }
   }
 
+  const handleShareMine = async () => {
+    if (!myEntry) return
+    const text = t.ranking.shareMyText(myEntry.position, myEntry.puntos_totales)
+    if (navigator.share) {
+      await navigator.share({ text }).catch(() => {})
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
+    }
+  }
+
   const handleToggleFavorite = useCallback(async (planillaId: string, e: React.MouseEvent) => {
     e.stopPropagation()
     if (togglingFav) return
@@ -185,25 +195,35 @@ export function Ranking() {
           {/* Mi posición */}
           {myEntry && !showOnlyFavorites && (
             <>
-            <div
-              onClick={() => setSelected(myEntry)}
-              className="t-gradient-hero rounded-xl p-4 text-white flex items-center gap-4 cursor-pointer hover:opacity-90 transition-opacity"
-            >
-              <div className="text-3xl font-black">#{myEntry.position}</div>
-              {myEntry.user_avatar
-                ? <img src={myEntry.user_avatar} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-white/30 shrink-0" />
-                : <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-lg shrink-0">
-                    {myEntry.user_name[0].toUpperCase()}
-                  </div>
-              }
-              <div className="flex-1">
-                <p className="font-semibold">{myEntry.user_name}</p>
-                <p className="text-white/60 text-xs">{t.ranking.globalLabel}</p>
+            <div className="t-gradient-hero rounded-xl p-4 text-white">
+              <div
+                onClick={() => setSelected(myEntry)}
+                className="flex items-center gap-4 cursor-pointer hover:opacity-90 transition-opacity"
+              >
+                <div className="text-3xl font-black">#{myEntry.position}</div>
+                {myEntry.user_avatar
+                  ? <img src={myEntry.user_avatar} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-white/30 shrink-0" />
+                  : <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-lg shrink-0">
+                      {myEntry.user_name[0].toUpperCase()}
+                    </div>
+                }
+                <div className="flex-1">
+                  <p className="font-semibold">{myEntry.user_name}</p>
+                  <p className="text-white/60 text-xs">{t.ranking.globalLabel}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-black t-text-secondary">{myEntry.puntos_totales}</p>
+                  <p className="text-white/60 text-xs">{t.ranking.points}</p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-2xl font-black t-text-secondary">{myEntry.puntos_totales}</p>
-                <p className="text-white/60 text-xs">{t.ranking.points}</p>
-              </div>
+              {myEntry.puntos_totales > 0 && (
+                <button
+                  onClick={handleShareMine}
+                  className="mt-3 w-full flex items-center justify-center gap-2 text-xs font-bold py-2 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors border border-white/20"
+                >
+                  {t.ranking.shareBtn}
+                </button>
+              )}
             </div>
             <AdCard />
             </>

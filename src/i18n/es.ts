@@ -104,6 +104,10 @@ export const es = {
     you: '(vos)', noOfficial: 'IMPAGA', extraBonus: '+Bonus',
     partial: 'Parciales', tendency: 'Tendencia',
     shareText: (n: string, p: number, pts: number) => `${n} está #${p} en el PRODE Caballito con ${pts} puntos 🏆`,
+    shareMyText: (p: number, pts: number) => p === 1
+      ? `¡Soy el líder del PRODE del Mundial 2026! 🥇 ${pts}pts y contando. ¿Alguien me derrota?\n👉 prodecaballito.com/ranking`
+      : `Voy #${p} en el PRODE del Mundial 2026 con ${pts}pts ⚽\n¿Me superás? Anotate gratis 👉 prodecaballito.com`,
+    shareBtn: '📲 Compartir posición',
     position: 'posición',
     points: 'puntos',
     favorites: '⭐ Favoritos',

@@ -595,6 +595,23 @@ export function Home() {
             </Link>
           )}
 
+          {/* Share CTA — solo cuando ya tiene puntos */}
+          {myEntry && myEntry.puntos_totales > 0 && (
+            <button
+              onClick={() => {
+                const text = t.ranking.shareMyText(myEntry.position, myEntry.puntos_totales)
+                if (navigator.share) {
+                  navigator.share({ text }).catch(() => {})
+                } else {
+                  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
+                }
+              }}
+              className="mt-2 flex items-center gap-1.5 text-[11px] font-semibold text-white/50 hover:text-white/80 transition-colors"
+            >
+              📲 {t.ranking.shareBtn}
+            </button>
+          )}
+
           {/* Fecha */}
           <p className="text-white/30 text-[10px] mt-2.5 tracking-wider font-semibold uppercase">
             {format(now, "EEEE, d MMM yyyy", { locale: esLocale })}
