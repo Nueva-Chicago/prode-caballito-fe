@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
 import { api } from '@/api/client'
+import { GanadoresModal } from './GanadoresModal'
 
 export function Navbar() {
   const { user, logout, updateUser, isAdmin } = useAuthStore()
@@ -11,6 +12,7 @@ export function Navbar() {
   const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [switchingLang, setSwitchingLang] = useState(false)
+  const [showGanadores, setShowGanadores] = useState(false)
 
   const navLinks = [
     { to: '/',                          label: t.nav.home,    icon: '🏠' },
@@ -86,6 +88,12 @@ export function Navbar() {
               {l.label}
             </Link>
           ))}
+          <button
+            onClick={() => setShowGanadores(true)}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10"
+          >
+            🏆 {t.nav.winners}
+          </button>
           {isAdmin() && adminLinks.map((l) => (
             <Link
               key={l.to}
@@ -166,6 +174,12 @@ export function Navbar() {
               <span>{l.icon}</span>{l.label}
             </Link>
           ))}
+          <button
+            onClick={() => { setShowGanadores(true); setMenuOpen(false) }}
+            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-sm text-white w-full text-left"
+          >
+            <span>🏆</span>{t.nav.winners}
+          </button>
           {isAdmin() && adminLinks.map((l) => (
             <Link key={l.to} to={l.to} onClick={() => setMenuOpen(false)}
               className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 text-sm">
@@ -187,6 +201,8 @@ export function Navbar() {
           </button>
         </div>
       )}
+
+      {showGanadores && <GanadoresModal onClose={() => setShowGanadores(false)} />}
 
       {/* Mobile bottom tab bar — compacto, fuera del <nav> sticky */}
       <div

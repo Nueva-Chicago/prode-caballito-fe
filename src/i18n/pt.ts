@@ -8,6 +8,7 @@ export const pt: T = {
     prizes: 'Prêmios',
     admin: 'Admin', logout: 'Sair', logoutMobile: 'Fechar sessão',
     switchLang: 'Mudar para Español', fixture: 'Fixture',
+    winners: 'Vencedores',
   },
   home: {
     greeting: (n: string) => `Olá, ${n}!`,

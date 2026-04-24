@@ -6,6 +6,7 @@ export const es = {
     prizes: 'Premios',
     admin: 'Admin', logout: 'Salir', logoutMobile: 'Cerrar sesión',
     switchLang: 'Cambiar a Português', fixture: 'Fixture',
+    winners: 'Ganadores',
   },
   home: {
     greeting: (n: string) => `¡Hola, ${n}!`,
