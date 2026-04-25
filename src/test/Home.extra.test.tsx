@@ -73,7 +73,12 @@ function setupApi(overrides: {
 } = {}) {
   return import('@/api/client').then(({ api }) => {
     if (overrides.rejectAll) {
-      ;(api.get as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('network'))
+      // Solo rechazar /matches para forzar el catch de loadData; los demás resuelven
+      // para evitar rechazos no manejados en Promise.all (Node 20 los trata como fatal)
+      ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
+        if (url.startsWith('/matches')) return Promise.reject(new Error('network'))
+        return Promise.resolve({ data: { data: [] } })
+      })
       return
     }
     ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
@@ -96,11 +101,10 @@ function renderHome() {
 describe('Home — estado de carga y errores', () => {
   afterEach(() => vi.clearAllMocks())
 
-  it('muestra skeleton mientras carga', () => {
+  it('muestra skeleton mientras carga', async () => {
     // API que nunca resuelve → loading permanente
-    import('@/api/client').then(({ api }) => {
-      ;(api.get as ReturnType<typeof vi.fn>).mockImplementation(() => new Promise(() => {}))
-    })
+    const { api } = await import('@/api/client')
+    ;(api.get as ReturnType<typeof vi.fn>).mockImplementation(() => new Promise(() => {}))
     renderHome()
     // Skeleton está en el DOM (no hay contenido real)
     expect(screen.queryByText(/pronóstico/i)).toBeNull()

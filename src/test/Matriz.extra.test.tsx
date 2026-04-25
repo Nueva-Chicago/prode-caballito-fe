@@ -48,6 +48,9 @@ async function setupApi(overrides: { planillas?: unknown[]; matches?: unknown[];
     p2: { mf1: { home: 1, away: 1 } },
   }
   ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
+    if (url.includes('favorites')) {
+      return Promise.resolve({ data: { data: [] } })
+    }
     if (url.includes('/planillas') || url.includes('/ranking')) {
       return Promise.resolve({ data: { data: { ranking: overrides.planillas ?? [PLANILLA_MINE, PLANILLA_OTHER] } } })
     }
@@ -56,9 +59,6 @@ async function setupApi(overrides: { planillas?: unknown[]; matches?: unknown[];
     }
     if (url.includes('/matriz')) {
       return Promise.resolve({ data: { data: { bets: overrides.bets ?? defaultBets, ranking: [PLANILLA_MINE, PLANILLA_OTHER] } } })
-    }
-    if (url.includes('favorites')) {
-      return Promise.resolve({ data: { data: [] } })
     }
     return Promise.resolve({ data: { data: [] } })
   })
