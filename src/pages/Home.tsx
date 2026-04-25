@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, Fragment } from 'react'
+import { usePolling } from '@/hooks/usePolling'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
 import { es as esLocale } from 'date-fns/locale'
@@ -474,11 +475,8 @@ export function Home() {
 
   useEffect(() => { loadData() }, [])
 
-  // Polling cada 30s para refrescar resultados automáticamente
-  useEffect(() => {
-    const interval = setInterval(() => loadData(true), 30000)
-    return () => clearInterval(interval)
-  }, [])
+  // Polling cada 30s — se pausa automáticamente cuando el tab está en background
+  usePolling(() => loadData(true), 30_000)
 
   const loadData = async (silent = false) => {
     if (!silent) setLoading(true)

@@ -1,4 +1,5 @@
-import { useEffect, useState, useMemo, useRef, Fragment } from 'react'
+import { useEffect, useState, useMemo, Fragment } from 'react'
+import { usePolling } from '@/hooks/usePolling'
 import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
@@ -49,7 +50,7 @@ export function Apuestas() {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [lockingPlanilla, setLockingPlanilla] = useState(false)
   const [now, setNow] = useState(Date.now())
-  const livePollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const hasLive = matches.some(m => m.estado === 'live')
 
   useEffect(() => {
     loadInitial()
@@ -65,20 +66,13 @@ export function Apuestas() {
     return () => clearInterval(id)
   }, [])
 
-  // Live polling: refresh matches every 30s when any match is live
-  useEffect(() => {
-    const hasLive = matches.some(m => m.estado === 'live')
-    if (livePollingRef.current) { clearInterval(livePollingRef.current); livePollingRef.current = null }
-    if (!hasLive) return
-    livePollingRef.current = setInterval(async () => {
-      try {
-        const res = await api.get('/matches?limit=200')
-        setMatches(res.data.data.matches)
-        setNow(Date.now())
-      } catch { /* silent */ }
-    }, 30_000)
-    return () => { if (livePollingRef.current) clearInterval(livePollingRef.current) }
-  }, [matches])
+  // Live polling: refresh matches every 30s when live — pausa si el tab está oculto
+  usePolling(() => {
+    api.get('/matches?limit=200').then(res => {
+      setMatches(res.data.data.matches)
+      setNow(Date.now())
+    }).catch(() => {})
+  }, 30_000, hasLive)
 
   const loadInitial = async () => {
     setLoading(true)
