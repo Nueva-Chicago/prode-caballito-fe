@@ -41,8 +41,6 @@ function PlanillaSkeleton() {
     </div>
   )
 }
-import type { Match } from '@/types'
-
 export function Planilla() {
   const { planillaId } = useParams<{ planillaId: string }>()
   const { user } = useAuthStore()
