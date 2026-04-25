@@ -8,7 +8,7 @@ import { Spinner } from '@/components/ui/Spinner'
 import { useToastStore } from '@/store/toastStore'
 import type { Match, Tournament } from '@/types'
 
-type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast'
+type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast' | 'jobs'
 
 export function Admin() {
   const { show } = useToastStore()
@@ -130,6 +130,7 @@ export function Admin() {
     { id: 'usuarios', label: '👥 Usuarios' },
     { id: 'torneos', label: '🏆 Torneos' },
     { id: 'broadcast',   label: '📣 WhatsApp' },
+    { id: 'jobs',        label: '⚙️ Procesos' },
   ]
 
   return (
@@ -167,6 +168,9 @@ export function Admin() {
 
       {/* Tab: Broadcast WhatsApp */}
       {tab === 'broadcast' && <BroadcastTab />}
+
+      {/* Tab: Procesos manuales */}
+      {tab === 'jobs' && <JobsTab />}
 
       {/* Modal partido */}
       <Modal open={showMatchModal} onClose={() => setShowMatchModal(false)} title={editMatch ? 'Editar Partido' : 'Nuevo Partido'}>
@@ -982,6 +986,180 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
           })}
         </tbody>
       </table>
+    </div>
+  )
+}
+
+/* ── JobsTab ─────────────────────────────────────────────────────────── */
+function JobCard({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-3">
+      <div>
+        <h3 className="text-sm font-semibold text-[#001A4B]">{title}</h3>
+        <p className="text-xs text-gray-400 mt-0.5">{description}</p>
+      </div>
+      {children}
+    </div>
+  )
+}
+
+function JobsTab() {
+  const { show } = useToastStore()
+  const [matchdays, setMatchdays] = useState<{ id: string; name: string }[]>([])
+  const [loading, setLoading] = useState<string | null>(null)
+  const [recalcMatchdayId, setRecalcMatchdayId] = useState('')
+  const [winnerEmail, setWinnerEmail] = useState('')
+  const [winnerMatchdayName, setWinnerMatchdayName] = useState('')
+  const [winnerPoints, setWinnerPoints] = useState('42')
+  const [weeklyTestEmail, setWeeklyTestEmail] = useState('')
+  const [jobResult, setJobResult] = useState<{ id: string; text: string } | null>(null)
+
+  useEffect(() => {
+    api.get('/matchdays').then(res => {
+      setMatchdays(res.data.data || [])
+    }).catch(() => {})
+  }, [])
+
+  const runJob = async (jobId: string, fn: () => Promise<string>) => {
+    setLoading(jobId)
+    setJobResult(null)
+    try {
+      const msg = await fn()
+      setJobResult({ id: jobId, text: msg })
+      show(msg, 'success')
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al ejecutar'
+      show(msg, 'error')
+    } finally {
+      setLoading(null)
+    }
+  }
+
+  return (
+    <div className="space-y-4 max-w-2xl">
+      {/* Recalcular Ranking */}
+      <JobCard title="🔄 Recalcular Ranking" description="Suma todos los puntos de la tabla scores y recalcula posiciones.">
+        <button
+          onClick={() => runJob('ranking', async () => {
+            await api.post('/admin/jobs/recalculate-ranking', {})
+            return 'Ranking recalculado ✓'
+          })}
+          disabled={!!loading}
+          className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50"
+        >
+          {loading === 'ranking' ? 'Recalculando...' : 'Ejecutar'}
+        </button>
+        {jobResult?.id === 'ranking' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
+      </JobCard>
+
+      {/* Recalcular Jornada */}
+      <JobCard title="📅 Recalcular Jornada" description="Recalcula puntos y detecta ganador para una jornada específica.">
+        <div className="flex gap-2 items-end">
+          <div className="flex-1">
+            <label className="block text-xs font-medium text-gray-600 mb-1">Jornada</label>
+            <select
+              value={recalcMatchdayId}
+              onChange={e => setRecalcMatchdayId(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+            >
+              <option value="">— Seleccioná —</option>
+              {matchdays.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+            </select>
+          </div>
+          <button
+            onClick={() => runJob('matchday', async () => {
+              if (!recalcMatchdayId) { show('Seleccioná una jornada', 'error'); return '' }
+              const { data } = await api.post('/admin/jobs/recalc-matchday', { matchday_id: recalcMatchdayId })
+              return `Jornada recalculada ✓ (${data.data?.updated ?? 0} apuestas)`
+            })}
+            disabled={!!loading || !recalcMatchdayId}
+            className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50 whitespace-nowrap"
+          >
+            {loading === 'matchday' ? 'Calculando...' : 'Ejecutar'}
+          </button>
+        </div>
+        {jobResult?.id === 'matchday' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
+      </JobCard>
+
+      {/* Simular Ganador */}
+      <JobCard title="🏆 Simular Ganador de Jornada" description="Dispara el flujo completo: imagen FIFA, email, WhatsApp y push a todos.">
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Email del ganador *</label>
+            <input
+              type="email"
+              value={winnerEmail}
+              onChange={e => setWinnerEmail(e.target.value)}
+              placeholder="cfdelrio@gmail.com"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Nombre de jornada</label>
+              <input
+                value={winnerMatchdayName}
+                onChange={e => setWinnerMatchdayName(e.target.value)}
+                placeholder="Fecha 1"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Puntos</label>
+              <input
+                type="number"
+                value={winnerPoints}
+                onChange={e => setWinnerPoints(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+              />
+            </div>
+          </div>
+          <button
+            onClick={() => runJob('winner', async () => {
+              if (!winnerEmail) { show('Ingresá el email del ganador', 'error'); return '' }
+              await api.post('/admin/jobs/trigger-winner', {
+                email: winnerEmail,
+                matchday_name: winnerMatchdayName || undefined,
+                points: winnerPoints ? parseInt(winnerPoints) : undefined,
+              })
+              return `Flujo de ganador disparado para ${winnerEmail} ✓`
+            })}
+            disabled={!!loading || !winnerEmail}
+            className="bg-green-600 text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-green-700 disabled:opacity-50"
+          >
+            {loading === 'winner' ? 'Procesando...' : '🚀 Disparar flujo ganador'}
+          </button>
+          {jobResult?.id === 'winner' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
+        </div>
+      </JobCard>
+
+      {/* Email Semanal */}
+      <JobCard title="📧 Email Semanal" description="Con email de prueba lo envía solo a esa dirección. Vacío = envía a todos los usuarios.">
+        <div className="flex gap-2 items-end">
+          <div className="flex-1">
+            <label className="block text-xs font-medium text-gray-600 mb-1">Email de prueba (opcional)</label>
+            <input
+              type="email"
+              value={weeklyTestEmail}
+              onChange={e => setWeeklyTestEmail(e.target.value)}
+              placeholder="vacío = enviar a todos"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+            />
+          </div>
+          <button
+            onClick={() => runJob('weekly', async () => {
+              if (!weeklyTestEmail && !confirm('¿Enviar el email semanal a TODOS los usuarios?')) return ''
+              const { data } = await api.post('/admin/weekly-email', weeklyTestEmail ? { test_email: weeklyTestEmail } : {})
+              return `Email semanal: ${data.data.sent} enviados, ${data.data.failed} fallidos`
+            })}
+            disabled={!!loading}
+            className="bg-[#FFDF00] text-[#001A4B] text-sm font-bold px-5 py-2 rounded-xl hover:bg-yellow-400 disabled:opacity-50 whitespace-nowrap"
+          >
+            {loading === 'weekly' ? 'Enviando...' : '📤 Enviar'}
+          </button>
+        </div>
+        {jobResult?.id === 'weekly' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
+      </JobCard>
     </div>
   )
 }
