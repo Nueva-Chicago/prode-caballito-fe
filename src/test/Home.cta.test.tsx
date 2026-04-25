@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { Home } from '@/pages/Home'
@@ -52,12 +52,10 @@ vi.mock('@/api/client', () => ({
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/** Cutoff 3 days from now — open and not urgent */
 function futureCutoff(hoursFromNow = 72) {
   return new Date(Date.now() + hoursFromNow * 3600 * 1000).toISOString()
 }
 
-/** A pending match that closes far in the future (no urgency) */
 function makeMatch(id: string, overrides: Partial<{
   estado: string
   time_cutoff: string
@@ -74,7 +72,6 @@ function makeMatch(id: string, overrides: Partial<{
   }
 }
 
-/** A pending match closing in 2h (urgent — within 6h window) */
 function makeUrgentMatch(id: string) {
   return makeMatch(id, { time_cutoff: futureCutoff(2) })
 }
@@ -122,7 +119,7 @@ describe('Home — CTA pronósticos pendientes', () => {
 
   it('muestra banner cuando hay pendientes sin urgencia', async () => {
     const matches = [makeMatch('m1'), makeMatch('m2'), makeMatch('m3')]
-    const bets = [makeBet('m1')] // m2 y m3 sin apuesta → totalUnbet = 2
+    const bets = [makeBet('m1')]
     await setupApiMock(matches, bets)()
 
     renderHome()

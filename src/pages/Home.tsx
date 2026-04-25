@@ -681,7 +681,7 @@ export function Home() {
               }}
               className="mt-2 flex items-center gap-1.5 text-[11px] font-semibold text-white/50 hover:text-white/80 transition-colors"
             >
-              📲 {t.ranking.shareBtn}
+              {t.ranking.shareBtn}
             </button>
           )}
 
