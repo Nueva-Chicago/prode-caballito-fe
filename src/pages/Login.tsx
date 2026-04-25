@@ -17,7 +17,7 @@ export function Login() {
     try {
       const { data } = await api.post('/auth/login', form)
       setAuth(data.data.user, data.data.token, data.data.refreshToken)
-      navigate('/apuestas')
+      navigate('/')
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al iniciar sesión'
       show(msg, 'error')
