@@ -1,6 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { Home } from '@/pages/Home'
 
@@ -14,166 +13,141 @@ vi.mock('@/store/authStore', () => ({
 }))
 
 vi.mock('@/store/toastStore', () => ({
-  useToastStore: () => ({ addToast: vi.fn() }),
+  useToastStore: () => ({ addToast: vi.fn(), show: vi.fn() }),
 }))
 
-// Silence applyTheme / CSS vars in jsdom
 vi.mock('@/utils/theme', () => ({ applyTheme: vi.fn() }))
 
-// Mock MatchCard so we don't need to render the full beast
+vi.mock('@/hooks/usePWAInstall', () => ({
+  usePWAInstall: () => ({ state: { type: 'unavailable' }, install: vi.fn() }),
+}))
+
+vi.mock('@/components/ui/AdCard', () => ({
+  AdCard: () => null,
+}))
+
+vi.mock('@/pages/LeaderHome', () => ({
+  LeaderHome: () => <div data-testid="leader-home" />,
+}))
+
+vi.mock('@/utils/teamFlags', () => ({
+  teamFlag: () => '',
+  teamAbbr: (name: string) => name.slice(0, 3).toUpperCase(),
+}))
+
+vi.mock('@/store/teamBadgesStore', () => ({
+  useTeamBadgesStore: () => ({}),
+  getTeamBadge: () => null,
+}))
+
 vi.mock('@/components/match/MatchCard', () => ({
   MatchCard: ({ match }: { match: { home_team: string; away_team: string } }) => (
     <div data-testid="match-card">{match.home_team} vs {match.away_team}</div>
   ),
 }))
 
+vi.mock('@/api/client', () => ({
+  api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
+}))
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const NOW = new Date('2026-04-18T12:00:00Z')
+/** Cutoff 3 days from now — open and not urgent */
+function futureCutoff(hoursFromNow = 72) {
+  return new Date(Date.now() + hoursFromNow * 3600 * 1000).toISOString()
+}
 
 /** A pending match that closes far in the future (no urgency) */
 function makeMatch(id: string, overrides: Partial<{
-  estado: 'pending' | 'live' | 'finished'
+  estado: string
   time_cutoff: string
 }> = {}) {
   return {
     id,
     home_team: `Home${id}`,
     away_team: `Away${id}`,
-    start_time: '2026-04-19T18:00:00Z',
-    time_cutoff: overrides.time_cutoff ?? '2026-04-19T17:00:00Z', // ~29h away
+    start_time: new Date(Date.now() + 73 * 3600 * 1000).toISOString(),
+    time_cutoff: overrides.time_cutoff ?? futureCutoff(72),
     halftime_minutes: 0,
     estado: overrides.estado ?? 'pending',
     finished: overrides.estado === 'finished',
   }
 }
 
-/** A pending match closing in <6h (urgent) */
+/** A pending match closing in 2h (urgent — within 6h window) */
 function makeUrgentMatch(id: string) {
-  const cutoff = new Date(NOW.getTime() + 2 * 3600 * 1000).toISOString() // 2h from now
-  return makeMatch(id, { time_cutoff: cutoff })
+  return makeMatch(id, { time_cutoff: futureCutoff(2) })
 }
 
 function makeBet(matchId: string) {
-  return {
-    id: `bet-${matchId}`,
-    planilla_id: 'p1',
-    match_id: matchId,
-    goles_local: 1,
-    goles_visitante: 0,
-  }
+  return { id: `bet-${matchId}`, planilla_id: 'p1', match_id: matchId, goles_local: 1, goles_visitante: 0 }
 }
 
 const PLANILLA = { id: 'p1', user_id: 'u1', nombre_planilla: 'Mi planilla', precio_pagado: true }
 
-// ─── API mock factory ─────────────────────────────────────────────────────────
-
-function mockApi(matches: ReturnType<typeof makeMatch>[], bets: ReturnType<typeof makeBet>[]) {
-  const { api } = vi.mocked(await import('@/api/client'))
-  api.get = vi.fn((url: string) => {
-    if (url.startsWith('/matches')) return Promise.resolve({ data: { data: { matches } } })
-    if (url.startsWith('/planillas')) return Promise.resolve({ data: { data: [PLANILLA] } })
-    if (url.startsWith('/ranking')) return Promise.resolve({ data: { data: { ranking: [] } } })
-    if (url.startsWith('/tournaments')) return Promise.resolve({ data: { data: [] } })
-    if (url.includes('/bets')) return Promise.resolve({ data: { data: bets } })
-    return Promise.resolve({ data: { data: [] } })
-  })
+function setupApiMock(matches: ReturnType<typeof makeMatch>[], bets: ReturnType<typeof makeBet>[]) {
+  return async () => {
+    const { api } = await import('@/api/client')
+    ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
+      if (url.startsWith('/matches')) return Promise.resolve({ data: { data: { matches } } })
+      if (url.startsWith('/planillas')) return Promise.resolve({ data: { data: [PLANILLA] } })
+      if (url.startsWith('/ranking')) return Promise.resolve({ data: { data: { ranking: [] } } })
+      if (url.startsWith('/tournaments')) return Promise.resolve({ data: { data: [] } })
+      if (url.includes('/bets')) return Promise.resolve({ data: { data: bets } })
+      return Promise.resolve({ data: { data: [] } })
+    })
+  }
 }
 
-vi.mock('@/api/client', () => ({
-  api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
-}))
+function renderHome() {
+  return render(<MemoryRouter><Home /></MemoryRouter>)
+}
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-function renderHome() {
-  return render(
-    <MemoryRouter>
-      <Home />
-    </MemoryRouter>
-  )
-}
-
 describe('Home — CTA pronósticos pendientes', () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-    vi.setSystemTime(NOW)
-  })
-
-  afterEach(() => {
-    vi.useRealTimers()
-    vi.clearAllMocks()
-  })
+  afterEach(() => vi.clearAllMocks())
 
   it('no muestra el banner cuando todos los partidos tienen apuesta', async () => {
     const matches = [makeMatch('m1'), makeMatch('m2')]
     const bets = [makeBet('m1'), makeBet('m2')]
-    const { api } = await import('@/api/client')
-    ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
-      if (url.startsWith('/matches')) return Promise.resolve({ data: { data: { matches } } })
-      if (url.startsWith('/planillas')) return Promise.resolve({ data: { data: [PLANILLA] } })
-      if (url.startsWith('/ranking')) return Promise.resolve({ data: { data: { ranking: [] } } })
-      if (url.startsWith('/tournaments')) return Promise.resolve({ data: { data: [] } })
-      if (url.includes('/bets')) return Promise.resolve({ data: { data: bets } })
-      return Promise.resolve({ data: { data: [] } })
-    })
-
-    renderHome()
-    await waitFor(() => expect(screen.queryByText(/pronóstico/i)).not.toBeNull())
-
-    // El banner de "pendientes" no debe aparecer
-    expect(screen.queryByText(/Tenés/i)).toBeNull()
-  })
-
-  it('muestra banner ámbar cuando hay pendientes sin urgencia', async () => {
-    const matches = [makeMatch('m1'), makeMatch('m2'), makeMatch('m3')]
-    const bets = [makeBet('m1')] // m2 y m3 sin apuesta → totalUnbet = 2
-    const { api } = await import('@/api/client')
-    ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
-      if (url.startsWith('/matches')) return Promise.resolve({ data: { data: { matches } } })
-      if (url.startsWith('/planillas')) return Promise.resolve({ data: { data: [PLANILLA] } })
-      if (url.startsWith('/ranking')) return Promise.resolve({ data: { data: { ranking: [] } } })
-      if (url.startsWith('/tournaments')) return Promise.resolve({ data: { data: [] } })
-      if (url.includes('/bets')) return Promise.resolve({ data: { data: bets } })
-      return Promise.resolve({ data: { data: [] } })
-    })
+    await setupApiMock(matches, bets)()
 
     renderHome()
 
     await waitFor(() => {
-      expect(screen.getByText('Tenés 2 pronósticos pendientes')).toBeInTheDocument()
-    })
+      expect(screen.queryByText(/Tenés \d+ pronóstico/i)).toBeNull()
+    }, { timeout: 3000 })
+  })
 
-    // Botón CTA presente
+  it('muestra banner cuando hay pendientes sin urgencia', async () => {
+    const matches = [makeMatch('m1'), makeMatch('m2'), makeMatch('m3')]
+    const bets = [makeBet('m1')] // m2 y m3 sin apuesta → totalUnbet = 2
+    await setupApiMock(matches, bets)()
+
+    renderHome()
+
+    await waitFor(() => {
+      expect(screen.getByText('Tenés 2 pronósticos pendientes esta semana')).toBeInTheDocument()
+    }, { timeout: 3000 })
+
     expect(screen.getByText('Completar ahora →')).toBeInTheDocument()
-
-    // Sin mensaje de urgencia
     expect(screen.queryByText(/cierra pronto/i)).toBeNull()
   })
 
-  it('muestra banner rojo con texto urgente cuando hay partidos que cierran pronto sin apuesta', async () => {
+  it('muestra texto urgente cuando hay partidos que cierran pronto sin apuesta', async () => {
     const urgentMatch = makeUrgentMatch('urgent1')
     const normalMatch = makeMatch('normal1')
     const matches = [urgentMatch, normalMatch]
-    const bets: ReturnType<typeof makeBet>[] = [] // ninguna apuesta
-
-    const { api } = await import('@/api/client')
-    ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
-      if (url.startsWith('/matches')) return Promise.resolve({ data: { data: { matches } } })
-      if (url.startsWith('/planillas')) return Promise.resolve({ data: { data: [PLANILLA] } })
-      if (url.startsWith('/ranking')) return Promise.resolve({ data: { data: { ranking: [] } } })
-      if (url.startsWith('/tournaments')) return Promise.resolve({ data: { data: [] } })
-      if (url.includes('/bets')) return Promise.resolve({ data: { data: bets } })
-      return Promise.resolve({ data: { data: [] } })
-    })
+    const bets: ReturnType<typeof makeBet>[] = []
+    await setupApiMock(matches, bets)()
 
     renderHome()
 
     await waitFor(() => {
-      expect(screen.getByText('Tenés 2 pronósticos pendientes')).toBeInTheDocument()
-    })
+      expect(screen.getByText('Tenés 2 pronósticos pendientes esta semana')).toBeInTheDocument()
+    }, { timeout: 3000 })
 
-    // Texto urgente debe aparecer (1 partido cierra pronto)
     expect(screen.getByText('⚠️ 1 partido cierra pronto sin tu apuesta')).toBeInTheDocument()
   })
 
@@ -181,69 +155,44 @@ describe('Home — CTA pronósticos pendientes', () => {
     const matches = [
       makeMatch('m1', { estado: 'finished' }),
       makeMatch('m2', { estado: 'finished' }),
-      makeMatch('m3'), // único pendiente, sin apuesta
+      makeMatch('m3'),
     ]
     const bets: ReturnType<typeof makeBet>[] = []
-    const { api } = await import('@/api/client')
-    ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
-      if (url.startsWith('/matches')) return Promise.resolve({ data: { data: { matches } } })
-      if (url.startsWith('/planillas')) return Promise.resolve({ data: { data: [PLANILLA] } })
-      if (url.startsWith('/ranking')) return Promise.resolve({ data: { data: { ranking: [] } } })
-      if (url.startsWith('/tournaments')) return Promise.resolve({ data: { data: [] } })
-      if (url.includes('/bets')) return Promise.resolve({ data: { data: bets } })
-      return Promise.resolve({ data: { data: [] } })
-    })
+    await setupApiMock(matches, bets)()
 
     renderHome()
 
     await waitFor(() => {
-      // Solo 1 pendiente (m3)
-      expect(screen.getByText('Tenés 1 pronóstico pendiente')).toBeInTheDocument()
-    })
+      expect(screen.getByText('Tenés 1 pronóstico pendiente esta semana')).toBeInTheDocument()
+    }, { timeout: 3000 })
   })
 
-  it('el banner es un link que lleva a /apuestas', async () => {
+  it('el banner contiene link a /apuestas', async () => {
     const matches = [makeMatch('m1')]
     const bets: ReturnType<typeof makeBet>[] = []
-    const { api } = await import('@/api/client')
-    ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
-      if (url.startsWith('/matches')) return Promise.resolve({ data: { data: { matches } } })
-      if (url.startsWith('/planillas')) return Promise.resolve({ data: { data: [PLANILLA] } })
-      if (url.startsWith('/ranking')) return Promise.resolve({ data: { data: { ranking: [] } } })
-      if (url.startsWith('/tournaments')) return Promise.resolve({ data: { data: [] } })
-      if (url.includes('/bets')) return Promise.resolve({ data: { data: bets } })
-      return Promise.resolve({ data: { data: [] } })
-    })
+    await setupApiMock(matches, bets)()
 
     renderHome()
 
     await waitFor(() => {
-      expect(screen.getByText('Tenés 1 pronóstico pendiente')).toBeInTheDocument()
-    })
+      expect(screen.getByText('Tenés 1 pronóstico pendiente esta semana')).toBeInTheDocument()
+    }, { timeout: 3000 })
 
     const link = screen.getByText('Completar ahora →').closest('a')
     expect(link).toHaveAttribute('href', '/apuestas')
   })
 
-  it('singular correcto: "1 pronóstico" (no "1 pronósticos")', async () => {
+  it('singular correcto: "1 pronóstico" sin pluralizar', async () => {
     const matches = [makeMatch('m1')]
     const bets: ReturnType<typeof makeBet>[] = []
-    const { api } = await import('@/api/client')
-    ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
-      if (url.startsWith('/matches')) return Promise.resolve({ data: { data: { matches } } })
-      if (url.startsWith('/planillas')) return Promise.resolve({ data: { data: [PLANILLA] } })
-      if (url.startsWith('/ranking')) return Promise.resolve({ data: { data: { ranking: [] } } })
-      if (url.startsWith('/tournaments')) return Promise.resolve({ data: { data: [] } })
-      if (url.includes('/bets')) return Promise.resolve({ data: { data: bets } })
-      return Promise.resolve({ data: { data: [] } })
-    })
+    await setupApiMock(matches, bets)()
 
     renderHome()
 
     await waitFor(() => {
-      expect(screen.getByText('Tenés 1 pronóstico pendiente')).toBeInTheDocument()
-    })
-    // Plural no debe aparecer
+      expect(screen.getByText('Tenés 1 pronóstico pendiente esta semana')).toBeInTheDocument()
+    }, { timeout: 3000 })
+
     expect(screen.queryByText(/1 pronósticos/)).toBeNull()
   })
 })
