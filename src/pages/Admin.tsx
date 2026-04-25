@@ -1005,18 +1005,32 @@ function JobCard({ title, description, children }: { title: string; description:
 
 function JobsTab() {
   const { show } = useToastStore()
-  const [matchdays, setMatchdays] = useState<{ id: string; name: string }[]>([])
+  const [matchdays, setMatchdays] = useState<{ id: string; name: string; tournament_name?: string }[]>([])
   const [loading, setLoading] = useState<string | null>(null)
   const [recalcMatchdayId, setRecalcMatchdayId] = useState('')
   const [winnerEmail, setWinnerEmail] = useState('')
   const [winnerMatchdayName, setWinnerMatchdayName] = useState('')
   const [winnerPoints, setWinnerPoints] = useState('42')
   const [weeklyTestEmail, setWeeklyTestEmail] = useState('')
+  const [welcomeEmail, setWelcomeEmail] = useState('')
+  const [waTo, setWaTo] = useState('')
+  const [waMessage, setWaMessage] = useState('')
   const [jobResult, setJobResult] = useState<{ id: string; text: string } | null>(null)
 
   useEffect(() => {
-    api.get('/matchdays').then(res => {
-      setMatchdays(res.data.data || [])
+    // GET /matchdays requires tournament_id → load all tournaments first, then matchdays per tournament
+    api.get('/tournaments/admin/all').then(async res => {
+      const tournaments: { id: string; name: string }[] = res.data.data || []
+      const all: { id: string; name: string; tournament_name: string }[] = []
+      await Promise.allSettled(
+        tournaments.map(async t => {
+          const r = await api.get(`/matchdays?tournament_id=${t.id}`)
+          for (const md of (r.data.data || [])) {
+            all.push({ id: md.id, name: md.name, tournament_name: t.name })
+          }
+        })
+      )
+      setMatchdays(all)
     }).catch(() => {})
   }, [])
 
@@ -1025,8 +1039,7 @@ function JobsTab() {
     setJobResult(null)
     try {
       const msg = await fn()
-      setJobResult({ id: jobId, text: msg })
-      show(msg, 'success')
+      if (msg) { setJobResult({ id: jobId, text: msg }); show(msg, 'success') }
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al ejecutar'
       show(msg, 'error')
@@ -1063,7 +1076,11 @@ function JobsTab() {
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
             >
               <option value="">— Seleccioná —</option>
-              {matchdays.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+              {matchdays.map(m => (
+                <option key={m.id} value={m.id}>
+                  {m.tournament_name ? `${m.tournament_name} · ` : ''}{m.name}
+                </option>
+              ))}
             </select>
           </div>
           <button
@@ -1159,6 +1176,70 @@ function JobsTab() {
           </button>
         </div>
         {jobResult?.id === 'weekly' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
+      </JobCard>
+
+      {/* Email de Bienvenida */}
+      <JobCard title="👋 Email de Bienvenida" description="Re-envía el email de bienvenida a un usuario registrado.">
+        <div className="flex gap-2 items-end">
+          <div className="flex-1">
+            <label className="block text-xs font-medium text-gray-600 mb-1">Email del usuario *</label>
+            <input
+              type="email"
+              value={welcomeEmail}
+              onChange={e => setWelcomeEmail(e.target.value)}
+              placeholder="usuario@ejemplo.com"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+            />
+          </div>
+          <button
+            onClick={() => runJob('welcome', async () => {
+              if (!welcomeEmail) { show('Ingresá un email', 'error'); return '' }
+              await api.post('/admin/jobs/send-welcome', { email: welcomeEmail })
+              return `Email de bienvenida enviado a ${welcomeEmail} ✓`
+            })}
+            disabled={!!loading || !welcomeEmail}
+            className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50 whitespace-nowrap"
+          >
+            {loading === 'welcome' ? 'Enviando...' : '📤 Enviar'}
+          </button>
+        </div>
+        {jobResult?.id === 'welcome' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
+      </JobCard>
+
+      {/* Test WhatsApp */}
+      <JobCard title="💬 Test WhatsApp" description="Envía un mensaje de WhatsApp a un número específico para verificar la integración.">
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Número (con código de país) *</label>
+            <input
+              value={waTo}
+              onChange={e => setWaTo(e.target.value)}
+              placeholder="+5491112345678"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Mensaje *</label>
+            <input
+              value={waMessage}
+              onChange={e => setWaMessage(e.target.value)}
+              placeholder="Mensaje de prueba desde PRODE Caballito"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+            />
+          </div>
+          <button
+            onClick={() => runJob('whatsapp', async () => {
+              if (!waTo || !waMessage) { show('Completá número y mensaje', 'error'); return '' }
+              await api.post('/admin/test-whatsapp', { to: waTo, message: waMessage })
+              return `WhatsApp enviado a ${waTo} ✓`
+            })}
+            disabled={!!loading || !waTo || !waMessage}
+            className="bg-green-600 text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-green-700 disabled:opacity-50"
+          >
+            {loading === 'whatsapp' ? 'Enviando...' : '📱 Enviar WhatsApp'}
+          </button>
+          {jobResult?.id === 'whatsapp' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
+        </div>
       </JobCard>
     </div>
   )
