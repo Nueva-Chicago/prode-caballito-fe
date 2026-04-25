@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { calcularPuntaje, formatScore } from '@/utils/scoring'
+// test PR — verifica que CI bloquea deploy si hay errores
 
 describe('calcularPuntaje', () => {
   const bet = (local: number, visitante: number) => ({ goles_local: local, goles_visitante: visitante })
