@@ -4,11 +4,12 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { Register } from '@/pages/Register'
 
-const mockShow = vi.hoisted(() => vi.fn())
+const mockShow   = vi.hoisted(() => vi.fn())
+const mockSetAuth = vi.hoisted(() => vi.fn())
 
 vi.mock('@/store/authStore', () => ({
   useAuthStore: vi.fn((selector?: (s: any) => any) => {
-    const store = { user: null, setAuth: vi.fn(), updateUser: vi.fn() }
+    const store = { user: null, setAuth: mockSetAuth, updateUser: vi.fn() }
     return selector ? selector(store) : store
   }),
 }))
@@ -139,6 +140,163 @@ describe('Register — paso 2: verificación de email', () => {
     // Paso 3: perfil completo
     await waitFor(() => {
       expect(screen.getByText(/Email verificado/i)).toBeInTheDocument()
+    })
+  })
+})
+
+// ─── Helper compartido para llegar al paso 3 ─────────────────────────────────
+
+async function goToCompleteStep() {
+  const user = userEvent.setup()
+  const { api } = await import('@/api/client')
+
+  ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    data: { data: { pendingId: 'pending123' } },
+  })
+  renderRegister()
+  await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
+  await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
+  await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
+  await user.click(screen.getByRole('button', { name: /Continuar/i }))
+  await waitFor(() => expect(screen.getByPlaceholderText('000000')).toBeInTheDocument())
+
+  ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+    data: { data: { userId: 'u1' } },
+  })
+  await user.type(screen.getByPlaceholderText('000000'), '123456')
+  await user.click(screen.getByRole('button', { name: /Verificar/i }))
+  await waitFor(() => expect(screen.getByText(/Email verificado/i)).toBeInTheDocument())
+
+  return { user, api }
+}
+
+// ─── Tests ────────────────────────────────────────────────────────────────────
+
+describe('Register — paso 3: completar perfil', () => {
+  afterEach(() => vi.clearAllMocks())
+
+  it('renderiza selector de equipos y botón de completar', async () => {
+    await goToCompleteStep()
+    expect(screen.getByRole('button', { name: /Completar registro/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Boca Juniors/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /River Plate/i })).toBeInTheDocument()
+  })
+
+  it('handleComplete → llama /auth/complete-registration con userId', async () => {
+    const { user, api } = await goToCompleteStep()
+    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      data: { data: { token: 'tok', refreshToken: 'ref', user: { id: 'u1', nombre: 'Carlos' } } },
+    })
+    await user.click(screen.getByRole('button', { name: /Completar registro/i }))
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/auth/complete-registration', expect.objectContaining({ userId: 'u1' }))
+    })
+  })
+
+  it('handleComplete con token → llama setAuth', async () => {
+    const { user, api } = await goToCompleteStep()
+    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      data: { data: { token: 'tok', refreshToken: 'ref', user: { id: 'u1', nombre: 'Carlos' } } },
+    })
+    await user.click(screen.getByRole('button', { name: /Completar registro/i }))
+    await waitFor(() => {
+      expect(mockSetAuth).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'u1' }), 'tok', 'ref'
+      )
+    })
+  })
+
+  it('handleComplete sin token → no llama setAuth', async () => {
+    const { user, api } = await goToCompleteStep()
+    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      data: { data: {} },
+    })
+    await user.click(screen.getByRole('button', { name: /Completar registro/i }))
+    await waitFor(() => {
+      expect(mockShow).toHaveBeenCalledWith('¡Registro completado! Iniciá sesión', 'success')
+    })
+    expect(mockSetAuth).not.toHaveBeenCalled()
+  })
+
+  it('handleComplete error → toast de error', async () => {
+    const { user, api } = await goToCompleteStep()
+    ;(api.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce({
+      response: { data: { error: 'Error al completar el registro' } },
+    })
+    await user.click(screen.getByRole('button', { name: /Completar registro/i }))
+    await waitFor(() => {
+      expect(mockShow).toHaveBeenCalledWith('Error al completar el registro', 'error')
+    })
+  })
+
+  it('seleccionar equipo favorito envía tema_equipo correcto a la API', async () => {
+    const { user, api } = await goToCompleteStep()
+    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      data: { data: { token: 'tok', refreshToken: 'ref', user: { id: 'u1', nombre: 'Carlos' } } },
+    })
+    await user.click(screen.getByRole('button', { name: /Boca Juniors/i }))
+    await user.click(screen.getByRole('button', { name: /Completar registro/i }))
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/auth/complete-registration', expect.objectContaining({ tema_equipo: 'boca' }))
+    })
+  })
+})
+
+describe('Register — paso 4: notificaciones', () => {
+  beforeEach(() => {
+    Object.defineProperty(window, 'Notification', {
+      value: { permission: 'default', requestPermission: vi.fn().mockResolvedValue('granted') },
+      writable: true, configurable: true,
+    })
+  })
+  afterEach(() => vi.clearAllMocks())
+
+  async function goToNotifyStep() {
+    const { user, api } = await goToCompleteStep()
+    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      data: { data: { token: 'tok', refreshToken: 'ref', user: { id: 'u1', nombre: 'Carlos' } } },
+    })
+    await user.click(screen.getByRole('button', { name: /Completar registro/i }))
+    await waitFor(() => expect(screen.getByText(/Activá las notificaciones/i)).toBeInTheDocument())
+    return { user }
+  }
+
+  it('muestra la pantalla de notificaciones con sus botones', async () => {
+    await goToNotifyStep()
+    expect(screen.getByRole('button', { name: /Activar notificaciones/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Ahora no/i })).toBeInTheDocument()
+  })
+
+  it('muestra los 3 beneficios en la lista', async () => {
+    await goToNotifyStep()
+    expect(screen.getByText(/Recordatorios antes del cierre/i)).toBeInTheDocument()
+    expect(screen.getByText(/Resultados publicados al instante/i)).toBeInTheDocument()
+    expect(screen.getByText(/Alertas de ranking/i)).toBeInTheDocument()
+  })
+
+  it('"Activar notificaciones" llama Notification.requestPermission', async () => {
+    const { user } = await goToNotifyStep()
+    await user.click(screen.getByRole('button', { name: /Activar notificaciones/i }))
+    await waitFor(() => {
+      expect(window.Notification.requestPermission).toHaveBeenCalled()
+    })
+  })
+
+  it('permiso concedido → muestra "¡Todo listo!"', async () => {
+    window.Notification.requestPermission = vi.fn().mockResolvedValue('granted')
+    const { user } = await goToNotifyStep()
+    await user.click(screen.getByRole('button', { name: /Activar notificaciones/i }))
+    await waitFor(() => {
+      expect(screen.getByText(/Todo listo/i)).toBeInTheDocument()
+    })
+  })
+
+  it('permiso denegado → muestra "Sin notificaciones"', async () => {
+    window.Notification.requestPermission = vi.fn().mockResolvedValue('denied')
+    const { user } = await goToNotifyStep()
+    await user.click(screen.getByRole('button', { name: /Activar notificaciones/i }))
+    await waitFor(() => {
+      expect(screen.getByText(/Sin notificaciones/i)).toBeInTheDocument()
     })
   })
 })
