@@ -6,12 +6,16 @@ import { api } from '@/api/client'
 import { Modal } from '@/components/ui/Modal'
 import { Spinner } from '@/components/ui/Spinner'
 import { useToastStore } from '@/store/toastStore'
+import { useAuthStore } from '@/store/authStore'
 import type { Match, Tournament } from '@/types'
 
 type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast' | 'jobs'
 
+const SUPER_ADMIN_EMAIL = 'cfdelrio@gmail.com'
+
 export function Admin() {
   const { show } = useToastStore()
+  const { user } = useAuthStore()
   const [tab, setTab] = useState<Tab>('partidos')
   const [matches, setMatches] = useState<Match[]>([])
   const [tournaments, setTournaments] = useState<Tournament[]>([])
@@ -124,13 +128,15 @@ export function Admin() {
     setShowMatchModal(true)
   }
 
+  const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL
+
   const tabs: { id: Tab; label: string }[] = [
     { id: 'partidos', label: '⚽ Partidos' },
     { id: 'planillas', label: '📋 Planillas' },
     { id: 'usuarios', label: '👥 Usuarios' },
     { id: 'torneos', label: '🏆 Torneos' },
     { id: 'broadcast',   label: '📣 WhatsApp' },
-    { id: 'jobs',        label: '⚙️ Procesos' },
+    ...(isSuperAdmin ? [{ id: 'jobs' as Tab, label: '⚙️ Procesos' }] : []),
   ]
 
   return (
