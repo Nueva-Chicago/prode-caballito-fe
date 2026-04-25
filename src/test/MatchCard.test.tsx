@@ -1,10 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MatchCard } from '@/components/match/MatchCard'
 import type { Match, Bet } from '@/types'
 
+const mockShow = vi.hoisted(() => vi.fn())
+
 vi.mock('@/store/toastStore', () => ({
-  useToastStore: () => ({ show: vi.fn() }),
+  useToastStore: () => ({ show: mockShow }),
 }))
 
 vi.mock('@/store/authStore', () => ({
@@ -61,7 +64,7 @@ function makeBet(overrides: Partial<Bet> = {}): Bet {
   } as Bet
 }
 
-describe('MatchCard', () => {
+describe('MatchCard — renderizado básico', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('muestra los nombres de los equipos', () => {
@@ -74,6 +77,11 @@ describe('MatchCard', () => {
     const future = new Date(NOW + 8 * 3600 * 1000).toISOString()
     render(<MatchCard match={makeMatch({ time_cutoff: future })} now={NOW} />)
     expect(screen.getByText('VS')).toBeInTheDocument()
+  })
+
+  it('partido live → muestra "EN VIVO"', () => {
+    render(<MatchCard match={makeMatch({ estado: 'live' })} now={NOW} />)
+    expect(screen.getByText('EN VIVO')).toBeInTheDocument()
   })
 
   it('partido terminado → muestra "FIN"', () => {
@@ -96,7 +104,6 @@ describe('MatchCard', () => {
     })
     const bet = makeBet({ goles_local: 2, goles_visitante: 1 }) // exacto → 3pts
     render(<MatchCard match={match} bet={bet} now={NOW} />)
-    // La pill muestra algo como "🎯 2-1 · 3pts" en un único span
     expect(screen.getByText(/2-1/)).toBeInTheDocument()
     expect(screen.getByText(/3pts/)).toBeInTheDocument()
   })
@@ -112,24 +119,20 @@ describe('MatchCard', () => {
     expect(screen.getByText(/sin pronóstico/i)).toBeInTheDocument()
   })
 
-  it('apuesta existente muestra botones de editar y eliminar', () => {
+  it('planillaLocked → muestra chip de bloqueado', () => {
     const future = new Date(NOW + 8 * 3600 * 1000).toISOString()
-    const bet = makeBet({ goles_local: 1, goles_visitante: 2 })
-    render(<MatchCard match={makeMatch({ time_cutoff: future })} bet={bet} planillaId="p1" now={NOW} />)
-    // Con apuesta guardada aparecen botón editar ("Editar") y eliminar ("×")
-    expect(screen.getByText('Editar')).toBeInTheDocument()
-    expect(screen.getByText('×')).toBeInTheDocument()
-    // No hay input mientras no está en modo edición
-    expect(screen.queryByRole('textbox')).toBeNull()
+    render(
+      <MatchCard
+        match={makeMatch({ time_cutoff: future })}
+        planillaId="p1"
+        planillaLocked
+        now={NOW}
+      />
+    )
+    expect(screen.getByText(/🔒/)).toBeInTheDocument()
   })
 
-  it('readonly=true → no renderiza input de apuesta', () => {
-    const future = new Date(NOW + 8 * 3600 * 1000).toISOString()
-    render(<MatchCard match={makeMatch({ time_cutoff: future })} readonly now={NOW} />)
-    expect(screen.queryByRole('textbox')).toBeNull()
-  })
-
-  it('partido cerrado (cutoff pasado) sin resultado → no muestra input ni "FIN"', () => {
+  it('partido cerrado (cutoff pasado) sin resultado → chip "Cerrado"', () => {
     const past = new Date(NOW - 3600 * 1000).toISOString()
     render(
       <MatchCard
@@ -139,5 +142,126 @@ describe('MatchCard', () => {
       />
     )
     expect(screen.queryByRole('textbox')).toBeNull()
+    expect(screen.getByText(/cerrado/i)).toBeInTheDocument()
+  })
+
+  it('readonly=true → no renderiza input de apuesta', () => {
+    const future = new Date(NOW + 8 * 3600 * 1000).toISOString()
+    render(<MatchCard match={makeMatch({ time_cutoff: future })} readonly now={NOW} />)
+    expect(screen.queryByRole('textbox')).toBeNull()
+  })
+
+  it('sin apuesta y canEdit → botón "Apostar" visible', () => {
+    const future = new Date(NOW + 8 * 3600 * 1000).toISOString()
+    render(<MatchCard match={makeMatch({ time_cutoff: future })} planillaId="p1" now={NOW} />)
+    expect(screen.getByText(/apostar/i)).toBeInTheDocument()
+  })
+})
+
+describe('MatchCard — modo edición', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('apuesta existente → botones Editar y × visibles, sin input', () => {
+    const future = new Date(NOW + 8 * 3600 * 1000).toISOString()
+    const bet = makeBet({ goles_local: 1, goles_visitante: 2 })
+    render(<MatchCard match={makeMatch({ time_cutoff: future })} bet={bet} planillaId="p1" now={NOW} />)
+    expect(screen.getByText('Editar')).toBeInTheDocument()
+    expect(screen.getByText('×')).toBeInTheDocument()
+    expect(screen.queryByRole('textbox')).toBeNull()
+  })
+
+  it('click Editar → input con valor previo de la apuesta', async () => {
+    const user = userEvent.setup()
+    const future = new Date(NOW + 8 * 3600 * 1000).toISOString()
+    const bet = makeBet({ goles_local: 1, goles_visitante: 2 })
+    render(<MatchCard match={makeMatch({ time_cutoff: future })} bet={bet} planillaId="p1" now={NOW} />)
+    await user.click(screen.getByText('Editar'))
+    const input = screen.getByRole('textbox') as HTMLInputElement
+    expect(input).toBeInTheDocument()
+    expect(input.value).toBe('1-2')
+  })
+
+  it('click Apostar → aparece input vacío', async () => {
+    const user = userEvent.setup()
+    const future = new Date(NOW + 8 * 3600 * 1000).toISOString()
+    render(<MatchCard match={makeMatch({ time_cutoff: future })} planillaId="p1" now={NOW} />)
+    await user.click(screen.getByText(/apostar/i))
+    expect(screen.getByRole('textbox')).toBeInTheDocument()
+  })
+
+  it('formato inválido → toast error, sin API call', async () => {
+    const user = userEvent.setup()
+    const { api } = await import('@/api/client')
+    const future = new Date(NOW + 8 * 3600 * 1000).toISOString()
+    render(<MatchCard match={makeMatch({ time_cutoff: future })} planillaId="p1" now={NOW} />)
+    await user.click(screen.getByText(/apostar/i))
+    const input = screen.getByRole('textbox')
+    await user.clear(input)
+    await user.type(input, 'abc')
+    await user.keyboard('{Enter}')
+    expect(mockShow).toHaveBeenCalledWith(expect.stringContaining('válido'), 'error')
+    expect(api.post).not.toHaveBeenCalled()
+  })
+
+  it('save exitoso → llama onBetSaved y cierra editor', async () => {
+    const user = userEvent.setup()
+    const { api } = await import('@/api/client')
+    const onBetSaved = vi.fn()
+    const savedBet = makeBet({ goles_local: 2, goles_visitante: 0 })
+    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { data: savedBet } })
+
+    const future = new Date(NOW + 8 * 3600 * 1000).toISOString()
+    render(
+      <MatchCard
+        match={makeMatch({ time_cutoff: future })}
+        planillaId="p1"
+        onBetSaved={onBetSaved}
+        now={NOW}
+      />
+    )
+    await user.click(screen.getByText(/apostar/i))
+    const input = screen.getByRole('textbox')
+    await user.clear(input)
+    await user.type(input, '2-0')
+    await user.keyboard('{Enter}')
+
+    await waitFor(() => expect(onBetSaved).toHaveBeenCalledWith(savedBet))
+    expect(screen.queryByRole('textbox')).toBeNull()
+  })
+
+  it('delete exitoso → llama onBetDeleted', async () => {
+    const user = userEvent.setup()
+    const { api } = await import('@/api/client')
+    const onBetDeleted = vi.fn()
+    ;(api.delete as ReturnType<typeof vi.fn>).mockResolvedValueOnce({})
+
+    const future = new Date(NOW + 8 * 3600 * 1000).toISOString()
+    const bet = makeBet()
+    render(
+      <MatchCard
+        match={makeMatch({ time_cutoff: future })}
+        bet={bet}
+        planillaId="p1"
+        onBetDeleted={onBetDeleted}
+        now={NOW}
+      />
+    )
+    await user.click(screen.getByText('×'))
+    await waitFor(() => expect(onBetDeleted).toHaveBeenCalledWith('m1'))
+  })
+
+  it('error en save → toast de error', async () => {
+    const user = userEvent.setup()
+    const { api } = await import('@/api/client')
+    ;(api.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce({
+      response: { data: { error: 'Cupo agotado' } },
+    })
+
+    const future = new Date(NOW + 8 * 3600 * 1000).toISOString()
+    render(<MatchCard match={makeMatch({ time_cutoff: future })} planillaId="p1" now={NOW} />)
+    await user.click(screen.getByText(/apostar/i))
+    await user.type(screen.getByRole('textbox'), '1-0')
+    await user.keyboard('{Enter}')
+    await waitFor(() => expect(mockShow).toHaveBeenCalledWith('Cupo agotado', 'error'))
   })
 })
