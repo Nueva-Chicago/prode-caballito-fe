@@ -25,8 +25,20 @@ vi.mock('@/utils/teamFlags', () => ({
 }))
 
 vi.mock('@/components/match/MatchCard', () => ({
-  MatchCard: ({ match }: { match: { home_team: string; away_team: string } }) => (
-    <div data-testid="match-card">{match.home_team} vs {match.away_team}</div>
+  MatchCard: ({
+    match,
+    onBetSaved,
+    onBetDeleted,
+  }: {
+    match: { id: string; home_team: string; away_team: string }
+    onBetSaved?: () => void
+    onBetDeleted?: (mid: string) => void
+  }) => (
+    <div data-testid="match-card">
+      {match.home_team} vs {match.away_team}
+      {onBetSaved && <button onClick={onBetSaved} data-testid={`save-${match.id}`}>save</button>}
+      {onBetDeleted && <button onClick={() => onBetDeleted(match.id)} data-testid={`delete-${match.id}`}>delete</button>}
+    </div>
   ),
 }))
 

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { Planilla } from '@/pages/Planilla'
 
@@ -24,8 +25,20 @@ vi.mock('@/utils/teamFlags', () => ({
 }))
 
 vi.mock('@/components/match/MatchCard', () => ({
-  MatchCard: ({ match }: { match: { home_team: string; away_team: string } }) => (
-    <div data-testid="match-card">{match.home_team} vs {match.away_team}</div>
+  MatchCard: ({
+    match,
+    onBetSaved,
+    onBetDeleted,
+  }: {
+    match: { id: string; home_team: string; away_team: string }
+    onBetSaved?: () => void
+    onBetDeleted?: (mid: string) => void
+  }) => (
+    <div data-testid="match-card">
+      {match.home_team} vs {match.away_team}
+      {onBetSaved && <button onClick={onBetSaved} data-testid={`save-${match.id}`}>save</button>}
+      {onBetDeleted && <button onClick={() => onBetDeleted(match.id)} data-testid={`delete-${match.id}`}>delete</button>}
+    </div>
   ),
 }))
 
@@ -152,6 +165,61 @@ describe('Planilla — indicador no oficial', () => {
     }, { timeout: 3000 })
 
     expect(screen.queryByText(/No aparece en el ranking oficial/i)).toBeNull()
+  })
+})
+
+describe('Planilla — callbacks de MatchCard', () => {
+  afterEach(() => vi.clearAllMocks())
+
+  it('onBetSaved (refreshBets) re-fetcha las apuestas de la planilla', async () => {
+    const user = userEvent.setup()
+    const { api } = await import('@/api/client')
+
+    // Primera carga: 0 apuestas
+    ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
+      if (url.startsWith('/planillas/')) return Promise.resolve({ data: { data: PLANILLA } })
+      if (url.startsWith('/matches')) return Promise.resolve({ data: { data: { matches: [makePendingMatch('mp1')] } } })
+      if (url.includes('/bets')) return Promise.resolve({ data: { data: [] } })
+      return Promise.resolve({ data: { data: [] } })
+    })
+
+    renderPlanilla()
+    await waitFor(() => expect(screen.getByTestId('match-card')).toBeInTheDocument(), { timeout: 3000 })
+
+    // Simular que el usuario guardó una apuesta → MatchCard llama onBetSaved
+    await user.click(screen.getByTestId('save-mp1'))
+
+    // refreshBets debe haber llamado a GET /bets/planillas/p1/bets de nuevo
+    await waitFor(() => {
+      const getCalls = (api.get as ReturnType<typeof vi.fn>).mock.calls.map((c: any) => c[0] as string)
+      const refreshCalls = getCalls.filter((url: string) => url.includes('/bets/planillas/p1/bets'))
+      expect(refreshCalls.length).toBeGreaterThanOrEqual(2) // carga inicial + refresh
+    })
+  })
+
+  it('onBetDeleted elimina la apuesta del state local sin llamar a la API', async () => {
+    const user = userEvent.setup()
+    const { api } = await import('@/api/client')
+
+    const bets = [{ id: 'b1', match_id: 'mp1', goles_local: 1, goles_visitante: 0, puntos_obtenidos: null }]
+    ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
+      if (url.startsWith('/planillas/')) return Promise.resolve({ data: { data: PLANILLA } })
+      if (url.startsWith('/matches')) return Promise.resolve({ data: { data: { matches: [makePendingMatch('mp1')] } } })
+      if (url.includes('/bets')) return Promise.resolve({ data: { data: bets } })
+      return Promise.resolve({ data: { data: [] } })
+    })
+
+    renderPlanilla()
+    await waitFor(() => expect(screen.getByTestId('match-card')).toBeInTheDocument(), { timeout: 3000 })
+
+    // Registrar cuántas llamadas GET hay antes de delete
+    const callsBefore = (api.get as ReturnType<typeof vi.fn>).mock.calls.length
+
+    // Simular que MatchCard llama onBetDeleted
+    await user.click(screen.getByTestId('delete-mp1'))
+
+    // No debe disparar ninguna llamada API adicional (es solo state local)
+    expect((api.get as ReturnType<typeof vi.fn>).mock.calls.length).toBe(callsBefore)
   })
 })
 
