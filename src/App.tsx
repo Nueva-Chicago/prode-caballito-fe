@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useTeamBadgesStore } from '@/store/teamBadgesStore'
@@ -7,19 +7,20 @@ import { Navbar } from '@/components/layout/Navbar'
 import { ToastContainer } from '@/components/ui/Toast'
 import { AdBanner } from '@/components/ui/AdBanner'
 import { GoogleAdUnit } from '@/components/ui/GoogleAdUnit'
-import { Login } from '@/pages/Login'
-import { Register } from '@/pages/Register'
-import { Home } from '@/pages/Home'
-import { Apuestas } from '@/pages/Apuestas'
-import { Matriz } from '@/pages/Matriz'
-import { Ranking } from '@/pages/Ranking'
-import { Profile } from '@/pages/Profile'
-import { Messages } from '@/pages/Messages'
-import { Admin } from '@/pages/Admin'
-import { Reglamento } from '@/pages/Reglamento'
-import { Planilla } from '@/pages/Planilla'
-import { Tournaments } from '@/pages/Tournaments'
-import { Fixture } from '@/pages/Fixture'
+
+const Login      = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })))
+const Register   = lazy(() => import('@/pages/Register').then(m => ({ default: m.Register })))
+const Home       = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })))
+const Apuestas   = lazy(() => import('@/pages/Apuestas').then(m => ({ default: m.Apuestas })))
+const Matriz     = lazy(() => import('@/pages/Matriz').then(m => ({ default: m.Matriz })))
+const Ranking    = lazy(() => import('@/pages/Ranking').then(m => ({ default: m.Ranking })))
+const Profile    = lazy(() => import('@/pages/Profile').then(m => ({ default: m.Profile })))
+const Messages   = lazy(() => import('@/pages/Messages').then(m => ({ default: m.Messages })))
+const Admin      = lazy(() => import('@/pages/Admin').then(m => ({ default: m.Admin })))
+const Reglamento = lazy(() => import('@/pages/Reglamento').then(m => ({ default: m.Reglamento })))
+const Planilla   = lazy(() => import('@/pages/Planilla').then(m => ({ default: m.Planilla })))
+const Tournaments = lazy(() => import('@/pages/Tournaments').then(m => ({ default: m.Tournaments })))
+const Fixture    = lazy(() => import('@/pages/Fixture').then(m => ({ default: m.Fixture })))
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -57,6 +58,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <ToastContainer />
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0042A5]" />
+        </div>
+      }>
       <Routes>
         {/* Públicas */}
         <Route path="/login"    element={<Login />} />
@@ -108,6 +114,7 @@ export default function App() {
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }
