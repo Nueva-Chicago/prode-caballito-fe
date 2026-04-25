@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
+import { useMatches } from '@/hooks/useMatches'
+import { usePlanilla } from '@/hooks/usePlanilla'
+import { useBets } from '@/hooks/useBets'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -39,50 +41,19 @@ function PlanillaSkeleton() {
     </div>
   )
 }
-import type { Match, Bet, Planilla as PlanillaType } from '@/types'
+import type { Match } from '@/types'
 
 export function Planilla() {
   const { planillaId } = useParams<{ planillaId: string }>()
   const { user } = useAuthStore()
   const t = useT()
-  const [planilla, setPlanilla] = useState<PlanillaType | null>(null)
-  const [matches, setMatches] = useState<Match[]>([])
-  const [bets, setBets] = useState<Record<string, Bet>>({})
-  const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'todos' | 'pendientes' | 'finalizados'>('todos')
 
-  useEffect(() => {
-    if (!planillaId) return
-    loadData()
-  }, [planillaId])
+  const { planilla, loading: loadingPlanilla } = usePlanilla(planillaId)
+  const { matches, loading: loadingMatches }   = useMatches(200)
+  const { bets, setBets, refetch: refreshBets } = useBets(planillaId)
 
-  const loadData = async () => {
-    setLoading(true)
-    try {
-      const [planRes, matchRes, betRes] = await Promise.all([
-        api.get(`/planillas/${planillaId}`),
-        api.get('/matches?limit=200'),
-        api.get(`/bets/planillas/${planillaId}/bets?t=${Date.now()}`),
-      ])
-      setPlanilla(planRes.data.data)
-      setMatches(matchRes.data.data.matches)
-      const betMap: Record<string, Bet> = {}
-      for (const b of betRes.data.data) betMap[b.match_id] = b
-      setBets(betMap)
-    } catch {
-      // Error handled by empty state
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const refreshBets = async () => {
-    if (!planillaId) return
-    const r = await api.get(`/bets/planillas/${planillaId}/bets?t=${Date.now()}`)
-    const betMap: Record<string, Bet> = {}
-    for (const b of r.data.data) betMap[b.match_id] = b
-    setBets(betMap)
-  }
+  const loading = loadingPlanilla || loadingMatches
 
   const isOwner = planilla?.user_id === user?.id
   const isAdmin = user?.rol === 'admin'
