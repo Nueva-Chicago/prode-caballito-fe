@@ -37,6 +37,26 @@ jobs:
           json-summary-path: coverage/coverage-summary.json
           json-final-path: coverage/coverage-final.json
 
+      - name: Extract coverage percentage
+        id: coverage
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          PCT=$(node -e "const s=require('./coverage/coverage-summary.json'); console.log(Math.round(s.total.statements.pct) + '%')")
+          echo "coverage=$PCT" >> $GITHUB_OUTPUT
+
+      - name: Update coverage badge
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: 6eb515266a2c723d42eec2d6d5292979
+          filename: prode-caballito-fe-coverage.json
+          label: coverage
+          message: ${{ steps.coverage.outputs.coverage }}
+          valColorRange: ${{ steps.coverage.outputs.coverage }}
+          maxColorRange: 100
+          minColorRange: 0
+
   deploy:
     needs: test
     # Solo deployar en push a main (no en PRs)

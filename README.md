@@ -1,54 +1,33 @@
-# React + TypeScript + Vite
+# Prode Caballito — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/cfdelrio/6eb515266a2c723d42eec2d6d5292979/raw/prode-caballito-fe-coverage.json)](https://github.com/cfdelrio/prode-caballito-fe/actions)
 
-Currently, two official plugins are available:
+React 19 + TypeScript + Vite — frontend de [prodecaballito.com](https://prodecaballito.com)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Stack
 
-## Expanding the ESLint configuration
+- React 19 + TypeScript + Vite 6
+- Tailwind CSS v4
+- Zustand (estado global)
+- React Router v6
+- Vitest + Testing Library (unit/component tests)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Desarrollo local
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Tests
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+npm test                 # una sola corrida
+npm run test:coverage    # con reporte de coverage
 ```
+
+## Deploy
+
+El deploy es automático via GitHub Actions al pushear a `main`:
+- Frontend → S3 + CloudFront invalidation
+- Tests con coverage report en cada PR
