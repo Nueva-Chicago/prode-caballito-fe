@@ -195,12 +195,15 @@ export function Ranking() {
           {/* Mi posición */}
           {myEntry && !showOnlyFavorites && (
             <>
-            <div className="t-gradient-hero rounded-xl p-4 text-white">
+            <div className={`t-gradient-hero rounded-xl p-4 text-white ${myEntry.position === 1 ? 'ring-2 ring-yellow-400 ring-offset-1' : ''}`}>
+              {myEntry.position === 1 && (
+                <p className="text-xs text-yellow-300 font-bold mb-2 tracking-wide">👑 ¡Sos el líder! 🔥 No aflojés.</p>
+              )}
               <div
                 onClick={() => setSelected(myEntry)}
                 className="flex items-center gap-4 cursor-pointer hover:opacity-90 transition-opacity"
               >
-                <div className="text-3xl font-black">#{myEntry.position}</div>
+                <div className="text-3xl font-black">{myEntry.position === 1 ? '👑' : `#${myEntry.position}`}</div>
                 {myEntry.user_avatar
                   ? <img src={myEntry.user_avatar} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-white/30 shrink-0" />
                   : <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-lg shrink-0">
@@ -261,7 +264,7 @@ export function Ranking() {
                   <div
                     key={r.planilla_id}
                     onClick={() => setSelected(r)}
-                    className={`grid grid-cols-[2rem_1fr_auto_auto_2rem] gap-2 items-center px-4 py-3 cursor-pointer transition-colors ${i < displayRanking.length - 1 ? 'border-b border-gray-50' : ''} ${isMe ? 't-row-me' : 'hover:bg-gray-50'}`}
+                    className={`grid grid-cols-[2rem_1fr_auto_auto_2rem] gap-2 items-center px-4 py-3 cursor-pointer transition-colors ${i < displayRanking.length - 1 ? `border-b ${i === 0 ? 'border-yellow-100' : 'border-gray-50'}` : ''} ${i === 0 ? 'bg-yellow-50' : (isMe ? 't-row-me' : 'hover:bg-gray-50')}`}
                   >
                     <span className="text-sm font-bold text-gray-400">
                       {i < 3 ? MEDAL[i] : r.position}
