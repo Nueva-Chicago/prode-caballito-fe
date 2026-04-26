@@ -41,14 +41,8 @@ const COUNTRY_CODES = [
 ]
 
 const TEAMS = [
-  { value: 'neutral', label: 'Neutral' },
-  { value: 'boca', label: '🔵 Boca Juniors' },
-  { value: 'river', label: '🔴 River Plate' },
-  { value: 'racing', label: '🩵 Racing Club' },
-  { value: 'independiente', label: '🔴 Independiente' },
-  { value: 'san_lorenzo', label: '🔵 San Lorenzo' },
-  { value: 'estudiantes', label: '🔴 Estudiantes' },
-  { value: 'huracan', label: '⚪ Huracán' },
+  { value: 'neutral', label: '💚 Chicago 1' },
+  { value: 'nueva-chicago', label: '🖤 Chicago 2' },
 ]
 
 export function Register() {
