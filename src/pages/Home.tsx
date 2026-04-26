@@ -459,8 +459,135 @@ function WinnersCarousel({ winners }: { winners: WinnerEntry[] }) {
 }
 
 
+function GuestHome() {
+  const [now, setNow] = useState(new Date())
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60000)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
+
+      {/* Hero + panel derecho */}
+      <div className="-mx-4 md:mx-0 md:flex md:rounded-2xl md:overflow-hidden md:shadow-2xl">
+
+        <div className="text-white overflow-hidden relative md:flex-[3]" style={{ minHeight: 320, background: '#040404' }}>
+          <div className="absolute inset-0 pointer-events-none" style={{
+            backgroundImage: "url('/ChatGPT%20Image%20Apr%2025%2C%202026%2C%2005_00_01%20PM.png')",
+            backgroundSize: 'cover', backgroundPosition: 'center top', opacity: 0.45,
+          }} />
+          <div className="absolute inset-0 pointer-events-none" style={{
+            background: 'linear-gradient(160deg, rgba(0,8,3,0.92) 0%, rgba(0,30,10,0.78) 60%, rgba(0,20,5,0.65) 100%)',
+          }} />
+          <div className="relative px-5 py-5">
+            <div className="inline-flex items-center gap-2 mb-3"
+              style={{ background: 'rgba(0,146,63,0.22)', border: '1px solid rgba(74,222,128,0.4)', borderRadius: 99, padding: '5px 14px' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#4ade80', letterSpacing: '0.06em' }}>🌎 MUNDIAL 2026</span>
+            </div>
+            <h1 className="font-black text-white leading-none mb-1"
+              style={{ fontSize: 'clamp(26px, 5.5vw, 40px)', fontFamily: "'Arial Black', Arial, sans-serif", lineHeight: 0.97 }}>
+              EL MUNDIAL<br />SE JUEGA ACÁ<br />
+              <em style={{ color: '#4ade80', fontStyle: 'italic' }}>TAMBIÉN</em>
+            </h1>
+            <p className="text-white/45 text-xs mt-2 mb-3">
+              Pronosticá todos los partidos. Subí al podio. Llevate premios.
+            </p>
+            <div className="flex flex-col gap-2">
+              <Link to="/register"
+                className="inline-flex items-center gap-2 font-black text-sm px-5 py-2.5 rounded-xl transition-all hover:brightness-110 active:scale-95 w-fit"
+                style={{ background: '#00923f', color: '#ffffff', boxShadow: '0 4px 20px rgba(0,146,63,0.45)' }}>
+                🐂 REGISTRARSE GRATIS
+              </Link>
+              <Link to="/login" className="text-white/35 text-xs hover:text-white/65 transition-colors">
+                Ya tengo cuenta → Iniciar Sesión
+              </Link>
+            </div>
+            <p className="text-white/25 text-[10px] mt-3 tracking-wider font-semibold uppercase">
+              {format(now, "EEEE, d MMM yyyy", { locale: esLocale })}
+            </p>
+          </div>
+        </div>
+
+        {/* Panel derecho */}
+        <div className="hidden md:flex flex-col justify-center px-6 py-5 md:flex-[2] border-l gap-5"
+          style={{ background: 'rgba(0,0,0,0.60)', borderColor: 'rgba(255,255,255,0.08)' }}>
+          <div className="text-center space-y-1">
+            <p className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              MUNDIAL 2026 · YA ARRANCÓ
+            </p>
+            <p className="font-black text-white text-base">64 partidos · 32 selecciones</p>
+            <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.4)' }}>Registrate y empezá a apostar</p>
+          </div>
+          <Link to="/register"
+            className="block text-center font-black text-sm py-3 rounded-xl hover:brightness-110 transition-all"
+            style={{ background: '#00923f', color: '#ffffff' }}>
+            🐂 EMPEZAR GRATIS →
+          </Link>
+          <Link to="/login"
+            className="block text-center font-semibold text-sm py-2.5 rounded-xl transition-all"
+            style={{ color: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.12)' }}>
+            Iniciar Sesión
+          </Link>
+        </div>
+
+      </div>
+
+      {/* Mobile CTAs */}
+      <div className="md:hidden flex flex-col gap-3 px-0">
+        <Link to="/register"
+          className="block text-center font-black text-sm py-3.5 rounded-xl"
+          style={{ background: '#00923f', color: '#fff' }}>
+          🐂 REGISTRARSE GRATIS
+        </Link>
+        <Link to="/login"
+          className="block text-center font-semibold text-sm py-3 rounded-xl"
+          style={{ color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(0,0,0,0.3)' }}>
+          Ya tengo cuenta → Iniciar Sesión
+        </Link>
+      </div>
+
+      {/* Cards de acceso rápido */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { icon: '⚽', label: 'Apostar', desc: 'Participá y sumá puntos' },
+          { icon: '🏆', label: 'Ranking', desc: 'Mirá tu posición' },
+          { icon: '📊', label: 'Matriz', desc: 'Analizá y dominá' },
+        ].map(c => (
+          <Link key={c.label} to="/register"
+            className="t-surface rounded-xl p-3 text-center shadow-sm hover:shadow-md transition-all border t-border-page flex flex-col items-center gap-1.5">
+            <div className="text-3xl">{c.icon}</div>
+            <div className="text-xs font-bold t-text-nav">{c.label}</div>
+            <div className="text-[10px] t-text-muted leading-tight hidden sm:block">{c.desc}</div>
+            <span className="text-[10px] font-bold bg-green-500/15 text-green-600 px-2 py-0.5 rounded-full">Registrate →</span>
+          </Link>
+        ))}
+      </div>
+
+      {/* Banner premios */}
+      <a href="/premios.html" target="_blank" rel="noopener noreferrer"
+        className="block rounded-2xl overflow-hidden"
+        style={{ background: 'linear-gradient(110deg, #002A10 0%, #005C28 55%, #001A08 100%)', border: '1px solid rgba(0,166,80,0.35)' }}>
+        <div className="flex items-center gap-4 px-4 py-4">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg/500px-Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg.png"
+            alt="Nueva Chicago" className="w-12 h-12 object-contain shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold tracking-widest uppercase text-green-400/80 mb-0.5">🏆 Premios reales</p>
+            <p className="text-white font-black text-sm leading-tight">Ganá el Prode y llevate<br />más de $600.000 en premios</p>
+            <p className="text-white/50 text-[11px] mt-0.5">Pileta · Entradas · Ropa · Camiseta firmada</p>
+          </div>
+          <div className="shrink-0 text-xs font-black px-3 py-2 rounded-xl whitespace-nowrap" style={{ background: '#00A650', color: '#fff' }}>
+            Ver premios →
+          </div>
+        </div>
+      </a>
+
+    </div>
+  )
+}
+
 export function Home() {
-  const { user } = useAuthStore()
+  const { user, token } = useAuthStore()
   const t = useT()
   const [matches, setMatches] = useState<Match[]>([])
   const [bets, setBets] = useState<Record<string, Bet>>({})
@@ -474,18 +601,9 @@ export function Home() {
   const { state: pwaState, install: pwaInstall } = usePWAInstall()
   const { show: showToast } = useToastStore()
 
-  // Reloj para el countdown (cada minuto)
-  useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 60000)
-    return () => clearInterval(interval)
-  }, [])
-
-  useEffect(() => { loadData() }, [])
-
-  // Polling cada 30s — se pausa automáticamente cuando el tab está en background
-  usePolling(() => loadData(true), 30_000)
-
+  // loadData definida antes de los useEffect para evitar TDZ
   const loadData = async (silent = false) => {
+    if (!token) return
     if (!silent) setLoading(true)
     try {
       const [matchRes, planillaRes, rankRes, , winnersRes] = await Promise.all([
@@ -522,6 +640,20 @@ export function Home() {
       setLoading(false)
     }
   }
+
+  // Reloj para el countdown (cada minuto)
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 60000)
+    return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => { loadData() }, [])
+
+  // Polling cada 30s — se pausa automáticamente cuando el tab está en background
+  usePolling(() => loadData(true), 30_000)
+
+  // Vista pública — después de todos los hooks
+  if (!token) return <GuestHome />
 
   const refreshBets = async () => {
     if (!planilla) return

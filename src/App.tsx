@@ -68,9 +68,9 @@ export default function App() {
         <Route path="/login"    element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Privadas */}
+        {/* Home pública — logueado ve la home completa, guest ve la vista pública */}
         <Route path="/" element={
-          <RequireAuth><AppLayout adSlot={null}><Home /></AppLayout></RequireAuth>
+          <AppLayout adSlot={null}><Home /></AppLayout>
         } />
         <Route path="/apuestas" element={
           <RequireAuth><AppLayout adSlot="4004171291"><Apuestas /></AppLayout></RequireAuth>
