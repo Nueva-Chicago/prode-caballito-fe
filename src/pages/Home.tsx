@@ -604,6 +604,32 @@ export function Home() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
 
+      {/* Sub-header bar */}
+      <div className="-mx-4 -mt-6 mb-0" style={{ background: '#0a0a0a', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="flex items-center justify-between px-4 py-2.5">
+          <div className="flex items-center gap-2.5">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg/500px-Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg.png"
+              className="w-7 h-7 object-contain shrink-0"
+              alt=""
+            />
+            <div>
+              <p className="text-white text-[11px] font-black leading-none tracking-wide">100 AÑOS EN EL BARRIO</p>
+              <p className="text-[10px] leading-none mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                Nueva Chicago, el club que nos representa a todos en Mataderos
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/fixture"
+            className="text-[11px] font-black px-3 py-1.5 rounded-lg whitespace-nowrap"
+            style={{ background: '#00923f', color: '#fff' }}
+          >
+            VER FIXTURE →
+          </Link>
+        </div>
+      </div>
+
       {/* ── 1+2. HERO + PRÓXIMO PARTIDO ─────────────────────────── */}
       {/* Mobile: edge-to-edge (-mx-4 cancela el px-4 del padre)     */}
       {/* Desktop: side by side, rounded, shadow                      */}
