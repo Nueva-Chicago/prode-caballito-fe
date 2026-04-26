@@ -30,9 +30,9 @@ export function Login() {
     <div className="min-h-screen bg-gradient-to-br from-[#003d1c] to-[#00923f] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         <div className="bg-gradient-to-r from-[#003d1c] to-[#00923f] px-8 py-6 text-center">
-          <div className="text-4xl mb-2">⚽</div>
+          <div className="text-4xl mb-2">🐂</div>
           <h1 className="text-white font-bold text-2xl">PRODE Nueva Chicago</h1>
-          <p className="text-[#ffffff] text-sm mt-1">Qatar 2026</p>
+          <p className="text-white text-sm mt-1 opacity-75">El Torito de Mataderos · Mundial 2026</p>
         </div>
         <form onSubmit={handleSubmit} className="p-8 space-y-4">
           <div>
