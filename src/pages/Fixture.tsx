@@ -138,7 +138,7 @@ export function Fixture() {
   const handleShare = async () => {
     const text = tf.shareText
     if (navigator.share) {
-      try { await navigator.share({ text, url: 'https://prodecaballito.com' }); return } catch {}
+      try { await navigator.share({ text, url: 'https://chicago.prodecaballito.com' }); return } catch {}
     }
     await navigator.clipboard.writeText(text)
     setCopied(true)

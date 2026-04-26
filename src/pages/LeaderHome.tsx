@@ -115,10 +115,10 @@ export function LeaderHome({
 
   const handleShare = async () => {
     const text =
-      `Voy primero en el PRODE Caballito con ${myEntry.puntos_totales} puntos 🏆\n` +
-      `¿Me venís a buscar?\nprodecaballito.com/ranking`
+      `Voy primero en el PRODE Nueva Chicago con ${myEntry.puntos_totales} puntos 🏆\n` +
+      `¿Me venís a buscar?\nchicago.chicago.prodecaballito.com/ranking`
     if (navigator.share) {
-      await navigator.share({ title: 'PRODE Caballito', text }).catch(() => {})
+      await navigator.share({ title: 'PRODE Nueva Chicago', text }).catch(() => {})
     } else {
       await navigator.clipboard.writeText(text)
       setShared(true)

@@ -102,7 +102,7 @@ export function Ranking() {
     const text = t.ranking.shareText(r.user_name, r.position, r.puntos_totales)
     const url = window.location.origin + '/ranking'
     if (navigator.share) {
-      await navigator.share({ title: 'PRODE Caballito', text, url }).catch(() => {})
+      await navigator.share({ title: 'PRODE Nueva Chicago', text, url }).catch(() => {})
     } else {
       await navigator.clipboard.writeText(`${text}\n${url}`)
       setShared(true)

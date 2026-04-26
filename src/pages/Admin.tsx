@@ -1229,7 +1229,7 @@ function JobsTab() {
             <input
               value={waMessage}
               onChange={e => setWaMessage(e.target.value)}
-              placeholder="Mensaje de prueba desde PRODE Caballito"
+              placeholder="Mensaje de prueba desde PRODE Nueva Chicago"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
             />
           </div>
@@ -1287,7 +1287,7 @@ function BroadcastTab() {
         <textarea
           value={message}
           onChange={e => setMessage(e.target.value)}
-          placeholder={"Ejemplo:\n⚽ PRODE Caballito\n\nRecordá apostar el partido de hoy antes de las 20:00 hs.\n\n👉 prodecaballito.com/apuestas"}
+          placeholder={"Ejemplo:\n⚽ PRODE Nueva Chicago\n\nRecordá apostar el partido de hoy antes de las 20:00 hs.\n\n👉 chicago.prodecaballito.com/apuestas"}
           rows={6}
           className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5] resize-none"
         />

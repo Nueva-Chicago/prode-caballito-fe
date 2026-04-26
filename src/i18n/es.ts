@@ -20,9 +20,9 @@ export const es = {
     contextPending: (n: number) => n === 1 ? '⚠️ Te falta 1 pronóstico — no te quedes afuera' : `⚠️ Te faltan ${n} pronósticos por completar`,
     contextDefault: (pos: number) => `Estás en el puesto #${pos} — ¡a sumar más puntos!`,
     contextNoRanking: '¡Bienvenido! Empezá a apostar para aparecer en el ranking.',
-    subtitle: 'PRODE Caballito',
+    subtitle: 'PRODE Nueva Chicago',
     installApp: 'Agregar acceso directo',
-    iosInstallDesc: 'Seguí estos pasos para instalar Prode Caballito en tu pantalla de inicio:',
+    iosInstallDesc: 'Seguí estos pasos para instalar PRODE Nueva Chicago en tu pantalla de inicio:',
     iosStep1Title: 'Tocá el botón Compartir',
     iosStep1Desc: 'Es el ícono de cuadrado con flecha hacia arriba, en la barra inferior de Safari.',
     iosStep2Title: 'Elegí "Agregar a inicio"',
@@ -104,10 +104,10 @@ export const es = {
     fullPlanilla: 'Ver planilla completa', share: '↗ Compartir', copied: '✓ Copiado',
     you: '(vos)', noOfficial: 'IMPAGA', extraBonus: '+Bonus',
     partial: 'Parciales', tendency: 'Tendencia',
-    shareText: (n: string, p: number, pts: number) => `${n} está #${p} en el PRODE Caballito con ${pts} puntos 🏆`,
+    shareText: (n: string, p: number, pts: number) => `${n} está #${p} en el PRODE Nueva Chicago con ${pts} puntos 🏆`,
     shareMyText: (p: number, pts: number) => p === 1
-      ? `¡Soy el líder del PRODE del Mundial 2026! 🥇 ${pts}pts y contando. ¿Alguien me derrota?\n👉 prodecaballito.com/ranking`
-      : `Voy #${p} en el PRODE del Mundial 2026 con ${pts}pts ⚽\n¿Me superás? Anotate gratis 👉 prodecaballito.com`,
+      ? `¡Soy el líder del PRODE del Mundial 2026! 🥇 ${pts}pts y contando. ¿Alguien me derrota?\n👉 chicago.chicago.prodecaballito.com/ranking`
+      : `Voy #${p} en el PRODE del Mundial 2026 con ${pts}pts ⚽\n¿Me superás? Anotate gratis 👉 chicago.prodecaballito.com`,
     shareBtn: '📲 Compartir posición',
     position: 'posición',
     points: 'puntos',
@@ -193,7 +193,7 @@ export const es = {
     noBets: 'Sin pronósticos cargados',
     share: '↗ Compartir',
     shareText: (home: string, away: string, rL: number, rV: number, exact: number, total: number) =>
-      `⚽ ${home} ${rL}-${rV} ${away}\n🎯 ${exact === 0 ? 'Nadie acertó' : exact === 1 ? 'Solo 1 de ' + total + ' acertó' : exact + ' de ' + total + ' acertaron'} el resultado exacto en PRODE Caballito 2026\n\n¿Estabas entre los que la vieron venir? 👉 prodecaballito.com/ranking`,
+      `⚽ ${home} ${rL}-${rV} ${away}\n🎯 ${exact === 0 ? 'Nadie acertó' : exact === 1 ? 'Solo 1 de ' + total + ' acertó' : exact + ' de ' + total + ' acertaron'} el resultado exacto en PRODE Nueva Chicago 2026\n\n¿Estabas entre los que la vieron venir? 👉 chicago.chicago.prodecaballito.com/ranking`,
     copied: '✓ Copiado',
     seeAll: 'Ver todos',
     seeLess: 'Ver menos',
@@ -243,7 +243,7 @@ export const es = {
     bannerTitle: '¡VAMOS ARGENTINA!',
     bannerSubtitle: 'Seguimos juntos en busca de la cuarta ⭐⭐⭐',
     share: 'Compartir',
-    shareText: '¡Seguimos el camino de Argentina en el Mundial 2026! 🇦🇷⭐⭐⭐ prodecaballito.com',
+    shareText: '¡Seguimos el camino de Argentina en el Mundial 2026! 🇦🇷⭐⭐⭐ chicago.prodecaballito.com',
     copied: '✓ Copiado',
     modalHistoryTitle: '🇦🇷 Historial de Argentina',
     modalClose: 'Cerrar',

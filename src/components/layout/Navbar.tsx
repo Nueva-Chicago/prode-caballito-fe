@@ -61,7 +61,7 @@ export function Navbar() {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 font-bold text-lg shrink-0">
           <span style={{ color: 'var(--theme-secondary)' }}>⚽</span>
-          <span className="hidden sm:block text-sm font-semibold">PRODE Caballito</span>
+          <span className="hidden sm:block text-sm font-semibold">PRODE Nueva Chicago</span>
         </Link>
 
         {/* Desktop links */}

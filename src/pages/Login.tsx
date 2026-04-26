@@ -31,7 +31,7 @@ export function Login() {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] px-8 py-6 text-center">
           <div className="text-4xl mb-2">⚽</div>
-          <h1 className="text-white font-bold text-2xl">PRODE Caballito</h1>
+          <h1 className="text-white font-bold text-2xl">PRODE Nueva Chicago</h1>
           <p className="text-[#FFDF00] text-sm mt-1">Qatar 2026</p>
         </div>
         <form onSubmit={handleSubmit} className="p-8 space-y-4">

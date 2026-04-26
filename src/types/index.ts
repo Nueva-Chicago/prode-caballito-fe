@@ -154,9 +154,16 @@ export const TEAM_THEMES: Record<string, {
   ring?: string      // color del borde activo
   badgeUrl?: string  // URL del escudo del club (opcional, fallback a inicial)
 }> = {
-  // Neutral — azul/amarillo genérico de fútbol
+  // Neutral — colores de Nueva Chicago (verde/negro)
   neutral: {
-    primary: '#0042A5', secondary: '#FFDF00', name: 'Neutral',
+    primary: '#00923f', secondary: '#040404', name: 'Nueva Chicago',
+  },
+  // Nueva Chicago — El Torito de Mataderos (verde + negro)
+  nuevachicago: {
+    primary: '#00923f', secondary: '#040404', name: 'Nueva Chicago',
+    pattern: 'linear-gradient(180deg, #00923f 50%, #040404 50%)',
+    fg: '#FFFFFF', ring: '#00923f',
+    badgeUrl: 'https://canuevachicago.com.ar/wp-content/uploads/leaguemanager/131px-Escudo_del_Club_Nueva_Chicago.svg.png',
   },
   // Boca Juniors — azul profundo + banda amarilla horizontal
   boca: {
