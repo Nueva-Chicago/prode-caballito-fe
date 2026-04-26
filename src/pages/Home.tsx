@@ -229,7 +229,7 @@ function NextMatchBanner({ matches, bets, embedded = false }: { matches: Match[]
   )
 }
 
-/* Panel derecho del hero en desktop — tarjeta blanca con countdown + flags */
+/* Panel derecho del hero en desktop — dark con countdown + flags */
 function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Record<string, Bet> }) {
   const [now, setNow] = useState(Date.now())
   useEffect(() => {
@@ -251,25 +251,29 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
   const cdSecs  = Math.floor((diffMs % 60000) / 1000)
 
   return (
-    <div className="hidden md:flex flex-col justify-center px-6 py-5 md:flex-[2] border-l border-gray-100 bg-white gap-4">
+    <div
+      className="hidden md:flex flex-col justify-center px-6 py-5 md:flex-[2] border-l gap-4"
+      style={{ background: 'rgba(0,0,0,0.60)', borderColor: 'rgba(255,255,255,0.08)' }}
+    >
 
       {/* Countdown */}
       <div className="text-center">
-        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">
+        <p className="text-[9px] font-black uppercase tracking-widest mb-2"
+          style={{ color: 'rgba(255,255,255,0.4)' }}>
           FALTA PARA EL PRÓXIMO PARTIDO
         </p>
         <div className="flex items-end justify-center gap-1.5">
           {[{ v: cdDays, l: 'DÍAS' }, { v: cdHours, l: 'HS' }, { v: cdMins, l: 'MIN' }, { v: cdSecs, l: 'SEG' }].map(({ v, l }, i) => (
             <div key={l} className="flex items-end gap-1.5">
-              {i > 0 && <span className="text-gray-200 font-black text-lg pb-4">:</span>}
+              {i > 0 && <span className="font-black text-lg pb-4" style={{ color: 'rgba(255,255,255,0.18)' }}>:</span>}
               <div className="flex flex-col items-center gap-1">
                 <div
                   className="text-2xl font-black tabular-nums rounded-lg px-2 py-1 min-w-[42px] text-center leading-none"
-                  style={{ background: '#006d2e', color: l === 'SEG' ? 'rgba(255,223,0,0.6)' : '#ffffff', fontFamily: "'Arial Black', Arial, sans-serif" }}
+                  style={{ background: '#006d2e', color: '#ffffff', fontFamily: "'Arial Black', Arial, sans-serif" }}
                 >
                   {pad2(v)}
                 </div>
-                <span className="text-[8px] font-black text-gray-400 tracking-widest">{l}</span>
+                <span className="text-[8px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.3)' }}>{l}</span>
               </div>
             </div>
           ))}
@@ -278,8 +282,10 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
 
       {/* Header */}
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">⚡ Próximo partido</p>
-        <Link to="/fixture" className="text-[10px] font-semibold text-blue-500 hover:underline">
+        <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.45)' }}>
+          ⚡ Próximo partido
+        </p>
+        <Link to="/fixture" className="text-[10px] font-semibold hover:underline" style={{ color: '#4ade80' }}>
           Ver fixture →
         </Link>
       </div>
@@ -288,41 +294,42 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
       <div className="flex items-center justify-around gap-2">
         <div className="flex flex-col items-center gap-1.5">
           <span className="text-5xl leading-none">{teamFlag(match.home_team) || '🏳'}</span>
-          <p className="text-xs font-bold text-gray-700 text-center">{match.home_team}</p>
+          <p className="text-xs font-bold text-center" style={{ color: 'rgba(255,255,255,0.8)' }}>{match.home_team}</p>
         </div>
-        <p className="text-sm font-black text-gray-300 px-2">VS</p>
+        <p className="text-sm font-black px-2" style={{ color: 'rgba(255,255,255,0.22)' }}>VS</p>
         <div className="flex flex-col items-center gap-1.5">
           <span className="text-5xl leading-none">{teamFlag(match.away_team) || '🏳'}</span>
-          <p className="text-xs font-bold text-gray-700 text-center">{match.away_team}</p>
+          <p className="text-xs font-bold text-center" style={{ color: 'rgba(255,255,255,0.8)' }}>{match.away_team}</p>
         </div>
       </div>
 
       {/* Date */}
-      <p className="text-center text-[11px] text-gray-400">
+      <p className="text-center text-[11px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
         📅 {dateStr} hs
       </p>
 
       {/* Bet or CTA */}
       {hasBet ? (
         <div>
-          <div className="flex items-center justify-center gap-2 bg-green-50 border border-green-100 rounded-xl py-3">
-            <span className="text-[10px] font-bold text-gray-400 tracking-wide">{teamAbbr(match.home_team)}</span>
-            <span className="font-black text-2xl text-green-600">{bets[match.id].goles_local}</span>
-            <span className="text-gray-300 font-bold text-xl">—</span>
-            <span className="font-black text-2xl text-green-600">{bets[match.id].goles_visitante}</span>
-            <span className="text-[10px] font-bold text-gray-400 tracking-wide">{teamAbbr(match.away_team)}</span>
+          <div className="flex items-center justify-center gap-2 rounded-xl py-3"
+            style={{ background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.2)' }}>
+            <span className="text-[10px] font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>{teamAbbr(match.home_team)}</span>
+            <span className="font-black text-2xl" style={{ color: '#4ade80' }}>{bets[match.id].goles_local}</span>
+            <span className="font-bold text-xl" style={{ color: 'rgba(255,255,255,0.25)' }}>—</span>
+            <span className="font-black text-2xl" style={{ color: '#4ade80' }}>{bets[match.id].goles_visitante}</span>
+            <span className="text-[10px] font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>{teamAbbr(match.away_team)}</span>
           </div>
-          <p className="text-center text-[10px] text-gray-400 mt-2 uppercase tracking-wider font-bold">
+          <p className="text-center text-[10px] mt-2 uppercase tracking-wider font-bold" style={{ color: 'rgba(255,255,255,0.3)' }}>
             TU PRONÓSTICO ✏️
           </p>
         </div>
       ) : (
         <Link
           to="/apuestas"
-          className="block text-center font-black text-sm py-3 rounded-xl hover:brightness-95 transition-all"
-          style={{ background: '#ffffff', color: '#006d2e' }}
+          className="block text-center font-black text-sm py-3 rounded-xl hover:brightness-110 transition-all"
+          style={{ background: '#00923f', color: '#ffffff' }}
         >
-          🎯 Apostar ahora →
+          🎯 APOSTAR AHORA →
         </Link>
       )}
     </div>
@@ -597,6 +604,32 @@ export function Home() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-5">
 
+      {/* Sub-header bar */}
+      <div className="-mx-4 -mt-6 mb-0" style={{ background: '#0a0a0a', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="flex items-center justify-between px-4 py-2.5">
+          <div className="flex items-center gap-2.5">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg/500px-Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg.png"
+              className="w-7 h-7 object-contain shrink-0"
+              alt=""
+            />
+            <div>
+              <p className="text-white text-[11px] font-black leading-none tracking-wide">100 AÑOS EN EL BARRIO</p>
+              <p className="text-[10px] leading-none mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                Nueva Chicago, el club que nos representa a todos en Mataderos
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/fixture"
+            className="text-[11px] font-black px-3 py-1.5 rounded-lg whitespace-nowrap"
+            style={{ background: '#00923f', color: '#fff' }}
+          >
+            VER FIXTURE →
+          </Link>
+        </div>
+      </div>
+
       {/* ── 1+2. HERO + PRÓXIMO PARTIDO ─────────────────────────── */}
       {/* Mobile: edge-to-edge (-mx-4 cancela el px-4 del padre)     */}
       {/* Desktop: side by side, rounded, shadow                      */}
@@ -605,29 +638,29 @@ export function Home() {
       {/* Hero */}
       <div
         className="text-white overflow-hidden relative md:flex-[3]"
-        style={{ minHeight: 280, background: '#006d2e' }}
+        style={{ minHeight: 320, background: '#040404' }}
       >
         {/* Background image */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=1200&q=80')",
-            backgroundSize: 'cover', backgroundPosition: 'center top', opacity: 0.22,
+            backgroundImage: "url('/ChatGPT%20Image%20Apr%2025%2C%202026%2C%2005_00_01%20PM.png')",
+            backgroundSize: 'cover', backgroundPosition: 'center top', opacity: 0.45,
           }}
         />
         {/* Dark overlay */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: 'linear-gradient(135deg, rgba(0,26,75,0.97) 0%, rgba(0,26,75,0.82) 60%, rgba(0,26,75,0.55) 100%)' }}
+          style={{ background: 'linear-gradient(160deg, rgba(0,8,3,0.92) 0%, rgba(0,30,10,0.78) 60%, rgba(0,20,5,0.65) 100%)' }}
         />
 
         <div className="relative px-5 py-5">
 
           {/* Badge */}
           <div className="inline-flex items-center gap-2 mb-3"
-            style={{ background: 'rgba(255,223,0,0.12)', border: '1px solid rgba(255,223,0,0.35)', borderRadius: 99, padding: '5px 14px' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#ffffff', letterSpacing: '0.06em' }}>
-              ✨ PRONÓSTICOS EXCLUSIVOS
+            style={{ background: 'rgba(0,146,63,0.22)', border: '1px solid rgba(74,222,128,0.4)', borderRadius: 99, padding: '5px 14px' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#4ade80', letterSpacing: '0.06em' }}>
+              🌎 MUNDIAL 2026
             </span>
           </div>
 
@@ -637,7 +670,7 @@ export function Home() {
             style={{ fontSize: 'clamp(26px, 5.5vw, 40px)', fontFamily: "'Arial Black', Arial, sans-serif", lineHeight: 0.97 }}
           >
             EL MUNDIAL<br />SE JUEGA ACÁ<br />
-            <em style={{ color: '#ffffff', fontStyle: 'italic' }}>TAMBIÉN</em>
+            <em style={{ color: '#4ade80', fontStyle: 'italic' }}>TAMBIÉN</em>
           </h1>
 
           {/* Saludo sutil */}
@@ -660,9 +693,9 @@ export function Home() {
             <Link
               to="/apuestas"
               className="inline-flex items-center gap-2 font-black text-sm px-5 py-2.5 rounded-xl transition-all hover:brightness-110 active:scale-95"
-              style={{ background: '#ffffff', color: '#006d2e', boxShadow: '0 4px 20px rgba(255,223,0,0.35)' }}
+              style={{ background: '#00923f', color: '#ffffff', boxShadow: '0 4px 20px rgba(0,146,63,0.45)' }}
             >
-              EMPEZÁ TU PRODE ⚡
+              EMPEZÁ TU PRODE +
             </Link>
           )}
 
