@@ -474,7 +474,7 @@ function GuestHome() {
 
         <div className="text-white overflow-hidden relative md:flex-[3]" style={{ minHeight: 320, background: '#040404' }}>
           <div className="absolute inset-0 pointer-events-none" style={{
-            backgroundImage: "url('/ChatGPT%20Image%20Apr%2025%2C%202026%2C%2010_52_03%20PM.png')",
+            backgroundImage: "url('/hero-hincha.png')",
             backgroundSize: 'cover', backgroundPosition: 'center top', opacity: 0.45,
           }} />
           <div className="absolute inset-0 pointer-events-none" style={{
@@ -750,7 +750,7 @@ export function Home() {
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundImage: "url('/ChatGPT%20Image%20Apr%2025%2C%202026%2C%2010_52_03%20PM.png')",
+            backgroundImage: "url('/hero-hincha.png')",
             backgroundSize: 'cover', backgroundPosition: 'center top', opacity: 0.45,
           }}
         />
