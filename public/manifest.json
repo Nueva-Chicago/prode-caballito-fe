@@ -1,17 +1,17 @@
 {
-  "name": "Prode Caballito",
-  "short_name": "Prode",
-  "description": "El prode del Mundial 2026 con tus amigos",
+  "name": "PRODE Nueva Chicago",
+  "short_name": "PRODE Chicago",
+  "description": "El prode del Mundial 2026 para la familia Verdinegra",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#001A4B",
-  "theme_color": "#001A4B",
+  "background_color": "#040404",
+  "theme_color": "#00923f",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/favicon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
