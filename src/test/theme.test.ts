@@ -3,7 +3,7 @@ import { textOnBg, applyTheme } from '@/utils/theme'
 
 describe('textOnBg', () => {
   it('devuelve blanco sobre fondo oscuro', () => {
-    expect(textOnBg('#001A4B')).toBe('#FFFFFF')
+    expect(textOnBg('#006d2e')).toBe('#FFFFFF')
   })
 
   it('devuelve oscuro sobre fondo claro', () => {

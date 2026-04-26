@@ -83,7 +83,7 @@ export function Planilla() {
   if (!planilla) return (
     <div className="max-w-2xl mx-auto px-4 py-10 text-center">
       <p className="text-gray-400">{t.planilla.notFound}</p>
-      <Link to="/profile" className="text-[#0042A5] text-sm hover:underline mt-2 block">{t.planilla.back}</Link>
+      <Link to="/profile" className="text-[#00923f] text-sm hover:underline mt-2 block">{t.planilla.back}</Link>
     </div>
   )
 
@@ -95,7 +95,7 @@ export function Planilla() {
           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 t-text-nav" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
         </Link>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-[#001A4B]">{planilla.nombre_planilla}</h1>
+          <h1 className="text-xl font-bold text-[#006d2e]">{planilla.nombre_planilla}</h1>
           <div className="flex gap-2 mt-0.5">
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${planilla.precio_pagado ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600'}`}>
               {planilla.precio_pagado ? t.planilla.paid : t.planilla.unpaid}
@@ -110,11 +110,11 @@ export function Planilla() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-          <p className="text-3xl font-black text-[#0042A5]">{pts}</p>
+          <p className="text-3xl font-black text-[#00923f]">{pts}</p>
           <p className="text-xs text-gray-400 mt-1">{t.planilla.totalPoints}</p>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-          <p className="text-3xl font-black text-[#001A4B]">{exactos}</p>
+          <p className="text-3xl font-black text-[#006d2e]">{exactos}</p>
           <p className="text-xs text-gray-400 mt-1">{t.planilla.exacts}</p>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
@@ -149,7 +149,7 @@ export function Planilla() {
               </div>
               <div className="bg-gray-100 rounded-full h-1.5">
                 <div
-                  className="bg-[#FFDF00] h-1.5 rounded-full transition-all"
+                  className="bg-[#ffffff] h-1.5 rounded-full transition-all"
                   style={{ width: `${pending ? (betsDone / pending) * 100 : 0}%` }}
                 />
               </div>
@@ -166,7 +166,7 @@ export function Planilla() {
           ['finalizados', t.planilla.finishedFilter],
         ] as const).map(([f, label]) => (
           <button key={f} onClick={() => setFilter(f)}
-            className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${filter === f ? 'bg-white shadow text-[#0042A5]' : 'text-gray-500'}`}>
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${filter === f ? 'bg-white shadow text-[#00923f]' : 'text-gray-500'}`}>
             {label}
           </button>
         ))}

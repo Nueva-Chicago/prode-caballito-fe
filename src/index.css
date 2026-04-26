@@ -6,21 +6,21 @@
 
 :root,
 [data-theme="neutral"] {
-  --theme-nav-bg:      #001A4B;
+  --theme-nav-bg:      #006d2e;
   --theme-nav-bg-2:    #002B7F;
-  --theme-primary:     #0042A5;
-  --theme-secondary:   #FFDF00;
-  --theme-accent-text: #001A4B;
+  --theme-primary:     #00923f;
+  --theme-secondary:   #ffffff;
+  --theme-accent-text: #006d2e;
   --theme-on-primary:  #ffffff;
 }
 
 /* Boca Juniors — azul profundo / oro cálido */
 [data-theme="boca"] {
-  --theme-nav-bg:      #001A4B;
+  --theme-nav-bg:      #006d2e;
   --theme-nav-bg-2:    #00102E;
-  --theme-primary:     #003087;
+  --theme-primary:     #005c28;
   --theme-secondary:   #F5C500;
-  --theme-accent-text: #001A4B;
+  --theme-accent-text: #006d2e;
   --theme-on-primary:  #ffffff;
 }
 

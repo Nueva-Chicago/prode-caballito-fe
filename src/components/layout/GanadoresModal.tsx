@@ -32,7 +32,7 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
         className="relative w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5 py-4" style={{ background: '#001A4B' }}>
+        <div className="flex items-center justify-between px-5 py-4" style={{ background: '#006d2e' }}>
           <h2 className="text-white font-bold text-lg">
             🏆 {data?.matchday_label ?? 'Ganador de la Fecha'}
           </h2>

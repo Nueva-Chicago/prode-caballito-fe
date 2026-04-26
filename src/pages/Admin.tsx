@@ -141,13 +141,13 @@ export function Admin() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-4">
-      <h1 className="text-xl font-bold text-[#001A4B]">⚙️ Administración</h1>
+      <h1 className="text-xl font-bold text-[#006d2e]">⚙️ Administración</h1>
 
       {/* Tabs */}
       <div className="flex gap-1 flex-wrap">
         {tabs.map((t) => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.id ? 'bg-[#001A4B] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.id ? 'bg-[#006d2e] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
             {t.label}
           </button>
         ))}
@@ -185,24 +185,24 @@ export function Admin() {
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Equipo Local</label>
               <input value={matchForm.home_team} onChange={(e) => setMatchForm({ ...matchForm, home_team: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" required />
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]" required />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Equipo Visitante</label>
               <input value={matchForm.away_team} onChange={(e) => setMatchForm({ ...matchForm, away_team: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" required />
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]" required />
             </div>
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">📅 Fecha y hora del partido <span className="text-gray-400 font-normal">(hora local Argentina)</span></label>
             <input type="datetime-local" value={matchForm.start_time} onChange={(e) => setMatchForm({ ...matchForm, start_time: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" required />
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]" required />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Torneo</label>
               <select value={matchForm.tournament_id} onChange={(e) => setMatchForm({ ...matchForm, tournament_id: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]">
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]">
                 <option value="">Sin torneo</option>
                 {tournaments.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
               </select>
@@ -210,19 +210,19 @@ export function Admin() {
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Min. cierre pronóstico</label>
               <input type="number" value={matchForm.halftime_minutes} onChange={(e) => setMatchForm({ ...matchForm, halftime_minutes: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]" />
             </div>
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">📍 Sede</label>
             <input value={matchForm.sede} onChange={(e) => setMatchForm({ ...matchForm, sede: e.target.value })}
-              placeholder="Ciudad de México" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+              placeholder="Ciudad de México" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Grupo</label>
               <select value={matchForm.grupo} onChange={(e) => setMatchForm({ ...matchForm, grupo: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]">
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]">
                 <option value="">—</option>
                 {['A','B','C','D','E','F','G','H','I','J','K','L'].map(g => <option key={g} value={g}>{g}</option>)}
               </select>
@@ -230,7 +230,7 @@ export function Admin() {
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Jornada</label>
               <select value={matchForm.jornada} onChange={(e) => setMatchForm({ ...matchForm, jornada: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]">
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]">
                 <option value="">—</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -238,7 +238,7 @@ export function Admin() {
               </select>
             </div>
           </div>
-          <button type="submit" className="w-full bg-[#0042A5] text-white font-bold py-2.5 rounded-xl hover:bg-[#003080]">
+          <button type="submit" className="w-full bg-[#00923f] text-white font-bold py-2.5 rounded-xl hover:bg-[#005c28]">
             {editMatch ? 'Actualizar' : 'Crear partido'}
           </button>
         </form>
@@ -253,13 +253,13 @@ export function Admin() {
               <label className="block text-xs font-medium text-gray-600 mb-1">{resultMatch?.home_team}</label>
               <input type="number" min={0} value={resultForm.resultado_local}
                 onChange={(e) => setResultForm({ ...resultForm, resultado_local: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-3 text-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-[#0042A5]" required />
+                className="w-full border border-gray-200 rounded-lg px-3 py-3 text-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-[#00923f]" required />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">{resultMatch?.away_team}</label>
               <input type="number" min={0} value={resultForm.resultado_visitante}
                 onChange={(e) => setResultForm({ ...resultForm, resultado_visitante: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-3 text-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-[#0042A5]" required />
+                className="w-full border border-gray-200 rounded-lg px-3 py-3 text-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-[#00923f]" required />
             </div>
           </div>
           <button type="submit" className="w-full bg-green-600 text-white font-bold py-2.5 rounded-xl hover:bg-green-700">
@@ -303,11 +303,11 @@ function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResu
                 <button
                   key={t.id}
                   onClick={() => setSelectedTournamentId(t.id)}
-                  className="bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-[#0042A5] hover:shadow-sm transition-all group"
+                  className="bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-[#00923f] hover:shadow-sm transition-all group"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-semibold text-[#001A4B] group-hover:text-[#0042A5]">{t.name}</p>
+                      <p className="font-semibold text-[#006d2e] group-hover:text-[#00923f]">{t.name}</p>
                       <p className="text-xs text-gray-400 mt-0.5">{t.fase}</p>
                     </div>
                     <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-medium">
@@ -333,12 +333,12 @@ function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResu
       <div className="flex items-center gap-3">
         <button
           onClick={() => setSelectedTournamentId(null)}
-          className="text-sm text-[#0042A5] hover:underline flex items-center gap-1"
+          className="text-sm text-[#00923f] hover:underline flex items-center gap-1"
         >
           ← Torneos
         </button>
         <span className="text-gray-300">|</span>
-        <p className="text-sm font-semibold text-[#001A4B]">{selectedTournament?.name}</p>
+        <p className="text-sm font-semibold text-[#006d2e]">{selectedTournament?.name}</p>
         <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{selectedTournament?.fase}</span>
       </div>
 
@@ -347,7 +347,7 @@ function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResu
         <p className="text-sm text-gray-500">{filtered.length} partidos</p>
         <button
           onClick={() => onNewMatch(selectedTournamentId)}
-          className="bg-[#FFDF00] text-[#001A4B] text-sm font-bold px-4 py-2 rounded-xl hover:bg-yellow-400 transition-colors"
+          className="bg-[#ffffff] text-[#006d2e] text-sm font-bold px-4 py-2 rounded-xl hover:bg-yellow-400 transition-colors"
         >
           + Nuevo partido
         </button>
@@ -372,9 +372,9 @@ function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResu
               ) : filtered.map((m) => (
                 <tr key={m.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-4 py-3">
-                    <span className="font-medium text-[#001A4B]">{m.home_team}</span>
+                    <span className="font-medium text-[#006d2e]">{m.home_team}</span>
                     <span className="text-gray-400 mx-1">vs</span>
-                    <span className="font-medium text-[#001A4B]">{m.away_team}</span>
+                    <span className="font-medium text-[#006d2e]">{m.away_team}</span>
                   </td>
                   <td className="px-4 py-3 text-gray-500 text-xs">
                     {format(new Date(m.start_time), "d MMM HH:mm", { locale: es })}
@@ -484,7 +484,7 @@ function TournamentProgressBars({ t }: { t: TournamentWithCount }) {
         </div>
         <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all ${finished === total && total > 0 ? 'bg-green-500' : 'bg-[#0042A5]'}`}
+            className={`h-full rounded-full transition-all ${finished === total && total > 0 ? 'bg-green-500' : 'bg-[#00923f]'}`}
             style={{ width: `${matchPct}%` }}
           />
         </div>
@@ -613,29 +613,29 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
     <div className="space-y-4">
       {/* Formulario nuevo torneo */}
       <form onSubmit={handleCreate} className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm space-y-3">
-        <h3 className="font-semibold text-[#001A4B] text-sm">Nuevo Torneo</h3>
+        <h3 className="font-semibold text-[#006d2e] text-sm">Nuevo Torneo</h3>
         <div className="grid grid-cols-2 gap-3">
           <input value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
             placeholder="Nombre del torneo" required
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]" />
           <input value={createForm.fase} onChange={(e) => setCreateForm({ ...createForm, fase: e.target.value })}
             placeholder="Fase (Grupos, Octavos...)" required
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs text-gray-500 mb-1">Fecha inicio</label>
             <input type="date" value={createForm.start_date} onChange={(e) => setCreateForm({ ...createForm, start_date: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]" />
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">Fecha fin</label>
             <input type="date" value={createForm.end_date} onChange={(e) => setCreateForm({ ...createForm, end_date: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]" />
           </div>
         </div>
         <button type="submit" disabled={saving}
-          className="bg-[#FFDF00] text-[#001A4B] text-sm font-bold px-4 py-2 rounded-lg hover:bg-yellow-400 disabled:opacity-50">
+          className="bg-[#ffffff] text-[#006d2e] text-sm font-bold px-4 py-2 rounded-lg hover:bg-yellow-400 disabled:opacity-50">
           Crear torneo
         </button>
       </form>
@@ -652,7 +652,7 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
             <div className="flex items-center justify-between px-4 py-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <p className="text-sm font-semibold text-[#001A4B]">{t.name}</p>
+                  <p className="text-sm font-semibold text-[#006d2e]">{t.name}</p>
                   <span className="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{t.fase}</span>
                   {t.match_count != null && t.match_count > 0 && (
                     <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-full font-medium">
@@ -673,7 +673,7 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
                   {t.is_active ? '● Activo' : '○ Inactivo'}
                 </span>
                 <button onClick={() => openEdit(t)}
-                  className={`text-xs px-3 py-1.5 rounded-lg font-medium border transition-all ${editingId === t.id ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}>
+                  className={`text-xs px-3 py-1.5 rounded-lg font-medium border transition-all ${editingId === t.id ? 'bg-[#006d2e] text-white border-[#006d2e]' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}>
                   {editingId === t.id ? 'Cancelar' : 'Editar'}
                 </button>
               </div>
@@ -689,44 +689,44 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Nombre</label>
                     <input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#00923f]" />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Fase</label>
                     <input value={editForm.fase} onChange={(e) => setEditForm({ ...editForm, fase: e.target.value })}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#00923f]" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
                   <input value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                     placeholder="Descripción opcional..."
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#00923f]" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Fecha inicio</label>
                     <input type="date" value={editForm.start_date} onChange={(e) => setEditForm({ ...editForm, start_date: e.target.value })}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#00923f]" />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Fecha fin</label>
                     <input type="date" value={editForm.end_date} onChange={(e) => setEditForm({ ...editForm, end_date: e.target.value })}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#00923f]" />
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" checked={editForm.is_active}
                       onChange={(e) => setEditForm({ ...editForm, is_active: e.target.checked })}
-                      className="w-4 h-4 rounded accent-[#0042A5]" />
+                      className="w-4 h-4 rounded accent-[#00923f]" />
                     <span className="text-xs font-medium text-gray-700">Visible en la app</span>
                   </label>
                 </div>
 
                 {/* Cierre de pronósticos */}
                 <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
-                  <p className="text-xs font-semibold text-[#001A4B] mb-2">⏱ Cierre de pronósticos</p>
+                  <p className="text-xs font-semibold text-[#006d2e] mb-2">⏱ Cierre de pronósticos</p>
                   <p className="text-xs text-gray-500 mb-2">
                     Establecé cuántos minutos antes del inicio se cierran los pronósticos para todos los partidos de este torneo.
                   </p>
@@ -736,14 +736,14 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
                       value={cutoffMinutes[t.id] || ''}
                       onChange={(e) => setCutoffMinutes({ ...cutoffMinutes, [t.id]: e.target.value })}
                       placeholder="ej: 45"
-                      className="w-24 border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+                      className="w-24 border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#00923f]"
                     />
                     <span className="text-xs text-gray-500">minutos antes del partido</span>
                     <button
                       type="button"
                       onClick={() => handleApplyCutoff(t.id)}
                       disabled={applyingCutoff === t.id || !cutoffMinutes[t.id]}
-                      className="text-xs bg-[#0042A5] text-white font-bold px-3 py-1.5 rounded-lg hover:bg-[#003080] disabled:opacity-40 ml-auto"
+                      className="text-xs bg-[#00923f] text-white font-bold px-3 py-1.5 rounded-lg hover:bg-[#005c28] disabled:opacity-40 ml-auto"
                     >
                       {applyingCutoff === t.id ? 'Aplicando...' : 'Aplicar a todos'}
                     </button>
@@ -752,7 +752,7 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
 
                 <div className="flex gap-2 pt-1">
                   <button type="button" onClick={() => handleSaveEdit(t.id)} disabled={saving}
-                    className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50">
+                    className="bg-[#00923f] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#005c28] disabled:opacity-50">
                     Guardar cambios
                   </button>
                   <button type="button" onClick={() => setEditingId(null)}
@@ -860,7 +860,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
             {data.map((p) => (
               <tr key={String(p.id)} className="border-b border-gray-50 hover:bg-gray-50/50">
                 <td className="px-4 py-2 text-gray-600 text-xs">{String(p.user_name || '')}</td>
-                <td className="px-4 py-2 font-medium text-[#001A4B]">{String(p.nombre_planilla || '')}</td>
+                <td className="px-4 py-2 font-medium text-[#006d2e]">{String(p.nombre_planilla || '')}</td>
                 <td className="px-4 py-2 text-center text-gray-600">{String(p.puntos_totales || 0)}</td>
                 <td className="px-4 py-2 text-center">
                   <button onClick={() => handlePaid(String(p.id), Boolean(p.precio_pagado))}
@@ -907,7 +907,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                 className={`border-b border-gray-50 cursor-pointer transition-colors ${isExpanded ? 'bg-blue-50' : 'hover:bg-gray-50/50'}`}
                 onClick={() => handleUserClick(uid)}
               >
-                <td className="px-4 py-2 font-medium text-[#001A4B] flex items-center gap-2">
+                <td className="px-4 py-2 font-medium text-[#006d2e] flex items-center gap-2">
                   <span className="text-gray-400 text-xs">{isExpanded ? '▾' : '▸'}</span>
                   {String(u.nombre || '')}
                 </td>
@@ -941,7 +941,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                         <div className="flex gap-1.5 flex-wrap">
                           <button
                             onClick={(e) => { e.stopPropagation(); setPlanillaTournamentFilter('all') }}
-                            className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all ${planillaTournamentFilter === 'all' ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200'}`}
+                            className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all ${planillaTournamentFilter === 'all' ? 'bg-[#006d2e] text-white border-[#006d2e]' : 'bg-white text-gray-600 border-gray-200'}`}
                           >
                             Todos ({userPlanillas.length})
                           </button>
@@ -949,7 +949,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                             <button
                               key={t}
                               onClick={(e) => { e.stopPropagation(); setPlanillaTournamentFilter(t) }}
-                              className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all ${planillaTournamentFilter === t ? 'bg-[#001A4B] text-white border-[#001A4B]' : 'bg-white text-gray-600 border-gray-200'}`}
+                              className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all ${planillaTournamentFilter === t ? 'bg-[#006d2e] text-white border-[#006d2e]' : 'bg-white text-gray-600 border-gray-200'}`}
                             >
                               {t} ({userPlanillas.filter(p => String(p.tournament_name || '') === t).length})
                             </button>
@@ -961,11 +961,11 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                             <button
                               key={String(p.id)}
                               onClick={(e) => { e.stopPropagation(); navigate(`/planilla/${p.id}`) }}
-                              className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-left hover:border-[#0042A5] hover:shadow-sm transition-all group"
+                              className="bg-white border border-gray-200 rounded-lg px-4 py-3 text-left hover:border-[#00923f] hover:shadow-sm transition-all group"
                             >
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <p className="text-sm font-semibold text-[#001A4B] group-hover:text-[#0042A5]">
+                                  <p className="text-sm font-semibold text-[#006d2e] group-hover:text-[#00923f]">
                                     {String(p.nombre_planilla || 'Planilla')}
                                   </p>
                                   {p.tournament_name ? (
@@ -973,7 +973,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                                   ) : null}
                                 </div>
                                 <div className="text-right shrink-0">
-                                  <p className="text-sm font-black text-[#0042A5]">{String(p.puntos_totales || 0)} pts</p>
+                                  <p className="text-sm font-black text-[#00923f]">{String(p.puntos_totales || 0)} pts</p>
                                   <p className={`text-xs font-medium mt-0.5 ${p.precio_pagado ? 'text-green-600' : 'text-orange-500'}`}>
                                     {p.precio_pagado ? 'Pagada' : 'Sin pagar'}
                                   </p>
@@ -1001,7 +1001,7 @@ function JobCard({ title, description, children }: { title: string; description:
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-3">
       <div>
-        <h3 className="text-sm font-semibold text-[#001A4B]">{title}</h3>
+        <h3 className="text-sm font-semibold text-[#006d2e]">{title}</h3>
         <p className="text-xs text-gray-400 mt-0.5">{description}</p>
       </div>
       {children}
@@ -1064,7 +1064,7 @@ function JobsTab() {
             return 'Ranking recalculado ✓'
           })}
           disabled={!!loading}
-          className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50"
+          className="bg-[#00923f] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#005c28] disabled:opacity-50"
         >
           {loading === 'ranking' ? 'Recalculando...' : 'Ejecutar'}
         </button>
@@ -1079,7 +1079,7 @@ function JobsTab() {
             <select
               value={recalcMatchdayId}
               onChange={e => setRecalcMatchdayId(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]"
             >
               <option value="">— Seleccioná —</option>
               {matchdays.map(m => (
@@ -1096,7 +1096,7 @@ function JobsTab() {
               return `Jornada recalculada ✓ (${data.data?.updated ?? 0} apuestas)`
             })}
             disabled={!!loading || !recalcMatchdayId}
-            className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50 whitespace-nowrap"
+            className="bg-[#00923f] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#005c28] disabled:opacity-50 whitespace-nowrap"
           >
             {loading === 'matchday' ? 'Calculando...' : 'Ejecutar'}
           </button>
@@ -1114,7 +1114,7 @@ function JobsTab() {
               value={winnerEmail}
               onChange={e => setWinnerEmail(e.target.value)}
               placeholder="cfdelrio@gmail.com"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -1124,7 +1124,7 @@ function JobsTab() {
                 value={winnerMatchdayName}
                 onChange={e => setWinnerMatchdayName(e.target.value)}
                 placeholder="Fecha 1"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]"
               />
             </div>
             <div>
@@ -1133,7 +1133,7 @@ function JobsTab() {
                 type="number"
                 value={winnerPoints}
                 onChange={e => setWinnerPoints(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]"
               />
             </div>
           </div>
@@ -1166,7 +1166,7 @@ function JobsTab() {
               value={weeklyTestEmail}
               onChange={e => setWeeklyTestEmail(e.target.value)}
               placeholder="vacío = enviar a todos"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]"
             />
           </div>
           <button
@@ -1176,7 +1176,7 @@ function JobsTab() {
               return `Email semanal: ${data.data.sent} enviados, ${data.data.failed} fallidos`
             })}
             disabled={!!loading}
-            className="bg-[#FFDF00] text-[#001A4B] text-sm font-bold px-5 py-2 rounded-xl hover:bg-yellow-400 disabled:opacity-50 whitespace-nowrap"
+            className="bg-[#ffffff] text-[#006d2e] text-sm font-bold px-5 py-2 rounded-xl hover:bg-yellow-400 disabled:opacity-50 whitespace-nowrap"
           >
             {loading === 'weekly' ? 'Enviando...' : '📤 Enviar'}
           </button>
@@ -1194,7 +1194,7 @@ function JobsTab() {
               value={welcomeEmail}
               onChange={e => setWelcomeEmail(e.target.value)}
               placeholder="usuario@ejemplo.com"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]"
             />
           </div>
           <button
@@ -1204,7 +1204,7 @@ function JobsTab() {
               return `Email de bienvenida enviado a ${welcomeEmail} ✓`
             })}
             disabled={!!loading || !welcomeEmail}
-            className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50 whitespace-nowrap"
+            className="bg-[#00923f] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#005c28] disabled:opacity-50 whitespace-nowrap"
           >
             {loading === 'welcome' ? 'Enviando...' : '📤 Enviar'}
           </button>
@@ -1221,7 +1221,7 @@ function JobsTab() {
               value={waTo}
               onChange={e => setWaTo(e.target.value)}
               placeholder="+5491112345678"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]"
             />
           </div>
           <div>
@@ -1230,7 +1230,7 @@ function JobsTab() {
               value={waMessage}
               onChange={e => setWaMessage(e.target.value)}
               placeholder="Mensaje de prueba desde PRODE Nueva Chicago"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f]"
             />
           </div>
           <button
@@ -1281,7 +1281,7 @@ function BroadcastTab() {
     <div className="space-y-4 max-w-lg">
       <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
         <div>
-          <h3 className="text-sm font-semibold text-[#001A4B] mb-1">📣 Mensaje broadcast por WhatsApp</h3>
+          <h3 className="text-sm font-semibold text-[#006d2e] mb-1">📣 Mensaje broadcast por WhatsApp</h3>
           <p className="text-xs text-gray-400">Se enviará a todos los jugadores que tienen número de WhatsApp y dieron su consentimiento.</p>
         </div>
         <textarea
@@ -1289,7 +1289,7 @@ function BroadcastTab() {
           onChange={e => setMessage(e.target.value)}
           placeholder={"Ejemplo:\n⚽ PRODE Nueva Chicago\n\nRecordá apostar el partido de hoy antes de las 20:00 hs.\n\n👉 chicago.prodecaballito.com/apuestas"}
           rows={6}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5] resize-none"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f] resize-none"
         />
         <div className="flex items-center justify-between">
           <span className="text-xs text-gray-400">{message.length} caracteres</span>
@@ -1303,7 +1303,7 @@ function BroadcastTab() {
         </div>
         {result && (
           <div className="bg-gray-50 rounded-lg px-4 py-3 text-sm space-y-1">
-            <p className="font-medium text-[#001A4B]">Resultado del envío</p>
+            <p className="font-medium text-[#006d2e]">Resultado del envío</p>
             <p className="text-gray-600">Total destinatarios: <span className="font-semibold">{result.total}</span></p>
             <p className="text-green-600">Enviados: <span className="font-semibold">{result.sent}</span></p>
             {result.failed > 0 && <p className="text-red-500">Fallidos: <span className="font-semibold">{result.failed}</span></p>}

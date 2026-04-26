@@ -22,7 +22,7 @@ export function Modal({ open, onClose, title, children, maxWidth = 'max-w-lg' }:
       <div className={`relative bg-white rounded-2xl shadow-2xl w-full ${maxWidth} max-h-[90vh] overflow-y-auto`}>
         {title && (
           <div className="flex items-center justify-between p-5 border-b">
-            <h2 className="text-lg font-bold text-[#001A4B]">{title}</h2>
+            <h2 className="text-lg font-bold text-[#006d2e]">{title}</h2>
             <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
           </div>
         )}

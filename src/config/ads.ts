@@ -48,7 +48,7 @@ export const ADS: Ad[] = [
     ctaText: 'ASOCIARME →',
     ctaUrl: CHICAGO_URL,
     bg: 'linear-gradient(100deg, #002B10 0%, #006B30 60%, #003318 100%)',
-    ctaBg: '#FFDF00',
+    ctaBg: '#ffffff',
     ctaColor: '#003300',
     textColor: '#FFFFFF',
     dimColor: 'rgba(255,255,255,0.5)',

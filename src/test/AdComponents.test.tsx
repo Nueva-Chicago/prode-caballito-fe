@@ -15,9 +15,9 @@ const mockAd = {
   subline: 'Exclusivo para socios',
   ctaText: 'Ver más',
   ctaUrl: 'https://example.com',
-  bg: '#001A4B',
-  ctaBg: '#FFDF00',
-  ctaColor: '#001A4B',
+  bg: '#006d2e',
+  ctaBg: '#ffffff',
+  ctaColor: '#006d2e',
   textColor: '#FFFFFF',
   dimColor: 'rgba(255,255,255,0.5)',
 }

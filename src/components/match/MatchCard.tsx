@@ -49,7 +49,7 @@ function TeamDisplay({ team }: { team: string }) {
         ? <img src={badgeUrl} alt={team} className="w-full h-full object-contain p-1" />
         : flag
           ? <span style={{ fontSize: 32, lineHeight: 1 }}>{flag}</span>
-          : <span className="text-[#001A4B] font-black text-lg leading-none">—</span>
+          : <span className="text-[#006d2e] font-black text-lg leading-none">—</span>
       }
     </div>
   )
@@ -280,7 +280,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
               type="checkbox"
               checked={reminderEnabled}
               onChange={e => setReminderEnabled(e.target.checked)}
-              className="w-4 h-4 accent-[#0042A5] cursor-pointer shrink-0"
+              className="w-4 h-4 accent-[#00923f] cursor-pointer shrink-0"
             />
             <span className="text-xs t-text-muted">{t.match.remindMe}</span>
           </label>
@@ -323,7 +323,7 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
               onChange={(e) => setScore(e.target.value)}
               placeholder="2-1"
               autoFocus
-              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm w-20 text-center focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm w-20 text-center focus:outline-none focus:ring-2 focus:ring-[#00923f]"
               onKeyDown={(e) => e.key === 'Enter' && handleSave()}
             />
           )}

@@ -183,7 +183,7 @@ export function Apuestas() {
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-[#001A4B]">{t.bets.title}</h1>
+        <h1 className="text-xl font-bold text-[#006d2e]">{t.bets.title}</h1>
         <span className="text-sm text-gray-400">{progress.done}/{progress.total} {t.bets.completed}</span>
       </div>
 
@@ -194,7 +194,7 @@ export function Apuestas() {
             <select
               value={selectedPlanilla}
               onChange={(e) => setSelectedPlanilla(e.target.value)}
-              className="w-full appearance-none border border-gray-200 t-text-nav rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5] pr-8 font-medium transition-all"
+              className="w-full appearance-none border border-gray-200 t-text-nav rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#00923f] pr-8 font-medium transition-all"
             >
               {planillas.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre_planilla}</option>
@@ -259,7 +259,7 @@ export function Apuestas() {
             disabled={!allDone}
             className={`w-full font-bold py-3 rounded-xl text-sm transition-colors border-2 ${
               allDone
-                ? 'border-[#0042A5] text-[#0042A5] hover:bg-[#0042A5] hover:text-white cursor-pointer'
+                ? 'border-[#00923f] text-[#00923f] hover:bg-[#00923f] hover:text-white cursor-pointer'
                 : 'border-gray-300 text-gray-400 bg-gray-50 cursor-not-allowed'
             }`}
           >
@@ -281,7 +281,7 @@ export function Apuestas() {
                   <span className="text-gray-700 truncate mr-2">
                     {teamFlag(m.home_team)} {m.home_team} vs {m.away_team} {teamFlag(m.away_team)}
                   </span>
-                  <span className="font-mono font-bold text-[#0042A5] shrink-0">
+                  <span className="font-mono font-bold text-[#00923f] shrink-0">
                     {bets[m.id].goles_local} – {bets[m.id].goles_visitante}
                   </span>
                 </div>
@@ -318,7 +318,7 @@ export function Apuestas() {
               key={key}
               onClick={() => setFilter(key)}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                filter === key ? 'bg-white shadow text-[#0042A5]' : 'text-gray-500 hover:text-gray-700'
+                filter === key ? 'bg-white shadow text-[#00923f]' : 'text-gray-500 hover:text-gray-700'
               }`}
             >
               {label}
@@ -330,7 +330,7 @@ export function Apuestas() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t.bets.searchTeam}
-          className="flex-1 min-w-32 border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#0042A5] bg-white"
+          className="flex-1 min-w-32 border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#00923f] bg-white"
         />
       </div>
 

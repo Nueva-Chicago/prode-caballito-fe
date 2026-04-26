@@ -320,8 +320,8 @@ export function Ranking() {
             <div className="px-6 pt-3 pb-5">
               <div className="flex items-center gap-4">
                 {selected.user_avatar
-                  ? <img src={selected.user_avatar} alt="" className="w-16 h-16 rounded-full object-cover border-4 border-[#0042A5]/20 shrink-0" />
-                  : <div className="w-16 h-16 rounded-full bg-[#0042A5] flex items-center justify-center text-2xl font-black text-white shrink-0">
+                  ? <img src={selected.user_avatar} alt="" className="w-16 h-16 rounded-full object-cover border-4 border-[#00923f]/20 shrink-0" />
+                  : <div className="w-16 h-16 rounded-full bg-[#00923f] flex items-center justify-center text-2xl font-black text-white shrink-0">
                       {selected.user_name[0].toUpperCase()}
                     </div>
                 }
@@ -330,7 +330,7 @@ export function Ranking() {
                     <span className="text-lg font-black">
                       {selected.position <= 3 ? MEDAL[selected.position - 1] : `#${selected.position}`}
                     </span>
-                    <h2 className="text-base font-bold text-[#001A4B] truncate">{selected.user_name}</h2>
+                    <h2 className="text-base font-bold text-[#006d2e] truncate">{selected.user_name}</h2>
                   </div>
                   <p className="text-xs text-gray-400 mt-0.5 truncate">{selected.nombre_planilla}</p>
                   {!selected.precio_pagado && (
@@ -339,7 +339,7 @@ export function Ranking() {
                 </div>
                 <div className="flex flex-col items-end gap-2 shrink-0">
                   <div className="text-right">
-                    <p className="text-3xl font-black text-[#0042A5]">{selected.puntos_totales}</p>
+                    <p className="text-3xl font-black text-[#00923f]">{selected.puntos_totales}</p>
                     <p className="text-xs text-gray-400">{t.ranking.points}</p>
                   </div>
                   {/* Favorito desde el drawer */}
@@ -375,14 +375,14 @@ export function Ranking() {
               <div className="flex gap-3 mt-5">
                 <Link
                   to={`/planilla/${selected.planilla_id}`}
-                  className="flex-1 bg-[#001A4B] text-white text-sm font-bold py-3 rounded-xl text-center hover:bg-[#002870] transition-colors"
+                  className="flex-1 bg-[#006d2e] text-white text-sm font-bold py-3 rounded-xl text-center hover:bg-[#002870] transition-colors"
                   onClick={() => setSelected(null)}
                 >
                   {t.ranking.fullPlanilla}
                 </Link>
                 <button
                   onClick={() => handleShare(selected)}
-                  className="flex-1 border-2 border-[#001A4B] text-[#001A4B] text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                  className="flex-1 border-2 border-[#006d2e] text-[#006d2e] text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   {shared ? t.ranking.copied : t.ranking.share}
                 </button>

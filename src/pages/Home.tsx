@@ -199,7 +199,7 @@ function NextMatchBanner({ matches, bets, embedded = false }: { matches: Match[]
         {!hasBet && (
           <Link to="/apuestas" style={{
             display: 'inline-block', marginTop: 8,
-            background: '#FFCC00', color: '#001A4B',
+            background: '#FFCC00', color: '#006d2e',
             fontSize: 11, fontWeight: 800, padding: '4px 12px',
             borderRadius: 20, textDecoration: 'none',
           }}>
@@ -219,7 +219,7 @@ function NextMatchBanner({ matches, bets, embedded = false }: { matches: Match[]
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #0a0f1e 0%, #001A4B 60%, #0a2060 100%)',
+      background: 'linear-gradient(135deg, #0a0f1e 0%, #006d2e 60%, #0a2060 100%)',
       borderRadius: 16,
       padding: '16px 20px 18px',
       border: '1px solid rgba(255,255,255,0.1)',
@@ -265,7 +265,7 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
               <div className="flex flex-col items-center gap-1">
                 <div
                   className="text-2xl font-black tabular-nums rounded-lg px-2 py-1 min-w-[42px] text-center leading-none"
-                  style={{ background: '#001A4B', color: l === 'SEG' ? 'rgba(255,223,0,0.6)' : '#FFDF00', fontFamily: "'Arial Black', Arial, sans-serif" }}
+                  style={{ background: '#006d2e', color: l === 'SEG' ? 'rgba(255,223,0,0.6)' : '#ffffff', fontFamily: "'Arial Black', Arial, sans-serif" }}
                 >
                   {pad2(v)}
                 </div>
@@ -320,7 +320,7 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
         <Link
           to="/apuestas"
           className="block text-center font-black text-sm py-3 rounded-xl hover:brightness-95 transition-all"
-          style={{ background: '#FFDF00', color: '#001A4B' }}
+          style={{ background: '#ffffff', color: '#006d2e' }}
         >
           🎯 Apostar ahora →
         </Link>
@@ -407,7 +407,7 @@ function WinnersCarousel({ winners }: { winners: WinnerEntry[] }) {
   const w = winners[idx]
 
   return (
-    <div className="rounded-2xl overflow-hidden shadow-md -mx-4 md:mx-0" style={{ background: '#001A4B' }}>
+    <div className="rounded-2xl overflow-hidden shadow-md -mx-4 md:mx-0" style={{ background: '#006d2e' }}>
       <div className="flex items-center justify-between px-4 py-2.5">
         <p className="text-xs font-bold text-white uppercase tracking-widest">🏆 Ganadores de las Fechas</p>
         {winners.length > 1 && (
@@ -439,7 +439,7 @@ function WinnersCarousel({ winners }: { winners: WinnerEntry[] }) {
                 style={{
                   width: i === idx ? 16 : 6, height: 6,
                   borderRadius: 99, border: 'none', cursor: 'pointer',
-                  background: i === idx ? '#FFDF00' : 'rgba(255,255,255,0.3)',
+                  background: i === idx ? '#ffffff' : 'rgba(255,255,255,0.3)',
                   transition: 'all .3s',
                 }}
               />
@@ -605,7 +605,7 @@ export function Home() {
       {/* Hero */}
       <div
         className="text-white overflow-hidden relative md:flex-[3]"
-        style={{ minHeight: 280, background: '#001A4B' }}
+        style={{ minHeight: 280, background: '#006d2e' }}
       >
         {/* Background image */}
         <div
@@ -626,7 +626,7 @@ export function Home() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 mb-3"
             style={{ background: 'rgba(255,223,0,0.12)', border: '1px solid rgba(255,223,0,0.35)', borderRadius: 99, padding: '5px 14px' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#FFDF00', letterSpacing: '0.06em' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#ffffff', letterSpacing: '0.06em' }}>
               ✨ PRONÓSTICOS EXCLUSIVOS
             </span>
           </div>
@@ -637,7 +637,7 @@ export function Home() {
             style={{ fontSize: 'clamp(26px, 5.5vw, 40px)', fontFamily: "'Arial Black', Arial, sans-serif", lineHeight: 0.97 }}
           >
             EL MUNDIAL<br />SE JUEGA ACÁ<br />
-            <em style={{ color: '#FFDF00', fontStyle: 'italic' }}>TAMBIÉN</em>
+            <em style={{ color: '#ffffff', fontStyle: 'italic' }}>TAMBIÉN</em>
           </h1>
 
           {/* Saludo sutil */}
@@ -660,7 +660,7 @@ export function Home() {
             <Link
               to="/apuestas"
               className="inline-flex items-center gap-2 font-black text-sm px-5 py-2.5 rounded-xl transition-all hover:brightness-110 active:scale-95"
-              style={{ background: '#FFDF00', color: '#001A4B', boxShadow: '0 4px 20px rgba(255,223,0,0.35)' }}
+              style={{ background: '#ffffff', color: '#006d2e', boxShadow: '0 4px 20px rgba(255,223,0,0.35)' }}
             >
               EMPEZÁ TU PRODE ⚡
             </Link>
@@ -712,25 +712,25 @@ export function Home() {
             <div className="flex justify-center mb-4">
               <div className="w-10 h-1 rounded-full bg-gray-200" />
             </div>
-            <h3 className="font-bold text-[#001A4B] text-base mb-1">📲 {t.home.installApp}</h3>
+            <h3 className="font-bold text-[#006d2e] text-base mb-1">📲 {t.home.installApp}</h3>
             <p className="text-xs text-gray-400 mb-5">{t.home.iosInstallDesc}</p>
             <ol className="space-y-4">
               <li className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#0042A5] text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">1</span>
+                <span className="w-6 h-6 rounded-full bg-[#00923f] text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">1</span>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">{t.home.iosStep1Title}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{t.home.iosStep1Desc}</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#0042A5] text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">2</span>
+                <span className="w-6 h-6 rounded-full bg-[#00923f] text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">2</span>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">{t.home.iosStep2Title}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{t.home.iosStep2Desc}</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#FFDF00] text-[#001A4B] text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">3</span>
+                <span className="w-6 h-6 rounded-full bg-[#ffffff] text-[#006d2e] text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">3</span>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">{t.home.iosStep3Title}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{t.home.iosStep3Desc}</p>
@@ -739,7 +739,7 @@ export function Home() {
             </ol>
             <button
               onClick={() => setShowIOSGuide(false)}
-              className="mt-6 w-full bg-[#001A4B] text-white font-bold py-3 rounded-xl text-sm"
+              className="mt-6 w-full bg-[#006d2e] text-white font-bold py-3 rounded-xl text-sm"
             >
               {t.home.iosGotIt}
             </button>

@@ -167,8 +167,8 @@ export const TEAM_THEMES: Record<string, {
   },
   // Boca Juniors — azul profundo + banda amarilla horizontal
   boca: {
-    primary: '#003087', secondary: '#F5C500', name: 'Boca Juniors',
-    pattern: 'linear-gradient(180deg, #001A4B 0% 33%, #F5C500 33% 67%, #001A4B 67% 100%)',
+    primary: '#005c28', secondary: '#F5C500', name: 'Boca Juniors',
+    pattern: 'linear-gradient(180deg, #006d2e 0% 33%, #F5C500 33% 67%, #006d2e 67% 100%)',
     fg: '#F5C500', ring: '#F5C500',
     badgeUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Escudo_del_Club_Atl%C3%A9tico_Boca_Juniors.svg/250px-Escudo_del_Club_Atl%C3%A9tico_Boca_Juniors.svg.png',
   },

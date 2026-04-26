@@ -231,7 +231,7 @@ export function Matriz() {
 
       <div className="max-w-7xl mx-auto px-2 flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-bold text-[#001A4B]">{t.matrix.title}</h1>
+          <h1 className="text-xl font-bold text-[#006d2e]">{t.matrix.title}</h1>
           <p className="text-xs text-gray-400 mt-1">
             {t.matrix.players(rows.length)} · {t.matrix.matches(allMatches.length)}
           </p>
@@ -292,15 +292,15 @@ export function Matriz() {
           <div ref={headerInnerRef} className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <table className="text-xs border-collapse min-w-max">
               <thead>
-                <tr className="bg-[#001A4B] text-white">
-                  <th className="sticky left-0 bg-[#001A4B] px-2 py-2 text-left font-semibold z-30 min-w-[140px] sm:min-w-[180px]">
+                <tr className="bg-[#006d2e] text-white">
+                  <th className="sticky left-0 bg-[#006d2e] px-2 py-2 text-left font-semibold z-30 min-w-[140px] sm:min-w-[180px]">
                     {t.ranking.player}
                   </th>
-                  <th className="px-2 py-2 text-center font-semibold w-14 bg-[#001A4B]">{t.ranking.pts}</th>
+                  <th className="px-2 py-2 text-center font-semibold w-14 bg-[#006d2e]">{t.ranking.pts}</th>
                   {allMatches.map((m) => (
                     <th
                       key={m.id}
-                      className="px-1 py-2 text-center font-medium min-w-[60px] bg-[#001A4B] cursor-default"
+                      className="px-1 py-2 text-center font-medium min-w-[60px] bg-[#006d2e] cursor-default"
                       title={`${m.home_team} vs ${m.away_team}${m.estado === 'finished' ? ` · ${m.resultado_local}-${m.resultado_visitante}` : ''}`}
                     >
                       <div className="flex flex-col items-center gap-0.5">
@@ -318,7 +318,7 @@ export function Matriz() {
                           {m.away_team.substring(0,3)}
                         </div>
                         {m.estado === 'finished' && (
-                          <div className="text-[#FFDF00] font-bold text-[10px] leading-none mt-0.5">
+                          <div className="text-[#ffffff] font-bold text-[10px] leading-none mt-0.5">
                             {m.resultado_local}-{m.resultado_visitante}
                           </div>
                         )}
@@ -356,17 +356,17 @@ export function Matriz() {
                   <tr key={rowKey} className={`${rowBg} ${isMe ? 'hover:bg-blue-100/60' : 'hover:bg-yellow-50/50'} transition-colors ${isUnpaid && !isMe ? 'border-l-4 border-orange-400' : ''}`}>
                     <td className={`sticky left-0 px-1.5 sm:px-2 py-1.5 font-medium z-10 border-r border-gray-100 ${rowBg} min-w-[140px] sm:min-w-auto`}>
                       <div className="flex items-center gap-2">
-                        <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isMe ? 'bg-[#0042A5] text-white' : 'bg-gray-200 text-gray-600'}`}>
+                        <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isMe ? 'bg-[#00923f] text-white' : 'bg-gray-200 text-gray-600'}`}>
                           {pos}
                         </span>
                         {r.user_avatar
                           ? <img src={r.user_avatar} alt="" className="w-6 h-6 rounded-full object-cover shrink-0 border border-gray-100" />
-                          : <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isMe ? 'bg-[#0042A5] text-white' : 'bg-gray-300 text-gray-600'}`}>
+                          : <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isMe ? 'bg-[#00923f] text-white' : 'bg-gray-300 text-gray-600'}`}>
                               {r.user_name[0].toUpperCase()}
                             </div>
                         }
                         <div className="min-w-0 flex-1">
-                          <div className={`truncate max-w-[90px] sm:max-w-[105px] text-[11px] sm:text-xs font-semibold ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
+                          <div className={`truncate max-w-[90px] sm:max-w-[105px] text-[11px] sm:text-xs font-semibold ${isMe ? 'text-[#00923f]' : 'text-[#006d2e]'}`}>
                             {r.user_name}
                           </div>
                           {r.nombre_planilla && (
@@ -403,7 +403,7 @@ export function Matriz() {
                         )}
                       </div>
                     </td>
-                    <td className="px-2 py-1.5 text-center font-black text-[#0042A5]">{pts}</td>
+                    <td className="px-2 py-1.5 text-center font-black text-[#00923f]">{pts}</td>
                     {allMatches.map((m) => {
                       const b = playerBets[m.id]
                       const isCutoffPassed = new Date() > new Date(m.time_cutoff)
@@ -475,7 +475,7 @@ export function Matriz() {
             >
               <div className="text-center space-y-3">
                 <div className="text-4xl">🔒</div>
-                <h3 className="font-bold text-[#001A4B] text-base">Período de veda activo</h3>
+                <h3 className="font-bold text-[#006d2e] text-base">Período de veda activo</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">
                   Las apuestas de otros jugadores no se pueden ver hasta que finalice el período de veda de este partido.
                 </p>
@@ -484,7 +484,7 @@ export function Matriz() {
                 </p>
                 <button
                   onClick={() => setShowVedaModal(false)}
-                  className="w-full bg-[#001A4B] text-white font-bold py-2.5 rounded-xl text-sm mt-2 hover:bg-[#002870] transition-colors"
+                  className="w-full bg-[#006d2e] text-white font-bold py-2.5 rounded-xl text-sm mt-2 hover:bg-[#002870] transition-colors"
                 >
                   Entendido
                 </button>

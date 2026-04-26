@@ -27,12 +27,12 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#001A4B] to-[#0042A5] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#003d1c] to-[#00923f] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-        <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] px-8 py-6 text-center">
+        <div className="bg-gradient-to-r from-[#003d1c] to-[#00923f] px-8 py-6 text-center">
           <div className="text-4xl mb-2">⚽</div>
           <h1 className="text-white font-bold text-2xl">PRODE Nueva Chicago</h1>
-          <p className="text-[#FFDF00] text-sm mt-1">Qatar 2026</p>
+          <p className="text-[#ffffff] text-sm mt-1">Qatar 2026</p>
         </div>
         <form onSubmit={handleSubmit} className="p-8 space-y-4">
           <div>
@@ -41,7 +41,7 @@ export function Login() {
               type="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00923f] text-sm"
               placeholder="tu@email.com"
               required
             />
@@ -52,7 +52,7 @@ export function Login() {
               type="password"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00923f] text-sm"
               placeholder="••••••"
               required
             />
@@ -60,13 +60,13 @@ export function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#0042A5] text-white font-bold py-3 rounded-xl hover:bg-[#003080] disabled:opacity-50 transition-colors mt-2"
+            className="w-full bg-[#00923f] text-white font-bold py-3 rounded-xl hover:bg-[#005c28] disabled:opacity-50 transition-colors mt-2"
           >
             {loading ? 'Ingresando...' : 'Iniciar Sesión'}
           </button>
           <p className="text-center text-sm text-gray-500">
             ¿No tenés cuenta?{' '}
-            <Link to="/register" className="text-[#0042A5] font-semibold hover:underline">
+            <Link to="/register" className="text-[#00923f] font-semibold hover:underline">
               Registrate
             </Link>
           </p>

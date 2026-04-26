@@ -56,8 +56,8 @@ export function Reglamento() {
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 pb-20">
 
       {/* Header */}
-      <div className="bg-[#001A4B] text-white rounded-2xl p-5 text-center space-y-1">
-        <p className="text-xs font-semibold tracking-widest text-[#FFDF00] uppercase">Después de 4 años</p>
+      <div className="bg-[#006d2e] text-white rounded-2xl p-5 text-center space-y-1">
+        <p className="text-xs font-semibold tracking-widest text-[#ffffff] uppercase">Después de 4 años</p>
         <h1 className="text-xl font-black">⚽ Vuelve el PRODE del MUNDIAL ⚽</h1>
         <p className="text-sm text-white/70">Instructivo oficial — leelo antes de arrancar</p>
       </div>
@@ -77,7 +77,7 @@ export function Reglamento() {
 
       {/* Sistema de puntaje */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3">
-        <h2 className="font-bold text-[#001A4B] text-base">Sistema de Puntuación</h2>
+        <h2 className="font-bold text-[#006d2e] text-base">Sistema de Puntuación</h2>
         <div className="space-y-2">
           {([
             { color: 'celeste' as const, pts: '4 pts', desc: 'Resultado exacto + ambos goles exactos + 4 o más goles en total (BONUS)' },
@@ -99,7 +99,7 @@ export function Reglamento() {
 
       {/* Ejemplos */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
-        <h2 className="font-bold text-[#001A4B] text-base">Ejemplos Prácticos</h2>
+        <h2 className="font-bold text-[#006d2e] text-base">Ejemplos Prácticos</h2>
         <div className="space-y-3">
           {examples.map((e) => (
             <div key={e.num} className="rounded-xl border border-gray-100 overflow-hidden">
@@ -113,11 +113,11 @@ export function Reglamento() {
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
                     <span className="text-gray-400">Pronóstico</span>
-                    <p className="font-mono font-bold text-[#0042A5]">{e.bet}</p>
+                    <p className="font-mono font-bold text-[#00923f]">{e.bet}</p>
                   </div>
                   <div>
                     <span className="text-gray-400">Resultado real</span>
-                    <p className="font-mono font-bold text-[#001A4B]">{e.result}</p>
+                    <p className="font-mono font-bold text-[#006d2e]">{e.result}</p>
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 leading-relaxed">{e.explain}</p>
@@ -129,7 +129,7 @@ export function Reglamento() {
 
       {/* Precio y formato */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3">
-        <h2 className="font-bold text-[#001A4B] text-base">Participación</h2>
+        <h2 className="font-bold text-[#006d2e] text-base">Participación</h2>
         <ul className="space-y-2 text-sm text-gray-600">
           <li className="flex items-start gap-2"><span className="shrink-0">🎫</span><span>Cada planilla tiene un valor de <strong>$20.000</strong>.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">📋</span><span>Podés participar con <strong>la cantidad de planillas que quieras</strong>, cada una compite por separado.</span></li>
@@ -141,7 +141,7 @@ export function Reglamento() {
 
       {/* Criterios de desempate */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3">
-        <h2 className="font-bold text-[#001A4B] text-base">Criterios de Desempate</h2>
+        <h2 className="font-bold text-[#006d2e] text-base">Criterios de Desempate</h2>
         <p className="text-xs text-gray-500">Solo habrá un ganador. En caso de empate se aplican estos criterios en orden:</p>
         <ol className="space-y-2">
           {[
@@ -151,7 +151,7 @@ export function Reglamento() {
             { label: 'Mayor cantidad de', badge: 'amarillo'as const, suffix: '(1 pt)'  },
           ].map(({ label, badge, suffix }, i) => (
             <li key={badge} className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="w-5 h-5 rounded-full bg-[#001A4B] text-white text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+              <span className="w-5 h-5 rounded-full bg-[#006d2e] text-white text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
               {label} <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${POINT_COLORS[badge]}`}>{badge}</span> {suffix}
             </li>
           ))}
@@ -164,7 +164,7 @@ export function Reglamento() {
 
       {/* Reglas generales */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-2">
-        <h2 className="font-bold text-[#001A4B] text-base">Reglas Generales</h2>
+        <h2 className="font-bold text-[#006d2e] text-base">Reglas Generales</h2>
         <ul className="space-y-2 text-sm text-gray-600">
           <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Los resultados cuentan en los <strong>90 minutos</strong>. No cuentan alargues ni penales.</li>
           <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Podés editar tus pronósticos hasta el cierre (minutos antes del partido).</li>

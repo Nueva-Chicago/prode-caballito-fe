@@ -189,7 +189,7 @@ export function LeaderHome({
           <div style={{ textAlign: 'center', marginBottom: 22 }}>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: `linear-gradient(90deg, #F5C500 0%, #FFDF00 50%, #F5C500 100%)`,
+              background: `linear-gradient(90deg, #F5C500 0%, #ffffff 50%, #F5C500 100%)`,
               backgroundSize: '200% auto',
               animation: 'lh-badge-pop 0.55s cubic-bezier(0.175,0.885,0.32,1.275) both, lh-shimmer 3s linear 0.6s infinite',
               borderRadius: 99,
@@ -261,7 +261,7 @@ export function LeaderHome({
                 style={{
                   background: urgentUnbet > 0
                     ? 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)'
-                    : `linear-gradient(135deg, #F5C500 0%, #FFDF00 100%)`,
+                    : `linear-gradient(135deg, #F5C500 0%, #ffffff 100%)`,
                   color: urgentUnbet > 0 ? TEXT_WHITE : BG_DEEP,
                   fontWeight: 900,
                   fontSize: 14,
@@ -284,7 +284,7 @@ export function LeaderHome({
               <Link
                 to="/ranking"
                 style={{
-                  background: 'linear-gradient(135deg, #F5C500 0%, #FFDF00 100%)',
+                  background: 'linear-gradient(135deg, #F5C500 0%, #ffffff 100%)',
                   color: BG_DEEP,
                   fontWeight: 900,
                   fontSize: 14,
@@ -743,7 +743,7 @@ export function LeaderHome({
             style={{
               background: shared
                 ? 'rgba(74,222,128,0.15)'
-                : `linear-gradient(135deg, #F5C500 0%, #FFDF00 100%)`,
+                : `linear-gradient(135deg, #F5C500 0%, #ffffff 100%)`,
               color: shared ? '#4ade80' : BG_DEEP,
               fontWeight: 900,
               fontSize: 14,

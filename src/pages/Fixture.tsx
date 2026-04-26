@@ -177,7 +177,7 @@ export function Fixture() {
       </div>
 
       {/* ── Dark bracket section ──────────────────────────────────────────── */}
-      <div className="bg-[#001A4B]">
+      <div className="bg-[#006d2e]">
 
         {/* Section title */}
         <div className="text-center pt-6 pb-4 px-4">
@@ -259,7 +259,7 @@ export function Fixture() {
                   className="w-12 h-8 object-cover rounded shadow"
                 />
                 <div>
-                  <div className="font-black text-[#001A4B] text-base leading-tight">{featured.team}</div>
+                  <div className="font-black text-[#006d2e] text-base leading-tight">{featured.team}</div>
                   <div className="text-xs text-gray-400 font-medium">{featured.groupLabel}</div>
                 </div>
               </div>
@@ -283,7 +283,7 @@ export function Fixture() {
             {/* History card */}
             <div
               className="flex-1 lg:flex-none rounded-xl p-4 shadow-lg text-white"
-              style={{ background: 'linear-gradient(135deg, #001A4B 0%, #0a3272 100%)' }}
+              style={{ background: 'linear-gradient(135deg, #006d2e 0%, #0a3272 100%)' }}
             >
               <div className="text-xs font-black tracking-wider leading-snug whitespace-pre-line mb-2">
                 {tf.historyTitle}
@@ -331,7 +331,7 @@ export function Fixture() {
             className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
-            <h3 className="font-black text-[#001A4B] text-lg mb-4">{tf.modalHistoryTitle}</h3>
+            <h3 className="font-black text-[#006d2e] text-lg mb-4">{tf.modalHistoryTitle}</h3>
             <div className="space-y-2.5">
               {HISTORY[lang].map(c => (
                 <div

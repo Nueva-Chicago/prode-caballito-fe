@@ -192,9 +192,9 @@ export function Register() {
   const handleSkipNotifications = () => navigate('/apuestas')
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#001A4B] to-[#0042A5] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#003d1c] to-[#00923f] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-        <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] px-8 py-5 text-center">
+        <div className="bg-gradient-to-r from-[#003d1c] to-[#00923f] px-8 py-5 text-center">
           <h1 className="text-white font-bold text-xl">Crear cuenta</h1>
 
           {/* Stepper con etiquetas */}
@@ -215,19 +215,19 @@ export function Register() {
                     <div key={s.key} className="flex items-center">
                       {/* Línea izquierda */}
                       {i > 0 && (
-                        <div className={`w-10 h-px transition-colors ${i <= currentIdx ? 'bg-[#FFDF00]' : 'bg-white/25'}`} />
+                        <div className={`w-10 h-px transition-colors ${i <= currentIdx ? 'bg-[#ffffff]' : 'bg-white/25'}`} />
                       )}
                       {/* Círculo + label */}
                       <div className="flex flex-col items-center gap-1">
                         <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
-                          done   ? 'bg-[#FFDF00] text-[#001A4B]' :
-                          active ? 'bg-[#FFDF00] text-[#001A4B] ring-2 ring-white/40 ring-offset-1 ring-offset-transparent' :
+                          done   ? 'bg-[#ffffff] text-[#006d2e]' :
+                          active ? 'bg-[#ffffff] text-[#006d2e] ring-2 ring-white/40 ring-offset-1 ring-offset-transparent' :
                                    'bg-white/20 text-white/50'
                         }`}>
                           {done ? '✓' : i + 1}
                         </div>
                         <span className={`text-[9px] font-semibold tracking-wide uppercase transition-colors ${
-                          active || done ? 'text-[#FFDF00]' : 'text-white/35'
+                          active || done ? 'text-[#ffffff]' : 'text-white/35'
                         }`}>
                           {s.label}
                         </span>
@@ -247,28 +247,28 @@ export function Register() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
                 <input type="text" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00923f] text-sm"
                   placeholder="Tu nombre" required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00923f] text-sm"
                   placeholder="tu@email.com" required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
                 <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00923f] text-sm"
                   placeholder="Mínimo 6 caracteres" minLength={6} required />
               </div>
               <button type="submit" disabled={loading}
-                className="w-full bg-[#0042A5] text-white font-bold py-3 rounded-xl hover:bg-[#003080] disabled:opacity-50 transition-colors">
+                className="w-full bg-[#00923f] text-white font-bold py-3 rounded-xl hover:bg-[#005c28] disabled:opacity-50 transition-colors">
                 {loading ? 'Enviando...' : 'Continuar →'}
               </button>
               <p className="text-center text-sm text-gray-500">
                 ¿Ya tenés cuenta?{' '}
-                <Link to="/login" className="text-[#0042A5] font-semibold hover:underline">Iniciá sesión</Link>
+                <Link to="/login" className="text-[#00923f] font-semibold hover:underline">Iniciá sesión</Link>
               </p>
             </form>
           )}
@@ -281,14 +281,14 @@ export function Register() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 text-center">Código de verificación</label>
                 <input type="text" value={code} onChange={(e) => setCode(e.target.value)}
-                  className="w-full border-2 border-[#0042A5] rounded-xl px-4 py-3 focus:outline-none text-2xl font-bold text-center tracking-widest"
+                  className="w-full border-2 border-[#00923f] rounded-xl px-4 py-3 focus:outline-none text-2xl font-bold text-center tracking-widest"
                   placeholder="000000" maxLength={6} required />
               </div>
               <button type="submit" disabled={loading}
-                className="w-full bg-[#0042A5] text-white font-bold py-3 rounded-xl hover:bg-[#003080] disabled:opacity-50 transition-colors">
+                className="w-full bg-[#00923f] text-white font-bold py-3 rounded-xl hover:bg-[#005c28] disabled:opacity-50 transition-colors">
                 {loading ? 'Verificando...' : 'Verificar →'}
               </button>
-              <button type="button" onClick={handleResend} className="w-full text-sm text-gray-500 hover:text-[#0042A5]">
+              <button type="button" onClick={handleResend} className="w-full text-sm text-gray-500 hover:text-[#00923f]">
                 ¿No llegó? Reenviar código
               </button>
             </form>
@@ -303,14 +303,14 @@ export function Register() {
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-dashed border-gray-300 hover:border-[#0042A5] transition-colors bg-gray-50 flex items-center justify-center"
+                  className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-dashed border-gray-300 hover:border-[#00923f] transition-colors bg-gray-50 flex items-center justify-center"
                 >
                   {photoPreview
                     ? <img src={photoPreview} alt="" className="w-full h-full object-cover" />
                     : <span className="text-3xl">📷</span>
                   }
                   {photoPreview && (
-                    <div className="absolute bottom-0 right-0 bg-[#FFDF00] rounded-full p-1 shadow text-xs leading-none">✏️</div>
+                    <div className="absolute bottom-0 right-0 bg-[#ffffff] rounded-full p-1 shadow text-xs leading-none">✏️</div>
                   )}
                 </button>
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoSelect} />
@@ -324,7 +324,7 @@ export function Register() {
                   <select
                     value={countryCode}
                     onChange={e => setCountryCode(e.target.value)}
-                    className="border border-gray-200 rounded-xl px-2 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5] bg-white"
+                    className="border border-gray-200 rounded-xl px-2 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#00923f] bg-white"
                   >
                     {COUNTRY_CODES.map(c => (
                       <option key={c.code} value={c.code}>{c.flag} {c.code}</option>
@@ -336,7 +336,7 @@ export function Register() {
                     onChange={e => setLocalPhone(e.target.value.replace(/\D/g, ''))}
                     placeholder="11 1234 5678"
                     maxLength={12}
-                    className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
+                    className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#00923f] text-sm"
                   />
                 </div>
                 <label className="flex items-start gap-2.5 cursor-pointer mt-2">
@@ -344,7 +344,7 @@ export function Register() {
                     type="checkbox"
                     checked={waConsent}
                     onChange={e => setWaConsent(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 accent-[#0042A5] shrink-0"
+                    className="mt-0.5 w-4 h-4 accent-[#00923f] shrink-0"
                   />
                   <span className="text-xs text-gray-500 leading-relaxed">Acepto que mi número sea visible para otros jugadores en la Matriz</span>
                 </label>
@@ -356,7 +356,7 @@ export function Register() {
                 <div className="grid grid-cols-2 gap-2">
                   {TEAMS.map((t) => (
                     <button key={t.value} type="button" onClick={() => setTema(t.value)}
-                      className={`py-2 px-3 rounded-xl text-sm font-medium border-2 transition-all ${tema === t.value ? 'border-[#0042A5] bg-blue-50 text-[#0042A5]' : 'border-gray-200 hover:border-gray-300'}`}>
+                      className={`py-2 px-3 rounded-xl text-sm font-medium border-2 transition-all ${tema === t.value ? 'border-[#00923f] bg-blue-50 text-[#00923f]' : 'border-gray-200 hover:border-gray-300'}`}>
                       {t.label}
                     </button>
                   ))}
@@ -364,7 +364,7 @@ export function Register() {
               </div>
 
               <button type="submit" disabled={loading}
-                className="w-full bg-[#FFDF00] text-[#001A4B] font-bold py-3 rounded-xl hover:bg-yellow-400 disabled:opacity-50 transition-colors">
+                className="w-full bg-[#ffffff] text-[#006d2e] font-bold py-3 rounded-xl hover:bg-yellow-400 disabled:opacity-50 transition-colors">
                 {loading ? 'Guardando...' : '🎉 ¡Completar registro!'}
               </button>
             </form>
@@ -374,7 +374,7 @@ export function Register() {
             <div className="flex flex-col items-center text-center gap-5">
 
               {/* Ícono */}
-              <div className="w-20 h-20 rounded-full bg-[#001A4B]/8 flex items-center justify-center text-5xl">
+              <div className="w-20 h-20 rounded-full bg-[#006d2e]/8 flex items-center justify-center text-5xl">
                 {notifStatus === 'granted'  ? '✅' :
                  notifStatus === 'denied'   ? '🔕' :
                                              '🔔'}
@@ -384,7 +384,7 @@ export function Register() {
               {notifStatus === 'idle' || notifStatus === 'requesting' ? (
                 <>
                   <div>
-                    <h2 className="text-lg font-bold text-[#001A4B] mb-1">Activá las notificaciones</h2>
+                    <h2 className="text-lg font-bold text-[#006d2e] mb-1">Activá las notificaciones</h2>
                     <p className="text-sm text-gray-500 leading-relaxed">
                       Avisamos cuando cierran los pronósticos, se publican resultados y alguien te supera en el ranking.
                     </p>
@@ -407,7 +407,7 @@ export function Register() {
                     <button
                       onClick={handleAllowNotifications}
                       disabled={notifStatus === 'requesting'}
-                      className="w-full bg-[#001A4B] text-white font-bold py-3.5 rounded-xl hover:bg-[#002870] disabled:opacity-60 transition-colors text-sm"
+                      className="w-full bg-[#006d2e] text-white font-bold py-3.5 rounded-xl hover:bg-[#002870] disabled:opacity-60 transition-colors text-sm"
                     >
                       {notifStatus === 'requesting' ? 'Esperando permiso...' : 'Activar notificaciones'}
                     </button>
@@ -422,15 +422,15 @@ export function Register() {
               ) : notifStatus === 'granted' ? (
                 <>
                   <div>
-                    <h2 className="text-lg font-bold text-[#001A4B] mb-1">¡Todo listo!</h2>
+                    <h2 className="text-lg font-bold text-[#006d2e] mb-1">¡Todo listo!</h2>
                     <p className="text-sm text-gray-500">Notificaciones activadas. Ingresando al Prode...</p>
                   </div>
-                  <div className="w-8 h-8 border-3 border-[#0042A5] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-3 border-[#00923f] border-t-transparent rounded-full animate-spin" />
                 </>
               ) : (
                 <>
                   <div>
-                    <h2 className="text-lg font-bold text-[#001A4B] mb-1">Sin notificaciones</h2>
+                    <h2 className="text-lg font-bold text-[#006d2e] mb-1">Sin notificaciones</h2>
                     <p className="text-sm text-gray-500">Podés activarlas en cualquier momento desde el perfil.</p>
                   </div>
                   <div className="w-8 h-8 border-3 border-gray-300 border-t-transparent rounded-full animate-spin" />
